@@ -1,0 +1,12 @@
+development:
+  adapter: postgresql
+  database: sone
+
+test:
+  adapter: postgresql
+  database: sone_test
+  username: postgres
+
+production:
+  adapter: postgresql
+  database: sone
