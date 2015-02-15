@@ -1,17 +1,17 @@
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
-one:
-  domain_name: MyString
-  screen_name: MyString
-  nickname: MyString
-  profile_text: MyText
-  default_markup: MyString
+user1:
+  domain_name: example.com
+  screen_name: user1
+  nickname: User1
+  profile_text: User1 profile
+  default_markup: plaintext
   kitaguchi_profile_id: 1
 
-two:
-  domain_name: MyString
-  screen_name: MyString
-  nickname: MyString
-  profile_text: MyText
-  default_markup: MyString
-  kitaguchi_profile_id: 1
+user2:
+  domain_name: example.com
+  screen_name: user2
+  nickname: User2
+  profile_text: User2 profile
+  default_markup: plaintext
+  kitaguchi_profile_id: 2

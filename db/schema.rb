@@ -11,10 +11,26 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150208054154) do
+ActiveRecord::Schema.define(version: 20150211031441) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+  enable_extension "pgroonga"
+
+  create_table "documents", force: :cascade do |t|
+    t.string   "title",                             null: false
+    t.text     "description"
+    t.text     "body_yaml",   default: "--- []",    null: false
+    t.text     "fulltext"
+    t.boolean  "private",     default: true,        null: false
+    t.string   "password"
+    t.string   "markup",      default: "plaintext", null: false
+    t.integer  "user_id"
+    t.datetime "created_at",                        null: false
+    t.datetime "updated_at",                        null: false
+  end
+
+  add_index "documents", ["fulltext"], name: "index_documents_on_fulltext", using: :pgroonga
 
   create_table "users", force: :cascade do |t|
     t.string   "domain_name"
