@@ -9,6 +9,7 @@ class DocumentsController < ApplicationController
   def index
     @documents = Document.
       where(:private => false).
+      order("updated_at desc").
       offset(offset).
       limit(41)
   end

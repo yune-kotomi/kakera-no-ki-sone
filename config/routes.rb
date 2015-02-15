@@ -1,4 +1,19 @@
 Rails.application.routes.draw do
+  get 'users/:domain_name/:screen_name',
+    :controller => 'users',
+    :to => 'users#show',
+    :constraints => {:domain_name => /(.*?)/}
+
+  patch 'users/update', :to => 'users#update'
+  post 'users/update', :to => 'users#update'
+
+
+  get 'users/login'
+
+  get 'users/login_complete'
+
+  get 'users/logout'
+
   resources :documents
 
   # The priority is based upon order of creation: first created -> highest priority.

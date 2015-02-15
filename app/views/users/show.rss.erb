@@ -1,0 +1,37 @@
+<%
+rss = RSS::Maker.make('1.0'){|maker|
+	maker.channel.about = url_for(
+		:action => 'show',
+		:domain_name => @user.domain_name,
+		:screen_name => @user.screen_name,
+		:only_path => false
+	)
+
+	maker.channel.title =
+		"#{@user.nickname}: 文書一覧: #{Sone::Application.config.title}"
+	maker.channel.description =
+		"#{@user.nickname}: 文書一覧: #{Sone::Application.config.title}"
+
+	maker.channel.link = url_for(
+		:action => 'show',
+		:domain_name => @user.domain_name,
+		:screen_name => @user.screen_name,
+		:format => nil,
+		:only_path => false
+	)
+
+	maker.items.do_sort = true
+
+	@documents.each{|document|
+		item = maker.items.new_item
+		item.link = url_for(
+			:controller => 'documents',
+			:action=>'show',
+			:id=>document.id,
+			:only_path => false)
+		item.title = document.title
+		item.date = Time.at(document.updated_at.to_i)
+		item.description = h(document.description)
+	}
+}
+%><%= rss.to_s.html_safe %>
