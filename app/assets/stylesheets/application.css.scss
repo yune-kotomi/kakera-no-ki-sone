@@ -1,0 +1,11 @@
+@import "materialize";
+
+nav {
+  a.button-collapse {
+    display: block !important;
+  }
+
+  li>a {
+    display: block;
+  }
+}

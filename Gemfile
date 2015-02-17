@@ -3,15 +3,16 @@ source 'https://rubygems.org'
 gem 'rails', '~> 4.2.0'
 
 gem 'pg'
-gem 'rroonga'
 
 gem 'sass-rails', '~> 5.0'
+gem 'materialize-sass'
 gem 'autoprefixer-rails'
 gem 'uglifier', '>= 1.3.0'
 
 gem 'jquery-rails'
 gem 'opal-rails'
 gem 'turbolinks'
+gem 'jquery-turbolinks'
 
 gem 'jbuilder', '~> 2.0'
 

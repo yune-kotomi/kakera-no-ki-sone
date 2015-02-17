@@ -13,4 +13,8 @@
 //= require jquery
 //= require jquery_ujs
 //= require turbolinks
+//= require jquery.turbolinks
+//= require materialize-sprockets
+//= require opal
+//= require opal-jquery
 //= require_tree .

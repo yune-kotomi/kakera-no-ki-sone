@@ -1,14 +1,63 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Sone</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no"/>
+  <title><%= @title %>: <%= Sone::Application.config.title %></title>
+
   <%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track' => true %>
   <%= javascript_include_tag 'application', 'data-turbolinks-track' => true %>
   <%= csrf_meta_tags %>
 </head>
 <body>
+  <nav class="indigo lighten-1" role="navigation">
+    <div class="container">
+      <div class="nav-wrapper">
+        <ul class="right hide-on-med-and-down">
+          <% if @login_user.blank? %>
+            <li>
+              <%= link_to 'ユーザ登録/ログイン', users_login_path %>
+            </li>
+          <% else %>
+            <li>
+              <%= link_to_user %>
+            </li>
+          <% end %>
+        </ul>
 
-<%= yield %>
+        <ul id="nav-mobile" class="side-nav">
+          <% if @login_user.blank? %>
+            <li>
+              <%= link_to 'ユーザ登録/ログイン', users_login_path %>
+            </li>
+          <% else %>
+            <li class="deep-orange-text hide-on-large-only"><%= @login_user.nickname %></li>
+            <li class="divider hide-on-large-only"></li>
 
-</body>
+            <li>
+              <%= link_to_user '文書一覧' %>
+            </li>
+            <li>
+              <%= link_to 'ログアウト', users_logout_path %>
+            </li>
+          <% end %>
+        </ul>
+        <a href="#" data-activates="nav-mobile" class="button-collapse"><i class="mdi-navigation-menu"></i></a>
+        <span><%= @title %></span>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container">
+    <%= yield %>
+  </div>
+
+  <footer class="page-footer indigo lighten-5">
+    <div class="container">
+      <%= link_to root_path do %>
+        <%= image_tag('logo.png') %>
+      <% end %>
+    </div>
+  </footer>
+  </body>
 </html>

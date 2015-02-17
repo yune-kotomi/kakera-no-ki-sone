@@ -1,2 +1,6 @@
+<%
+  @title = "文書一覧"
+  @title = "#{@title}: #{@user.nickname}" unless @login_user == @user
+ %>
 <h1>Users#show</h1>
 <p>Find me in app/views/users/show.html.erb</p>
