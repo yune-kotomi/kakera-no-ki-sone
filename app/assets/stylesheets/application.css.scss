@@ -9,3 +9,17 @@ nav {
     display: block;
   }
 }
+
+.card {
+  .card-action {
+    text-align: right;
+
+    i {
+      @extend .grey-text, .text-darken-1;
+      font-size: 25px;
+    }
+  }
+}
+
+@import "users";
+@import "documents";

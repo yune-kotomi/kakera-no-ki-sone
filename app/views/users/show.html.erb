@@ -2,5 +2,32 @@
   @title = "文書一覧"
   @title = "#{@title}: #{@user.nickname}" unless @login_user == @user
  %>
-<h1>Users#show</h1>
-<p>Find me in app/views/users/show.html.erb</p>
+
+<div class="row documents">
+  <% @documents.each do |document| %>
+    <div class="col s12 m4">
+      <div class="card small">
+        <div class="card-content">
+          <span class="card-title grey-text text-darken-4"><%= document.title %></span>
+          <p><%= document.description %></p>
+        </div>
+
+        <div class="card-action">
+          <%= link_to document, :method => :delete do %>
+            <i class="mdi-action-delete"></i>
+          <% end %>
+
+          <a href="#"><i class="mdi-content-archive"></i></a>
+        </div>
+      </div>
+    </div>
+  <% end %>
+</div>
+
+<div class="fixed-action-btn" style="bottom: 24px; right: 34px;">
+  <%= form_for @user.documents.build do %>
+    <button class="waves-effect waves-light btn-floating btn-large red">
+      <i class="large mdi-content-add"></i>
+    </button>
+  <% end %>
+</div>
