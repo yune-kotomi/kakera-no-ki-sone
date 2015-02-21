@@ -32,7 +32,7 @@ class DocumentsControllerTest < ActionController::TestCase
         {:user_id => @user.id}
     end
 
-    assert_redirected_to document_path(assigns(:document))
+    assert_redirected_to edit_document_path(assigns(:document))
     assert_equal @user, assigns(:document).user
   end
 
@@ -159,6 +159,9 @@ class DocumentsControllerTest < ActionController::TestCase
         {:user_id => @owner.id}
     end
 
-    assert_redirected_to documents_path
+    assert_redirected_to :controller => :users,
+      :action => :show,
+      :domain_name => @owner.domain_name,
+      :screen_name => @owner.screen_name
   end
 end
