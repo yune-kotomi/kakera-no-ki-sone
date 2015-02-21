@@ -13,7 +13,7 @@
         </div>
 
         <div class="card-action">
-          <%= link_to document, :method => :delete do %>
+          <%= link_to document, :method => :delete, :data => {:confirm => '本当に削除してよろしいですか?'} do %>
             <i class="mdi-action-delete"></i>
           <% end %>
 
