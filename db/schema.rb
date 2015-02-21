@@ -18,7 +18,7 @@ ActiveRecord::Schema.define(version: 20150211031441) do
   enable_extension "pgroonga"
 
   create_table "documents", force: :cascade do |t|
-    t.string   "title",                             null: false
+    t.string   "title",       default: "新しい文書",     null: false
     t.text     "description"
     t.text     "body_yaml",   default: "--- []",    null: false
     t.text     "fulltext"

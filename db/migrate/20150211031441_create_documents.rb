@@ -1,7 +1,7 @@
 class CreateDocuments < ActiveRecord::Migration
   def change
     create_table :documents do |t|
-      t.string :title, :null => false
+      t.string :title, :default => '新しい文書', :null => false
       t.text :description
       t.text :body_yaml, :default => '--- []', :null => false
       t.text :fulltext

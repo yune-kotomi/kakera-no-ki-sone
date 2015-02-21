@@ -28,11 +28,12 @@ class DocumentsControllerTest < ActionController::TestCase
   test "ユーザは文書を作成できる" do
     assert_difference('Document.count') do
       post :create,
-        {:document => @public.attributes},
+        {},
         {:user_id => @user.id}
     end
 
     assert_redirected_to document_path(assigns(:document))
+    assert_equal @user, assigns(:document).user
   end
 
   test "ゲストは公開文書を閲覧できる" do
