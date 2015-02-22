@@ -5,8 +5,7 @@ class UsersController < ApplicationController
     @user = User.where(:domain_name => params[:domain_name], :screen_name => params[:screen_name]).first
     @documents = @user.documents.
       order("updated_at desc").
-      limit(41).
-      offset(offset)
+      page(params[:page])
 
     @documents = @documents.where(:private => false) unless @user == @login_user
   end

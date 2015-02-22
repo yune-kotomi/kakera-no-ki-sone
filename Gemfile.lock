@@ -78,6 +78,9 @@ GEM
       railties (>= 3.1.0)
       turbolinks
     json (1.8.2)
+    kaminari (0.16.3)
+      actionpack (>= 3.0.0)
+      activesupport (>= 3.0.0)
     log4r (1.1.10)
     loofah (2.0.1)
       nokogiri (>= 1.5.9)
@@ -197,6 +200,7 @@ DEPENDENCIES
   did_you_mean
   jquery-rails
   jquery-turbolinks
+  kaminari
   log4r
   materialize-sass
   opal-rails

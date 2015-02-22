@@ -21,5 +21,13 @@ nav {
   }
 }
 
+.pagination {
+  span.page.current>span {
+    @extend .btn-flat, .waves-effect;
+    cursor: auto;
+    font-weight: bold;
+  }
+}
+
 @import "users";
 @import "documents";

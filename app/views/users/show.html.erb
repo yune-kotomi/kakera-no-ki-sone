@@ -35,6 +35,8 @@
   <% end %>
 </div>
 
+<%= paginate(@documents) %>
+
 <div class="fixed-action-btn" style="bottom: 24px; right: 34px;">
   <%= form_for @user.documents.build do %>
     <button class="waves-effect waves-light btn-floating btn-large red">
