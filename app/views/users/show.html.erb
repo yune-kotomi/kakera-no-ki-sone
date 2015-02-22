@@ -23,11 +23,18 @@
 
         <% if @user == @login_user %>
           <div class="card-action">
-            <%= link_to document, :method => :delete, :data => {:confirm => '本当に削除してよろしいですか?'} do %>
+            <%= link_to document,
+              :method => :delete,
+              :data => {:confirm => '本当に削除してよろしいですか?'},
+              :class => 'waves-effect btn-flat' do %>
               <i class="mdi-action-delete"></i>
             <% end %>
 
-            <a href="#"><i class="mdi-content-archive"></i></a>
+            <%= link_to document,
+              :data => {:confirm => '保存記録にしてよろしいですか?'},
+              :class => 'waves-effect btn-flat' do %>
+              <i class="mdi-content-archive"></i>
+            <% end %>
           </div>
         <% end %>
       </div>

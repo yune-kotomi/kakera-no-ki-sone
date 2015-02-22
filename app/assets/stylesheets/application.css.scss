@@ -12,12 +12,18 @@ nav {
 
 .card {
   .card-action {
+    display: flex;
+    justify-content: space-between;
     text-align: right;
 
-    i {
-      @extend .grey-text, .text-darken-1;
-      font-size: 25px;
+    a {
+      margin: 0;
+      i {
+        @extend .grey-text, .text-darken-1;
+        font-size: 25px;
+      }
     }
+
   }
 }
 
