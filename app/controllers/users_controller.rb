@@ -2,8 +2,13 @@ class UsersController < ApplicationController
   protect_from_forgery :except => :update
 
   def show
-    @user = User.where(:domain_name => params[:domain_name], :screen_name => params[:screen_name]).first
+    @user = User.where(
+      :domain_name => params[:domain_name],
+      :screen_name => params[:screen_name]
+    ).first
+
     @documents = @user.documents.
+      where(:archived => params[:archived].present?).
       order("updated_at desc").
       page(params[:page])
 

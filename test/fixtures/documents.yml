@@ -5,6 +5,7 @@ document1:
   description: document 1 description
   body_yaml: --- []
   private: false
+  archived: false
   password:
   markup: plaintext
   user: user1
@@ -23,6 +24,7 @@ document2:
       body: body text 2
       children: []
   private: false
+  archived: false
   password:
   markup: plaintext
   user: user1
@@ -32,6 +34,27 @@ document3:
   description: document 3 description
   body_yaml: --- []
   private: true
+  archived: false
+  password:
+  markup: plaintext
+  user: user1
+
+document4:
+  title: document 4
+  description: document 4 description
+  body_yaml: --- []
+  private: false
+  archived: true
+  password:
+  markup: plaintext
+  user: user1
+
+document5:
+  title: document 5
+  description: document 5 description
+  body_yaml: --- []
+  private: true
+  archived: true
   password:
   markup: plaintext
   user: user1

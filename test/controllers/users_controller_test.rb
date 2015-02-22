@@ -13,6 +13,7 @@ class UsersControllerTest < ActionController::TestCase
   setup do
     WebMock.reset!
     @user = users(:user1)
+    @user2 = users(:user2)
   end
 
   test "loginは認証サービスへリダイレクトする" do
@@ -201,10 +202,74 @@ class UsersControllerTest < ActionController::TestCase
       rss = RSS::Parser.parse(@response.body)
       assert_not_nil rss
 
-      assert_equal @user.documents.where(:private => false).count, rss.items.size
+      assert_equal @user.documents.where(:private => false, :archived => false).count, rss.items.size
 
-      titles = @user.documents.where(:private => false).map{|d| d.title}.sort
+      titles = @user.documents.where(:private => false, :archived => false).map{|d| d.title}.sort
       assert_equal titles, rss.items.map{|item| item.title }.sort
     end
+  end
+
+  test "showはゲストには公開文書のみを表示" do
+    get :show,
+      {:domain_name => @user.domain_name, :screen_name => @user.screen_name}
+
+    assert_equal @user.documents.where(:private => false, :archived => false).count, assigns(:documents).size
+
+    titles = @user.documents.where(:private => false, :archived => false).map{|d| d.title}.sort
+    assert_equal titles, assigns(:documents).map(&:title).sort
+  end
+
+  test "showは他のユーザには公開文書のみを表示" do
+    get :show,
+      {:domain_name => @user.domain_name, :screen_name => @user.screen_name},
+      {:user_id => @user2.id}
+
+    assert_equal @user.documents.where(:private => false, :archived => false).count, assigns(:documents).size
+
+    titles = @user.documents.where(:private => false, :archived => false).map{|d| d.title}.sort
+    assert_equal titles, assigns(:documents).map(&:title).sort
+  end
+
+  test "showはオーナーには全文書を表示" do
+    get :show,
+      {:domain_name => @user.domain_name, :screen_name => @user.screen_name},
+      {:user_id => @user.id}
+
+    assert_equal @user.documents.where(:archived => false).count, assigns(:documents).size
+
+    titles = @user.documents.where(:archived => false).map{|d| d.title}.sort
+    assert_equal titles, assigns(:documents).map(&:title).sort
+  end
+
+  test "show?archived=trueはゲストにはアーカイブ済みの公開文書のみを表示" do
+    get :show,
+      {:domain_name => @user.domain_name, :screen_name => @user.screen_name, :archived => true}
+
+    assert_equal @user.documents.where(:private => false, :archived => true).count, assigns(:documents).size
+
+    titles = @user.documents.where(:private => false, :archived => true).map{|d| d.title}.sort
+    assert_equal titles, assigns(:documents).map(&:title).sort
+  end
+
+  test "show?archived=trueは他ユーザにはアーカイブ済みの公開文書のみを表示" do
+    get :show,
+      {:domain_name => @user.domain_name, :screen_name => @user.screen_name, :archived => true},
+      {:user_id => @user2.id}
+
+    assert_equal @user.documents.where(:private => false, :archived => true).count, assigns(:documents).size
+
+    titles = @user.documents.where(:private => false, :archived => true).map{|d| d.title}.sort
+    assert_equal titles, assigns(:documents).map(&:title).sort
+  end
+
+  test "show?archived=trueはオーナーにはアーカイブ済みの全文書を表示" do
+    get :show,
+      {:domain_name => @user.domain_name, :screen_name => @user.screen_name, :archived => true},
+      {:user_id => @user.id}
+
+    assert_equal @user.documents.where(:archived => true).count, assigns(:documents).size
+
+    titles = @user.documents.where(:archived => true).map{|d| d.title}.sort
+    assert_equal titles, assigns(:documents).map(&:title).sort
   end
 end
