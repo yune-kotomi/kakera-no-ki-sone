@@ -3,6 +3,13 @@ body.users {
     .card {
       .card-content {
         height: 222px !important;
+
+        &>a {
+          display: block;
+          &>p {
+            min-height: 140px;
+          }
+        }
       }
     }
   }

@@ -8,17 +8,28 @@
     <div class="col s12 m4">
       <div class="card small">
         <div class="card-content">
-          <span class="card-title grey-text text-darken-4"><%= document.title %></span>
-          <p><%= document.description %></p>
-        </div>
-
-        <div class="card-action">
-          <%= link_to document, :method => :delete, :data => {:confirm => '本当に削除してよろしいですか?'} do %>
-            <i class="mdi-action-delete"></i>
+          <%
+            if @user == @login_user
+              link = edit_document_path(document)
+            else
+              link = document
+            end
+          %>
+          <%= link_to link do %>
+            <span class="card-title grey-text text-darken-4"><%= document.title %></span>
+            <p><%= document.description %></p>
           <% end %>
-
-          <a href="#"><i class="mdi-content-archive"></i></a>
         </div>
+
+        <% if @user == @login_user %>
+          <div class="card-action">
+            <%= link_to document, :method => :delete, :data => {:confirm => '本当に削除してよろしいですか?'} do %>
+              <i class="mdi-action-delete"></i>
+            <% end %>
+
+            <a href="#"><i class="mdi-content-archive"></i></a>
+          </div>
+        <% end %>
       </div>
     </div>
   <% end %>
