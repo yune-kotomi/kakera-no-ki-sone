@@ -16,7 +16,7 @@ nav {
     justify-content: space-between;
     text-align: right;
 
-    a {
+    a,button {
       margin: 0;
       i {
         @extend .grey-text, .text-darken-1;
@@ -32,6 +32,12 @@ nav {
     @extend .btn-flat, .waves-effect;
     cursor: auto;
     font-weight: bold;
+  }
+}
+
+button {
+  &:focus {
+    background-color: inherit;
   }
 }
 

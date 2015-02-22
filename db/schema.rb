@@ -23,6 +23,7 @@ ActiveRecord::Schema.define(version: 20150211031441) do
     t.text     "body_yaml",   default: "--- []",    null: false
     t.text     "fulltext"
     t.boolean  "private",     default: true,        null: false
+    t.boolean  "archived",    default: false,       null: false
     t.string   "password"
     t.string   "markup",      default: "plaintext", null: false
     t.integer  "user_id"

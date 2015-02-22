@@ -30,10 +30,12 @@
               <i class="mdi-action-delete"></i>
             <% end %>
 
-            <%= link_to document,
-              :data => {:confirm => '保存記録にしてよろしいですか?'},
-              :class => 'waves-effect btn-flat' do %>
-              <i class="mdi-content-archive"></i>
+            <%= form_for(document) do |f| %>
+              <% document.archived = true %>
+              <%= f.hidden_field :archived %>
+              <%= f.button :class => 'waves-effect btn-flat' do %>
+                <i class="mdi-content-archive"></i>
+              <% end %>
             <% end %>
           </div>
         <% end %>
