@@ -35,11 +35,15 @@
             <% end %>
 
             <%= form_for(document) do |f| %>
-              <% document.archived = true %>
-              <%= f.hidden_field :archived %>
               <%= f.button :class => 'waves-effect btn-flat' do %>
-                <i class="mdi-content-archive"></i>
+                <% if document.archived %>
+                  <i class="mdi-content-archive-invert"></i>
+                <% else %>
+                  <i class="mdi-content-archive"></i>
+                <% end %>
               <% end %>
+              <% document.archived = !document.archived %>
+              <%= f.hidden_field :archived %>
             <% end %>
           </div>
         <% end %>

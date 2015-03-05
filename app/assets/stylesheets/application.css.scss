@@ -41,5 +41,13 @@ button {
   }
 }
 
+i.mdi-content-archive-invert {
+  display: block;
+  height: 25px;
+  width: 25px;
+  background-image: url(/assets/ic_archive_48px.svg);
+  background-size: contain;
+}
+
 @import "users";
 @import "documents";
