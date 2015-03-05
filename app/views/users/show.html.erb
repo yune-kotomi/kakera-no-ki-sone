@@ -1,5 +1,9 @@
 <%
-  @title = "文書一覧"
+  if params[:archived]
+    @title = "保存記録"
+  else
+    @title = "文書"
+  end
   @title = "#{@title}: #{@user.nickname}" unless @login_user == @user
  %>
 
