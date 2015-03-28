@@ -1,0 +1,15 @@
+---
+metadatum1:
+  document: document2
+  body_yaml: |
+    ---
+    - id: 05c60f4a-3250-4b54-8a2d-d78b1a5a1ff3
+      children: []
+      data:
+        open: true
+        tags:
+        - tag1
+        - tag2
+    - id: 5d33a7be-c4a8-413b-897e-b882b396f0d8
+      children: []
+      data: {}

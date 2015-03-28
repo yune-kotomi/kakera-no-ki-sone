@@ -1,7 +1,5 @@
-class Document < ActiveRecord::Base
-  belongs_to :user
-  has_one :metadatum
-  validates :markup, :inclusion => ['plaintext', 'hatena', 'markdown']
+class Metadatum < ActiveRecord::Base
+  belongs_to :document
   validate :body_validation
 
   def body
@@ -12,15 +10,16 @@ class Document < ActiveRecord::Base
     self.body_yaml = value.to_yaml
   end
 
+  private
   def body_validation
     unless (body.map{|node| valid_node?(node) }.uniq - [true]).blank?
       errors.add(:body, 'invalid node(s)')
     end
   end
 
-  private
   def valid_node?(target)
-    target.keys.sort == ['id', 'name', 'body', 'children'].sort &&
+    target.keys.sort == ['id', 'data', 'children'].sort &&
+      target['data'].class == Hash &&
       (target['children'].map{|c| valid_node?(c) }.uniq - [true]).blank?
   end
 end
