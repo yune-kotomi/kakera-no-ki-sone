@@ -207,4 +207,9 @@ class UsersControllerTest < ActionController::TestCase
       assert_equal titles, rss.items.map{|item| item.title }.sort
     end
   end
+
+  test "存在しないユーザを叩いたら404" do
+    get :show, :domain_name => 'non-exists', :screen_name => 'non-exists'
+    assert_response :missing
+  end
 end

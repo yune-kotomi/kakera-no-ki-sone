@@ -2,13 +2,21 @@ class UsersController < ApplicationController
   protect_from_forgery :except => :update
 
   def show
-    @user = User.where(:domain_name => params[:domain_name], :screen_name => params[:screen_name]).first
-    @documents = @user.documents.
-      order("updated_at desc").
-      limit(41).
-      offset(offset)
+    @user = User.where(
+      :domain_name => params[:domain_name],
+      :screen_name => params[:screen_name]
+    ).first
 
-    @documents = @documents.where(:private => false) unless @user == @login_user
+    if @user.present?
+      @documents = @user.documents.
+        order("updated_at desc").
+        limit(41).
+        offset(offset)
+
+      @documents = @documents.where(:private => false) unless @user == @login_user
+    else
+      missing
+    end
   end
 
   def login
