@@ -17,4 +17,6 @@
 //= require materialize-sprockets
 //= require opal
 //= require opal-jquery
+//= require juso/models/base
+//= require juso/views/base
 //= require_tree .
