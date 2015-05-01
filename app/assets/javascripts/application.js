@@ -15,6 +15,7 @@
 //= require turbolinks
 //= require jquery.turbolinks
 //= require materialize-sprockets
+//= require jquery.nestable
 //= require opal
 //= require opal-jquery
 //= require juso/models/base
