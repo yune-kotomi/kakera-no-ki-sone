@@ -50,6 +50,14 @@ module JavascriptTestsView
         :attr3 => nil
       }
 
+      setup
+      @test.attr3 = {:attr1 => test_value}
+      raise "attributesが異常: #{@test.attributes.inspect}" unless @test.attributes == {
+        :attr1 => nil,
+        :attr2 => 'default1',
+        :attr3 => {:attr1 => test_value}
+      }
+
       # update_attributes
       setup
       @test.update_attributes(:attr1 => test_value, :attr2 => test_value)

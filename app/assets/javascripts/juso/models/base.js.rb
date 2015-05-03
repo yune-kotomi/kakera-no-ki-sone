@@ -69,7 +69,11 @@ module Juso
       end
 
       def attributes
-        @attributes
+        ret = @attributes.map do |k, v|
+          v = v.attributes if v.respond_to?(:attributes)
+          [k, v]
+        end
+        Hash[ret]
       end
 
       def update_attributes(source)
