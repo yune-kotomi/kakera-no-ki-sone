@@ -155,6 +155,11 @@ module JavascriptTestsView
       value = @test.dom_element(:test4).find('li').text
       raise "値が異常: #{value}" unless value == data[:test4][:test1]
 
+      data = {:test4 => [{:test1 => 'test4-1'}, {:test1 => 'test4-2'}]}
+      setup(data)
+      value = @test.dom_element(:test4).find('li').count
+      raise "数が異常: #{value}" unless value == 2
+
       # 入力イベント
       setup
       value = nil
@@ -174,6 +179,19 @@ module JavascriptTestsView
       end
       @test.dom_element(:test1).trigger(:click)
       raise 'clickイベントが発火していない' unless triggered
+
+      tree_test
+    end
+
+    def self.tree_test
+      tree = Editor::View::Tree.new(
+        :id => 'test', :title => 'test', :leaves => [
+          {:id => '1', :title => '1', :leaves =>
+            [{:id => '1-1', :title => '1-1'}, {:id => '1-2', :title => '1-2'}]
+          }
+        ]
+      )
+      Element.find('#test').append(tree.dom_element)
     end
   end
 end

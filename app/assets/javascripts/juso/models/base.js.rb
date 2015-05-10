@@ -122,7 +122,12 @@ module Juso
             value.each{|v| raise AttributeMustBeAHashOrClassError.new unless [Hash, attribute_definition[:type]].include?(v.class) }
 
             if value.first.is_a?(Hash)
-              previous_attributes = previous_value.map{|v| v.attributes }
+              previous_attributes = if previous_value.nil?
+                nil
+              else
+                previous_value.map{|v| v.attributes }
+              end
+
               unless previous_attributes == value
                 values = value.map{|v| attribute_definition[:type].new(v) }
                 @attributes[name] = values
