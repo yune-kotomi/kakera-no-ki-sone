@@ -8,6 +8,11 @@ module Editor
       attribute :id
       attribute :title
       element :leaves, :selector => 'ol.dd-list', :type => Leaf
+
+      def initialize(data = {}, parent = nil)
+        super(data, parent)
+        dom_element(:leaves).remove if self.leaves.nil? || self.leaves.empty?
+      end
     end
 
     class Tree < Juso::View::Base
@@ -22,6 +27,12 @@ EOS
       attribute :id
       element :title, :selector => 'span.root'
       element :leaves, :selector => 'div.dd>ol.dd-list', :type => Leaf
+      element :nestable, :selector => 'div.dd'
+
+      def initialize(data = {}, parent = nil)
+        super(data, parent)
+        `#{dom_element(:nestable)}.nestable({});`
+      end
     end
   end
 end
