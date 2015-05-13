@@ -184,14 +184,26 @@ module JavascriptTestsView
     end
 
     def self.tree_test
-      tree = Editor::View::Tree.new(
-        :id => 'test', :title => 'test', :leaves => [
+      leaves = [
+        {:id => '1', :title => '1', :leaves =>
+          [{:id => '1-1', :title => '1-1'}, {:id => '1-2', :title => '1-2'}]
+        }
+      ]
+
+      tree = Editor::View::Tree.new(:id => 'test', :title => 'test', :leaves => leaves)
+      Element.find('#test').append(tree.dom_element)
+      tree.observe(:order) do |n|
+        p n
+      end
+
+      Element.find('#set-leaves').on('click') do
+        data = [
           {:id => '1', :title => '1', :leaves =>
-            [{:id => '1-1', :title => '1-1'}, {:id => '1-2', :title => '1-2'}]
+            rand(10).times.map{|i| {:id => "1-#{i}", :title => "1-#{i}"} }
           }
         ]
-      )
-      Element.find('#test').append(tree.dom_element)
+        tree.leaves = data
+      end
     end
   end
 end

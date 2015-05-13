@@ -6,6 +6,8 @@ module Editor
     class Leaf < Juso::View::Base
       template <<-EOS
       <li class="dd-item" data-id="{{attr:id}}">
+        <button data-action="collapse" type="button">Collapse</button>
+        <button data-action="expand" type="button" style="display: none;">Expand</button>
         <div class="dd-handle">Drag</div><div class="dd-content">{{:title}}</div>
         <ol class="dd-list"></ol>
       </li>
@@ -17,7 +19,12 @@ module Editor
 
       def initialize(data = {}, parent = nil)
         super(data, parent)
-        dom_element(:leaves).remove if self.leaves.nil? || self.leaves.empty?
+
+        if self.leaves.nil? || self.leaves.empty?
+          # 子がない場合に不要なものを削除
+          dom_element(:leaves).remove
+          dom_element.find('button').remove
+        end
       end
     end
 
@@ -32,13 +39,37 @@ module Editor
       EOS
 
       attribute :id
+      attribute :order
       element :title, :selector => 'span.root'
       element :leaves, :selector => 'div.dd>ol.dd-list', :type => Leaf
       element :nestable, :selector => 'div.dd'
 
       def initialize(data = {}, parent = nil)
         super(data, parent)
-        `#{dom_element(:nestable)}.nestable({});`
+        init_nestable
+      end
+
+      private
+      def serialize_nestable
+        JSON.parse(`JSON.stringify(#{dom_element(:nestable)}.nestable('serialize'))`)
+      end
+
+      def init_nestable
+        params = {}
+
+        # Nestable初期化時に開閉ボタンが重複して生成されるのを防止
+        dom_element(:nestable).find('button').remove
+
+        %x{
+          var target = #{dom_element(:nestable)};
+          target.nestable(#{params.to_n});
+          target.on('change', function(){#{rearrange}});
+        }
+        update_attribute(:order, serialize_nestable, {:trigger => false})
+      end
+
+      def rearrange
+        self.order = serialize_nestable
       end
     end
   end
