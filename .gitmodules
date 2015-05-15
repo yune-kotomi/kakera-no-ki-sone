@@ -1,0 +1,3 @@
+[submodule "vendor/Nestable"]
+	path = vendor/Nestable
+	url = https://github.com/uniring/Nestable.git

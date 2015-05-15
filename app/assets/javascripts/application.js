@@ -15,6 +15,7 @@
 //= require turbolinks
 //= require jquery.turbolinks
 //= require materialize-sprockets
+//= require jquery-ui
 //= require jquery.nestable
 //= require opal
 //= require opal-jquery

@@ -55,7 +55,7 @@ module Editor
       end
 
       def init_nestable
-        params = {}
+        params = {:scroll => true}
 
         # Nestable初期化時に開閉ボタンが重複して生成されるのを防止
         dom_element(:nestable).find('button').remove
