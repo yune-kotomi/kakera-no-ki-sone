@@ -183,8 +183,8 @@ module Juso
             # 入力系DOM要素ならvalueに値を投入
             elem.value = value
           else
-            # 入力系でなければtextを更新
-            elem.text = value
+            # 入力系でなければhtmlを更新
+            elem.html = value
           end
           update_attribute(name, value)
         end

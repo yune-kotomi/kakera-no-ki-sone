@@ -181,6 +181,9 @@ module JavascriptTestsView
       raise 'clickイベントが発火していない' unless triggered
 
       tree_test
+      display_test
+      editor_test
+      content_test
     end
 
     def self.tree_test
@@ -204,6 +207,44 @@ module JavascriptTestsView
         ]
         tree.leaves = data
       end
+    end
+
+    def self.display_test
+      display = Editor::View::Display.new(
+        :number => '1.1.1',
+        :title => 'title',
+        :body => "line1\nline2\n<tag>\nhogehoge",
+        :tags => ['t1', 't2'].map{|s| {:str => s} }
+      )
+      raise 'bodyが不正' unless display.dom_element(:body_display).html == "line1<br>line2<br>&lt;tag&gt;<br>hogehoge"
+
+      display2 = Editor::View::Display.new(:number => '1.1.2', :title => 'title')
+      display2.body = "line1\nline2\n<tag>\nhogehoge"
+      raise 'bodyが不正' unless display2.dom_element(:body_display).html == "line1<br>line2<br>&lt;tag&gt;<br>hogehoge"
+    end
+
+    def self.editor_test
+      editor = Editor::View::Editor.new(
+        :title => 'title',
+        :body => "line1\nline2\n<tag>\nhogehoge",
+        :tags => ['t1', 't2']
+      )
+      raise 'タグが不正' unless editor.dom_element(:tag_str).value == 't1 t2'
+      editor.dom_element(:tag_str).value = 't3 t4'
+      editor.dom_element(:tag_str).trigger(:input)
+      raise 'タグが更新されていない' unless editor.tags == ['t3', 't4']
+    end
+
+    def self.content_test
+      content = Editor::View::Content.new(
+        :number => '1.1.1',
+        :title => 'title',
+        :body => "line1\nline2\n<tag>\nhogehoge",
+        :tags => ['t1', 't2']
+      )
+      Element.find('#content').append(content.dom_element)
+      Element.find('#edit').on(:click) { content.edit }
+      Element.find('#show').on(:click) { content.show }
     end
   end
 end
