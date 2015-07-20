@@ -1,5 +1,5 @@
 <% @title = "編集: #{@document.title}" %>
-<div class="row">
+<div class="row" id="document-editor">
   <div class="col s12 m4 l5">
     tree
   </div>
@@ -8,3 +8,11 @@
     edit
   </div>
 </div>
+
+<%= hidden_field_tag :id, @document.id, :id => 'document-id' %>
+<%= hidden_field_tag :title, @document.title, :id => 'document-title' %>
+<%= hidden_field_tag :description, @document.description, :id => 'document-description' %>
+<%= hidden_field_tag :body, @document.body.to_json, :id => 'document-body' %>
+<%= hidden_field_tag :private, @document.private.to_json, :id => 'document-private' %>
+<%= hidden_field_tag :archived, @document.archived.to_json, :id => 'document-archived' %>
+<%= hidden_field_tag :markup, @document.markup.to_json, :id => 'document-markup' %>
