@@ -71,7 +71,8 @@ module Juso
           super(name, event) {|*args| block.call(*args) }
         else
           # 知らないイベントはDOMイベントとする
-          elem.on(event) {|*args| block.call(*args) }
+          # 親要素にイベントが伝搬しないようにする
+          elem.on(event) {|*args| block.call(*args); false }
         end
       end
 
