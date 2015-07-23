@@ -187,25 +187,25 @@ module JavascriptTestsView
     end
 
     def self.tree_test
-      leaves = [
-        {:id => '1', :title => '1', :leaves =>
+      children = [
+        {:id => '1', :title => '1', :children =>
           [{:id => '1-1', :title => '1-1'}, {:id => '1-2', :title => '1-2'}]
         }
       ]
 
-      tree = Editor::View::Tree.new(:id => 'test', :title => 'test', :leaves => leaves)
+      tree = Editor::View::Tree.new(:id => 'test', :title => 'test', :children => children)
       Element.find('#test').append(tree.dom_element)
       tree.observe(:order) do |n|
         p n
       end
 
-      Element.find('#set-leaves').on('click') do
+      Element.find('#set-children').on('click') do
         data = [
-          {:id => '1', :title => '1', :leaves =>
+          {:id => '1', :title => '1', :children =>
             rand(10).times.map{|i| {:id => "1-#{i}", :title => "1-#{i}"} }
           }
         ]
-        tree.leaves = data
+        tree.children = data
       end
     end
 
@@ -250,7 +250,7 @@ module JavascriptTestsView
 end
 
 Document.ready? do
-  JavascriptTestsView.execute if Element.find('body.javascript_test')
+  JavascriptTestsView.execute unless Element.find('body.javascript_test').empty?
 end
 
 # view test用
