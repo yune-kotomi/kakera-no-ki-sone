@@ -70,7 +70,15 @@ module Juso
 
       def attributes
         ret = @attributes.map do |k, v|
-          v = v.attributes if v.respond_to?(:attributes)
+          case v
+          when Array
+            v = v.map do |v|
+              v = v.attributes if v.respond_to?(:attributes)
+              v
+            end
+          else
+            v = v.attributes if v.respond_to?(:attributes)
+          end
           [k, v]
         end
         Hash[ret]
