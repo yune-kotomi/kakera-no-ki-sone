@@ -105,6 +105,7 @@ module Editor
 
       element :display, :selector => '.display-container', :type => Display
 
+      attribute :id
       attribute :number
       attribute :title
       attribute :body
@@ -157,6 +158,10 @@ module Editor
       def initialize(data = {}, parent = nil)
         data['children'] = flatten_children(data['children'])
         super(data, parent)
+      end
+
+      def find(target_id)
+        children.find{|c| c.id == target_id }
       end
 
       private

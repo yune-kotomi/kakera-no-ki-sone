@@ -11,6 +11,11 @@ module Editor
         super(data)
         @parent = parent
       end
+
+      def scan(&block)
+        block.call(self)
+        children.each {|c| block.call(c) }
+      end
     end
 
     class Root < Node

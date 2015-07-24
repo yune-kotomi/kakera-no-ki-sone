@@ -14,7 +14,7 @@ module Editor
       EOS
 
       attribute :id
-      attribute :title
+      element :title, :selector => 'div.dd-content'
       element :children, :selector => 'ol.dd-list', :type => Leaf
 
       def initialize(data = {}, parent = nil)
@@ -24,6 +24,14 @@ module Editor
           # 子がない場合に不要なものを削除
           dom_element(:children).remove
           dom_element.find('button').remove
+        end
+      end
+
+      def find(target_id)
+        if id == target_id
+          self
+        else
+          children.find{|c| c.id == target_id }
         end
       end
     end
@@ -47,6 +55,10 @@ module Editor
       def initialize(data = {}, parent = nil)
         super(data, parent)
         init_nestable
+      end
+
+      def find(target_id)
+        children.map{|c| c.find(target_id) }.compact.first
       end
 
       private

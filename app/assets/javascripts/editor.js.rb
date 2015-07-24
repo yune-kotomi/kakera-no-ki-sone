@@ -23,11 +23,23 @@ module Editor
     end
 
     def attach(element)
+      # view生成
       @tree = Editor::View::Tree.new(@document.attributes)
       element.find('.tree-view').append(@tree.dom_element)
-
       @contents = Editor::View::Contents.new(@document.attributes)
       element.find('.content-view').append(@contents.dom_element)
+
+      # 各属性を接続
+      @document.children.each do |c|
+        c.scan do |node|
+          leaf = @tree.find(node.id)
+          content = @contents.find(node.id)
+
+          node.observe(:title) {|t| leaf.title = t }
+          content.observe(:title) {|t| node.title = t }
+          content.observe(:body) {|b| node.body = b }
+        end
+      end
     end
   end
 end
