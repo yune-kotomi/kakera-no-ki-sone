@@ -118,7 +118,7 @@ module Editor
 
         # displayと結合
         self.display = Display.new(
-          data.merge(:tags => data[:tags].map{|t| {:str => t} })
+          data.merge(:tags => (data[:tags]||[]).map{|t| {:str => t} })
         )
         observe(:number) {|n| display.number = n }
         observe(:title) {|t| display.title = t }
@@ -146,6 +146,28 @@ module Editor
     end
 
     class Contents < Juso::View::Base
+      template <<-EOS
+        <div>
+          <div class="children"></div>
+        </div>
+      EOS
+
+      element :children, :selector => 'div.children', :type => Content
+
+      def initialize(data = {}, parent = nil)
+        data['children'] = flatten_children(data['children'])
+        super(data, parent)
+      end
+
+      private
+      def flatten_children(src)
+        case src
+        when Array
+          src.map{|e| flatten_children(e) }
+        when Hash
+          [src, flatten_children(src['children'])]
+        end.flatten
+      end
     end
   end
 end

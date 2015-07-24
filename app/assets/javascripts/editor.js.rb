@@ -14,7 +14,7 @@ module Editor
       @document = Editor::Model::Root.new(
         :id => id,
         :title => title,
-        :body => body,
+        :body => description,
         :children => children,
         :private => private,
         :archived => archived,
@@ -23,14 +23,17 @@ module Editor
     end
 
     def attach(element)
-      @tree = Editor::View::Tree.new(@document.tree)
-      @contents = Editor::View::Contents.new(@document.contents)
+      @tree = Editor::View::Tree.new(@document.attributes)
+      element.find('.tree-view').append(@tree.dom_element)
+
+      @contents = Editor::View::Contents.new(@document.attributes)
+      element.find('.content-view').append(@contents.dom_element)
     end
   end
 end
 
 Document.ready? do
-  if Element.find('#document-editor')
+  unless Element.find('#document-editor').empty?
     editor = Editor::Editor.new
     editor.load_from_dom
     editor.attach(Element.find('#document-editor'))

@@ -15,14 +15,14 @@ module Editor
 
       attribute :id
       attribute :title
-      element :leaves, :selector => 'ol.dd-list', :type => Leaf
+      element :children, :selector => 'ol.dd-list', :type => Leaf
 
       def initialize(data = {}, parent = nil)
         super(data, parent)
 
-        if self.leaves.nil? || self.leaves.empty?
+        if self.children.nil? || self.children.empty?
           # 子がない場合に不要なものを削除
-          dom_element(:leaves).remove
+          dom_element(:children).remove
           dom_element.find('button').remove
         end
       end
@@ -41,7 +41,7 @@ module Editor
       attribute :id
       attribute :order
       element :title, :selector => 'span.root'
-      element :leaves, :selector => 'div.dd>ol.dd-list', :type => Leaf
+      element :children, :selector => 'div.dd>ol.dd-list', :type => Leaf
       element :nestable, :selector => 'div.dd'
 
       def initialize(data = {}, parent = nil)
