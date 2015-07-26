@@ -55,10 +55,23 @@ module Editor
       def initialize(data = {}, parent = nil)
         super(data, parent)
         init_nestable
+        @rearrange_change_observers = []
+        observe(:order) {|current, previous| rearranged(previous, current) }
       end
 
       def find(target_id)
         children.map{|c| c.find(target_id) }.compact.first
+      end
+
+      # 並び替えイベントのオブザーバ登録
+      # ブロック引数は
+      # - 移動するノードID string
+      # - 移動元親ID string
+      # - 移動先親ID string
+      # - 挿入位置 number
+      def rearrange_observe(&block)
+        @rearrange_change_observers.push(block)
+        block
       end
 
       private
@@ -82,6 +95,53 @@ module Editor
 
       def rearrange
         self.order = serialize_nestable
+      end
+
+      def rearranged(previous, current)
+        target, from, _ = find_removed_node(nil, previous, current)
+        _, to, position = find_removed_node(nil, current, previous)
+
+
+        @rearrange_change_observers.each do |o|
+          o.call(target, from, to, position)
+        end
+      end
+
+      def find_removed_node(from, previous_source, current_source)
+        previous = (previous_source||[]).map{|s| s['id'] }
+        current = (current_source||[]).map{|s| s['id'] }
+
+        if previous.size > current.size
+          target = (previous - current).first
+          position = previous.index(target)
+          return [target, from, position]
+        elsif (previous.size == current.size) && (previous != current)
+          # 同一配列内で移動を行った場合
+          prev_sub = []
+          curr_sub = []
+          previous.each_with_index do |id, i|
+            if current[i] != id
+              prev_sub.push(id)
+              curr_sub.push(current[i])
+            end
+          end
+
+          prev_sub.each do |id|
+            if (prev_sub - [id]) == (curr_sub - [id])
+              target = id
+              position = previous.index(id)
+              return [target, from, position]
+            end
+          end
+        else
+          # この階層じゃないので下に潜る
+          previous_source.each do |previous_child|
+            current_child = current_source.find{|c| c['id'] == previous_child['id'] }
+            target, from, position = find_removed_node(previous_child['id'], previous_child['children'], current_child['children'])
+
+            return [target, from, position] unless target.nil?
+          end
+        end
       end
     end
   end

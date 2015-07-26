@@ -38,4 +38,9 @@ Rails.application.configure do
 
   # Raises error for missing translations
   # config.action_view.raise_on_missing_translations = true
+
+  # Enable/disable /opal_specs route
+  config.opal.enable_specs        = true
+
+  config.opal.spec_location = 'spec-opal'
 end
