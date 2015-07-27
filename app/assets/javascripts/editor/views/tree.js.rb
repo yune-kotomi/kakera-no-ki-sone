@@ -31,7 +31,7 @@ module Editor
         if id == target_id
           self
         else
-          children.find{|c| c.id == target_id }
+          children.map{|c| c.find(target_id) }.compact.first
         end
       end
     end
@@ -57,10 +57,15 @@ module Editor
         init_nestable
         @rearrange_change_observers = []
         observe(:order) {|current, previous| rearranged(previous, current) }
+        rearrange_observe {|t, f, to, pos| rearrange_leaves(t, f, to, pos) }
       end
 
       def find(target_id)
-        children.map{|c| c.find(target_id) }.compact.first
+        if target_id.nil?
+          self
+        else
+          children.map{|c| c.find(target_id) }.compact.first
+        end
       end
 
       # 並び替えイベントのオブザーバ登録
@@ -142,6 +147,15 @@ module Editor
             return [target, from, position] unless target.nil?
           end
         end
+      end
+
+      # 内部で保持しているLeafオブジェクト群を並び替える
+      def rearrange_leaves(target_id, from_id, to_id, position)
+        target = find(target_id)
+        from = find(from_id)
+        to = find(to_id)
+        from.children.delete(target)
+        to.children.insert(position, target)
       end
     end
   end
