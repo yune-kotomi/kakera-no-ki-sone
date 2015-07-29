@@ -97,7 +97,7 @@ module Editor
 
     class Content < Juso::View::Base
       template <<-EOS
-        <div class="content">
+        <div class="content" data-id="{{:id}}">
           <div class="display-container"></div>
           <div class="editor-container" style="display:none"></div>
         </div>
@@ -164,13 +164,37 @@ module Editor
         children.find{|c| c.id == target_id }
       end
 
+      def rearrange(new_order)
+        new_list = flatten_children(new_order).
+          map{|src| children.find{|c| c.id == src['id'] } }
+        children.clear
+        children.push(new_list)
+        children.flatten!
+
+        # DOM要素の並べ直し
+        dom_element(:children).prepend(new_list.first.dom_element)
+
+        (1..new_list.size - 1).each do |i|
+          prev = new_list[i - 1]
+          current = new_list[i]
+
+          unless prev.dom_element['data-id'] == current.dom_element.prev['data-id']
+            prev.dom_element.after(current.dom_element)
+          end
+        end
+      end
+
       private
       def flatten_children(src)
         case src
         when Array
           src.map{|e| flatten_children(e) }
         when Hash
-          [src, flatten_children(src['children'])]
+          if src['children'].nil?
+            [src]
+          else
+            [src, flatten_children(src['children'])]
+          end
         end.flatten
       end
     end
