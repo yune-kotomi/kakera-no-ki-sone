@@ -16,6 +16,14 @@ module Editor
         block.call(self)
         children.each {|c| block.call(c) }
       end
+
+      def find(target_id)
+        if id == target_id
+          self
+        else
+          children.map{|c| c.find(target_id) }.compact.first
+        end
+      end
     end
 
     class Root < Node
@@ -28,6 +36,22 @@ module Editor
         HTTP.post("/documents/#{self.id}.json", :payload => self.attributes.to_json) do |response|
           yield(response)
         end
+      end
+
+      def find(target_id)
+        if target_id.nil?
+          self
+        else
+          children.map{|c| c.find(target_id) }.compact.first
+        end
+      end
+
+      def rearrange(target_id, from_id, to_id, position)
+        target = find(target_id)
+        from = find(from_id)
+        to = find(to_id)
+        from.children.delete(target)
+        to.children.insert(position, target)
       end
     end
   end
