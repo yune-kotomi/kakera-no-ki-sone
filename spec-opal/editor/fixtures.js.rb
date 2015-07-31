@@ -1,7 +1,7 @@
 def document_source
   let(:children) {
-    [{"id"=>1,
-      "title"=>"1",
+    [{"id"=>'c1',
+      "title"=>"c1",
       "body"=>"body 1",
       "children"=>
        [{"id"=>"1-1", "title"=>"1-1", "body"=>"body 1-1", "children"=>

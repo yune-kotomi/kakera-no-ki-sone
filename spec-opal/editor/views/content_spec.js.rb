@@ -15,7 +15,7 @@ describe 'Editor::View::Contents' do
 
   before { @order = contents.children.map(&:id) }
   it '初期orderのチェック' do
-    expect(@order).to eq [1, '1-1', '1-1-1', '1-2', '1-3']
+    expect(@order).to eq ['c1', '1-1', '1-1-1', '1-2', '1-3']
   end
 
   describe '並び替え' do
@@ -27,8 +27,8 @@ describe 'Editor::View::Contents' do
     let(:dom_expected) { expected.map{|s| s.to_s } }
 
     describe '1-2を1-1の子に' do
-      let(:new_order) { [{"id"=>1, "children"=>[{"id"=>"1-1", "children"=>[{"id"=>"1-1-1"}, {"id"=>"1-2"}]}, {"id"=>"1-3"}]}] }
-      let(:expected) { [1, '1-1', '1-1-1', '1-2', '1-3'] }
+      let(:new_order) { [{"id"=>'c1', "children"=>[{"id"=>"1-1", "children"=>[{"id"=>"1-1-1"}, {"id"=>"1-2"}]}, {"id"=>"1-3"}]}] }
+      let(:expected) { ['c1', '1-1', '1-1-1', '1-2', '1-3'] }
 
       it { expect(@order).to eq expected }
 
@@ -38,8 +38,8 @@ describe 'Editor::View::Contents' do
     end
 
     describe '1-1を1の前に' do
-      let(:new_order) { [{"id"=>"1-1", "children"=>[{"id"=>"1-1-1"}]}, {"id"=>1, "children"=>[{"id"=>"1-2"}, {"id"=>"1-3"}]}] }
-      let(:expected) { ['1-1', '1-1-1', 1, '1-2', '1-3'] }
+      let(:new_order) { [{"id"=>"1-1", "children"=>[{"id"=>"1-1-1"}]}, {"id"=>'c1', "children"=>[{"id"=>"1-2"}, {"id"=>"1-3"}]}] }
+      let(:expected) { ['1-1', '1-1-1', 'c1', '1-2', '1-3'] }
 
       it { expect(@order).to eq expected }
 
@@ -49,8 +49,8 @@ describe 'Editor::View::Contents' do
     end
 
     describe '1-2を1の後ろに' do
-      let(:new_order) { [{"id"=>1, "children"=>[{"id"=>"1-1", "children"=>[{"id"=>"1-1-1"}]}, {"id"=>"1-3"}]}, {"id"=>"1-2"}] }
-      let(:expected) { [1, '1-1', '1-1-1', '1-3', '1-2'] }
+      let(:new_order) { [{"id"=>'c1', "children"=>[{"id"=>"1-1", "children"=>[{"id"=>"1-1-1"}]}, {"id"=>"1-3"}]}, {"id"=>"1-2"}] }
+      let(:expected) { ['c1', '1-1', '1-1-1', '1-3', '1-2'] }
 
       it { expect(@order).to eq expected }
 
@@ -60,8 +60,8 @@ describe 'Editor::View::Contents' do
     end
 
     describe '1-3を1-1の前に' do
-      let(:new_order) { [{"id"=>1, "children"=>[{"id"=>"1-3"}, {"id"=>"1-1", "children"=>[{"id"=>"1-1-1"}]}, {"id"=>"1-2"}]}] }
-      let(:expected) { [1, '1-3', '1-1', '1-1-1', '1-2'] }
+      let(:new_order) { [{"id"=>'c1', "children"=>[{"id"=>"1-3"}, {"id"=>"1-1", "children"=>[{"id"=>"1-1-1"}]}, {"id"=>"1-2"}]}] }
+      let(:expected) { ['c1', '1-3', '1-1', '1-1-1', '1-2'] }
 
       it { expect(@order).to eq expected }
 
@@ -71,8 +71,8 @@ describe 'Editor::View::Contents' do
     end
 
     describe '1-1-1を1-1の後に' do
-      let(:new_order) { [{"id"=>1, "children"=>[{"id"=>"1-1"}, {"id"=>"1-1-1"}, {"id"=>"1-2"}, {"id"=>"1-3"}]}] }
-      let(:expected) { [1, '1-1', '1-1-1', '1-2', '1-3'] }
+      let(:new_order) { [{"id"=>'c1', "children"=>[{"id"=>"1-1"}, {"id"=>"1-1-1"}, {"id"=>"1-2"}, {"id"=>"1-3"}]}] }
+      let(:expected) { ['c1', '1-1', '1-1-1', '1-2', '1-3'] }
 
       it { expect(@order).to eq expected }
 
