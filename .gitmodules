@@ -1,3 +1,6 @@
 [submodule "vendor/Nestable"]
 	path = vendor/Nestable
 	url = https://github.com/uniring/Nestable.git
+[submodule "vendor/jsdiff"]
+	path = vendor/jsdiff
+	url = https://github.com/kpdecker/jsdiff.git

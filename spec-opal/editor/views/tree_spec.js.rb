@@ -1,12 +1,10 @@
 require 'spec_helper'
 require 'jquery'
 require 'jquery_ujs'
-require 'turbolinks'
-require 'jquery.turbolinks'
-require 'materialize-sprockets'
 require 'jquery-ui'
 require 'jquery.nestable'
 require 'opal-jquery'
+require 'diff'
 require 'juso/models/base'
 require 'juso/views/base'
 require 'editor/views/tree'
@@ -111,5 +109,52 @@ describe 'Editor::View::Tree' do
         it { expect(child1.children.size).to eq 4 }
       end
     end
+
+    describe '1-2-1を1-1の子にする' do
+      let(:children) {
+        [{"id"=>'c1',
+          "title"=>"c1",
+          "body"=>"body 1",
+          "children"=>
+           [{"id"=>"1-1", "title"=>"1-1", "body"=>"body 1-1", "children"=> []},
+            {"id"=>"1-2", "title"=>"1-2", "body"=>"body 1-2", "children"=>[{"id"=>"1-2-1", "title"=>"1-2-1", "body"=>"body 1-2-1", "children"=>[]}]},
+            {"id"=>"1-3", "title"=>"1-3", "body"=>"body 1-3", "children"=>[]}]}]
+
+      }
+      let(:new_order) { [{"id"=>'c1', "children"=>[{"id"=>"1-1", 'children' => [{"id"=>"1-2-1"}]}, {"id"=>"1-2"}, {"id"=>"1-3"}]}] }
+
+      it { expect(@target).to eq '1-2-1' }
+      it { expect(@from).to eq '1-2' }
+      it { expect(@to).to eq '1-1' }
+      it { expect(@position).to eq 0 }
+    end
+  end
+end
+
+describe 'Editor::JsDiff' do
+  let(:a) { "1\n1.1-1\n1.1-1.1-1-1\n1.1-2\n1.1-3\n" }
+  let(:b) { "1\n1.1-2\n1.1-2.1-1\n1.1-2.1-1.1-1-1\n1.1-3\n" }
+  let(:results) { Editor::JsDiff.diff(a, b) }
+  it { expect(results.size).to eq 5 }
+
+  describe '変更なしの行' do
+    let(:result) { results[0] }
+    it { expect(result.added?).to be false }
+    it { expect(result.removed?).to be false }
+    it { expect(result.value).to eq "1\n" }
+  end
+
+  describe '削除された行' do
+    let(:result) { results[1] }
+    it { expect(result.added?).to be false }
+    it { expect(result.removed?).to be true }
+    it { expect(result.value).to eq "1.1-1\n1.1-1.1-1-1\n" }
+  end
+
+  describe '追加された行' do
+    let(:result) { results[3] }
+    it { expect(result.added?).to be true }
+    it { expect(result.removed?).to be false }
+    it { expect(result.value).to eq "1.1-2.1-1\n1.1-2.1-1.1-1-1\n" }
   end
 end

@@ -2,6 +2,33 @@
 # 葉の増減はNestableを再生成
 #
 module Editor
+  module JsDiff
+    class Diff
+      attr_accessor :count
+      attr_accessor :value
+
+      def added?
+        @added == true
+      end
+
+      def removed?
+        @removed == true
+      end
+
+      def initialize(values)
+        @count = values['count']
+        @value = values['value']
+        @added = true if values['added']
+        @removed = true if values['removed']
+      end
+    end
+
+    def self.diff(a, b)
+      result = JSON.parse(`JSON.stringify(JsDiff.diffLines(#{a}, #{b}))`)
+      result.map {|v| Diff.new(v) }
+    end
+  end
+
   module View
     class Leaf < Juso::View::Base
       template <<-EOS
@@ -103,50 +130,45 @@ module Editor
       end
 
       def rearranged(previous, current)
-        target, from, _ = find_removed_node(nil, previous, current)
-        _, to, position = find_removed_node(nil, current, previous)
+        # IDの一覧テキストを生成
+        prev_text = generate_id_text({'id' => '', 'children' => previous}) + "\n"
+        curr_text = generate_id_text({'id' => '', 'children' => current}) + "\n"
 
+        diff = JsDiff.diff(prev_text, curr_text)
+
+        # 子を引きぬかれた親を探す
+        removed = diff.find{|d| d.removed? }
+        tmp = removed.value.split("\n").first.split(":")
+        target = tmp.pop
+        from = tmp.last
+        from = nil if from == ''
+        # 子の挿入先を探す
+        added = diff.find{|d| d.added? }
+        tmp = added.value.split("\n").first.split(":")
+        tmp.pop
+        to = tmp.last
+        to = nil if to == ''
+        # 子の挿入位置検出
+        children = curr_text.split("\n").
+          select{|s| s.split(':').size == tmp.size + 1 }.
+          select{|s| s.match(/^#{tmp.join(':')}:/) }
+        position = children.index{|s| s == "#{tmp.join(':')}:#{target}" }
 
         @rearrange_change_observers.each do |o|
           o.call(target, from, to, position)
         end
       end
 
-      def find_removed_node(from, previous_source, current_source)
-        previous = (previous_source||[]).map{|s| s['id'] }
-        current = (current_source||[]).map{|s| s['id'] }
-
-        if previous.size > current.size
-          target = (previous - current).first
-          position = previous.index(target)
-          return [target, from, position]
-        elsif (previous.size == current.size) && (previous != current)
-          # 同一配列内で移動を行った場合
-          prev_sub = []
-          curr_sub = []
-          previous.each_with_index do |id, i|
-            if current[i] != id
-              prev_sub.push(id)
-              curr_sub.push(current[i])
-            end
-          end
-
-          prev_sub.each do |id|
-            if (prev_sub - [id]) == (curr_sub - [id])
-              target = id
-              position = previous.index(id)
-              return [target, from, position]
-            end
-          end
-        else
-          # この階層じゃないので下に潜る
-          previous_source.each do |previous_child|
-            current_child = current_source.find{|c| c['id'] == previous_child['id'] }
-            target, from, position = find_removed_node(previous_child['id'], previous_child['children'], current_child['children'])
-
-            return [target, from, position] unless target.nil?
-          end
+      def generate_id_text(src)
+        id = src['id']
+        result = [id]
+        unless src['children'].nil?
+          ret = src['children'].map {|c| generate_id_text(c) }.join("\n")
+          ret = ret.split("\n").map{|s| "#{id}:#{s}" }.join("\n")
+          result.push(ret)
         end
+
+        result.join("\n")
       end
 
       # 内部で保持しているLeafオブジェクト群を並び替える
