@@ -40,6 +40,12 @@ module Editor
           content.observe(:body) {|b| node.body = b }
         end
       end
+
+      # 並び替え
+      @tree.rearrange_observe do |target, from, to, position|
+        @document.rearrange(target, from, to, position)
+      end
+      @tree.observe(:order) {|v| @contents.rearrange(v) }
     end
   end
 end
