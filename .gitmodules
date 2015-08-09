@@ -4,3 +4,6 @@
 [submodule "vendor/jsdiff"]
 	path = vendor/jsdiff
 	url = https://github.com/kpdecker/jsdiff.git
+[submodule "vendor/uuidjs"]
+	path = vendor/uuidjs
+	url = https://github.com/LiosK/UUID.js.git

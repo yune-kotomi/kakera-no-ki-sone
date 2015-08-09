@@ -3,6 +3,8 @@ require 'jquery'
 require 'jquery_ujs'
 require 'jquery-ui'
 require 'jquery.nestable'
+require 'uuid.core'
+require 'uuid'
 require 'opal-jquery'
 require 'juso/models/base'
 require 'editor/fixtures'
@@ -42,5 +44,12 @@ describe 'Editor::Model::Node' do
       before { root.rearrange('1-1-1', '1-1', 'c1', 1) }
       it { expect(child1.children[1]).to eq child1_1_1 }
     end
+  end
+
+  describe 'ノードの追加' do
+    before { @new_child = child1.add_child }
+    it { expect(child1.children.size).to eq 4 }
+    it { expect(child1.children.last).to eq @new_child }
+    it { expect(@new_child.id).not_to be_empty }
   end
 end

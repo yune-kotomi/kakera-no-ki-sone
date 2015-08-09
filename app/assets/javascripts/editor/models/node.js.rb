@@ -24,6 +24,12 @@ module Editor
           children.map{|c| c.find(target_id) }.compact.first
         end
       end
+
+      def add_child(init_data = {})
+        new_child = Node.new(init_data.merge(:id => UUID.generate), self)
+        children.push(new_child)
+        new_child
+      end
     end
 
     class Root < Node
