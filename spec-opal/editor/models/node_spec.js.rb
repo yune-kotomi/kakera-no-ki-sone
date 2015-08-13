@@ -47,9 +47,15 @@ describe 'Editor::Model::Node' do
   end
 
   describe 'ノードの追加' do
-    before { @new_child = child1.add_child }
+    before do
+      root.observe(:children) { @root_changed = true }
+      child1.observe(:children) { @child1_changed = true }
+      @new_child = child1.add_child
+    end
     it { expect(child1.children.size).to eq 4 }
     it { expect(child1.children.last).to eq @new_child }
     it { expect(@new_child.id).not_to be_empty }
+    it { expect(@root_changed).to be_nil }
+    it { expect(@child1_changed).to eq true }
   end
 end
