@@ -184,6 +184,16 @@ module Editor
         end
       end
 
+      def add_child(target_id, src)
+        new_content = Content.new(src.attributes)
+        prev_content = find(target_id)
+        position = children.index {|c| c.id == target_id }
+        children.insert(position + 1, new_content)
+        prev_content.dom_element.after(new_content.dom_element)
+
+        new_content
+      end
+
       private
       def flatten_children(src)
         case src

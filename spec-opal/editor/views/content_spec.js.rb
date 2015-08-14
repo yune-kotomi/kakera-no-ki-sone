@@ -6,6 +6,7 @@ require 'jquery.nestable'
 require 'opal-jquery'
 require 'juso/models/base'
 require 'juso/views/base'
+require 'editor/models/node'
 require 'editor/views/content'
 require 'editor/fixtures'
 
@@ -79,6 +80,23 @@ describe 'Editor::View::Contents' do
       context 'DOM' do
         it { expect(@dom_order).to eq dom_expected }
       end
+    end
+  end
+
+  describe 'Contentの追加' do
+    let(:data) { {
+        :id => '1-4',
+        :number => '1.4',
+        :title => 'child1-4',
+        :body => 'child1-4 body'
+      } }
+    describe 'Modelで追加' do
+      let(:new_model) { Editor::Model::Node.new(data) }
+      before { contents.add_child('1-3', new_model) }
+      let(:content_1_3) { contents.find('1-3') }
+
+      it { expect(content_1_3.dom_element.next).not_to be_nil }
+      it { expect(content_1_3.dom_element.next['data-id']).to eq '1-4' }
     end
   end
 end
