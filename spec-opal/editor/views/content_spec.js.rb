@@ -97,6 +97,16 @@ describe 'Editor::View::Contents' do
 
       it { expect(content_1_3.dom_element.next).not_to be_nil }
       it { expect(content_1_3.dom_element.next['data-id']).to eq '1-4' }
+
+      describe 'Viewからの変更伝搬' do
+        let(:content_1_4) { contents.find('1-4') }
+        before do
+          content_1_4.title = 'child1-4 edit'
+          content_1_4.body = 'child1-4 body edit'
+        end
+        it { expect(new_model.title).to eq 'child1-4 edit' }
+        it { expect(new_model.body).to eq 'child1-4 body edit' }
+      end
     end
   end
 end

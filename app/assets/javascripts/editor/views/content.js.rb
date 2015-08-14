@@ -191,6 +191,9 @@ module Editor
         children.insert(position + 1, new_content)
         prev_content.dom_element.after(new_content.dom_element)
 
+        new_content.observe(:title) {|v| src.title = v }
+        new_content.observe(:body) {|v| src.body = v }
+
         new_content
       end
 
