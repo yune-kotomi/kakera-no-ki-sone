@@ -7,6 +7,7 @@ require 'opal-jquery'
 require 'diff'
 require 'juso/models/base'
 require 'juso/views/base'
+require 'editor/models/node'
 require 'editor/views/tree'
 require 'editor/fixtures'
 
@@ -127,6 +128,35 @@ describe 'Editor::View::Tree' do
       it { expect(@from).to eq '1-2' }
       it { expect(@to).to eq '1-1' }
       it { expect(@position).to eq 0 }
+    end
+  end
+
+  describe '子要素の追加' do
+    describe 'Hashで追加' do
+      before do
+        child1.add_child(:id => '1-4', :title => 'child1-4')
+      end
+      let(:child1_4) { tree.find('1-4') }
+      let(:dom_element) { child1.dom_element(:children).children('li:last-child') }
+
+      it { expect(child1.children.size).to eq 4 }
+      it { expect(child1.children.last).to eq child1_4 }
+      it { expect(dom_element['data-id']).to eq '1-4' }
+      it { expect(dom_element.find('.dd-content').text).to eq 'child1-4' }
+    end
+
+    describe 'Node modelで追加' do
+      let(:model) { Editor::Model::Node.new(:id => '1-4', :title => 'child1-4', :body => 'body') }
+      before do
+        child1.add_child(model)
+      end
+      let(:child1_4) { tree.find('1-4') }
+      let(:dom_element) { child1.dom_element(:children).children('li:last-child') }
+
+      it { expect(child1.children.size).to eq 4 }
+      it { expect(child1.children.last).to eq child1_4 }
+      it { expect(dom_element['data-id']).to eq '1-4' }
+      it { expect(dom_element.find('.dd-content').text).to eq 'child1-4' }
     end
   end
 end

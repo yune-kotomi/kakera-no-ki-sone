@@ -42,7 +42,7 @@ module Editor
 
       attribute :id
       element :title, :selector => 'div.dd-content'
-      element :children, :selector => 'ol.dd-list', :type => Leaf
+      element :children, :selector => 'ol.dd-list:first', :type => Leaf
 
       def initialize(data = {}, parent = nil)
         super(data, parent)
@@ -60,6 +60,20 @@ module Editor
         else
           children.map{|c| c.find(target_id) }.compact.first
         end
+      end
+
+      def add_child(model)
+        if model.is_a?(Hash)
+          model_attributes = model
+        else
+          model_attributes = model.attributes
+        end
+
+        new_child = Leaf.new(model_attributes)
+        children.push(new_child)
+        dom_element(:children).append(new_child.dom_element)
+
+        new_child
       end
     end
 
