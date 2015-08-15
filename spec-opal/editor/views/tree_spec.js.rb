@@ -157,36 +157,35 @@ describe 'Editor::View::Tree' do
   end
 
   describe '子要素の追加' do
-    describe 'Hashで追加' do
-      before do
-        child1.add_child(:id => '1-4', :title => 'child1-4')
-      end
-      let(:child1_4) { tree.find('1-4') }
-      let(:dom_element) { child1.dom_element(:children).children('li:last-child') }
-
-      it { expect(child1.children.size).to eq 4 }
-      it { expect(child1.children.last).to eq child1_4 }
-      it { expect(dom_element['data-id']).to eq '1-4' }
-      it { expect(dom_element.find('.dd-content').text).to eq 'child1-4' }
-    end
-
     describe 'Node modelで追加' do
       let(:model) { Editor::Model::Node.new(:id => '1-4', :title => 'child1-4', :body => 'body') }
-      before do
-        child1.add_child(model)
-      end
       let(:child1_4) { tree.find('1-4') }
-      let(:dom_element) { child1.dom_element(:children).children('li:last-child') }
+      let(:dom_elements) { child1.dom_element(:children).children }
 
-      it { expect(child1.children.size).to eq 4 }
-      it { expect(child1.children.last).to eq child1_4 }
-      it { expect(dom_element['data-id']).to eq '1-4' }
-      it { expect(dom_element.find('.dd-content').text).to eq 'child1-4' }
-      it { expect(tree.order).to eq [{"id"=>'c1', "children"=>[{"id"=>"1-1", "children"=>[{"id"=>"1-1-1"}]}, {"id"=>"1-2"}, {"id"=>"1-3"}, {"id"=>"1-4"}]}] }
+      describe '2番目に挿入' do
+        before { child1.add_child(1, model) }
 
-      describe 'ModelからViewへの変更伝搬' do
-        before { model.title = 'child1-4 title' }
-        it { expect(child1_4.title).to eq 'child1-4 title' }
+        it { expect(child1.children.size).to eq 4 }
+        it { expect(child1.children[0]).to eq child1_1 }
+        it { expect(child1.children[1]).to eq child1_4 }
+        it { expect(child1.children[2]).to eq child1_2 }
+        it { expect(dom_elements.at(1)['data-id']).to eq '1-4' }
+        it { expect(dom_elements.at(1).find('.dd-content').text).to eq 'child1-4' }
+        it { expect(tree.order).to eq [{"id"=>'c1', "children"=>[{"id"=>"1-1", "children"=>[{"id"=>"1-1-1"}]}, {"id"=>"1-4"}, {"id"=>"1-2"}, {"id"=>"1-3"}]}] }
+
+        describe 'ModelからViewへの変更伝搬' do
+          before { model.title = 'child1-4 title' }
+          it { expect(child1_4.title).to eq 'child1-4 title' }
+        end
+      end
+
+      describe '先頭に挿入' do
+        before { child1.add_child(0, model) }
+        it { expect(child1.children[0]).to eq child1_4 }
+        it { expect(child1.children[1]).to eq child1_1 }
+        it { expect(dom_elements.at(0)['data-id']).to eq '1-4' }
+        it { expect(dom_elements.at(1)['data-id']).to eq '1-1' }
+        it { expect(tree.order).to eq [{"id"=>'c1', "children"=>[{"id"=>"1-4"}, {"id"=>"1-1", "children"=>[{"id"=>"1-1-1"}]}, {"id"=>"1-2"}, {"id"=>"1-3"}]}] }
       end
     end
   end

@@ -25,10 +25,10 @@ module Editor
         end
       end
 
-      def add_child(init_data = {})
+      def add_child(position, init_data = {})
         new_child = Node.new(init_data.merge(:id => UUID.generate), self)
         old_children = children.dup
-        children.push(new_child)
+        children.insert(position, new_child)
         trigger(:children, :change, children, old_children)
         new_child
       end

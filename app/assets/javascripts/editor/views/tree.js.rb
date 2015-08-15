@@ -76,21 +76,17 @@ module Editor
         end
       end
 
-      def add_child(model)
-        if model.is_a?(Hash)
-          model_attributes = model
+      def add_child(position, model)
+        new_child = Leaf.new(model.attributes, self)
+        children.insert(position, new_child)
+        if position == 0
+          dom_element(:children).prepend(new_child.dom_element)
         else
-          model_attributes = model.attributes
+          dom_element(:children).children.at(position - 1).after(new_child.dom_element)
         end
-
-        new_child = Leaf.new(model_attributes, self)
-        children.push(new_child)
-        dom_element(:children).append(new_child.dom_element)
 
         # 変更内容伝搬用
-        unless model.is_a?(Hash)
-          model.observe(:title) {|v| new_child.title = v }
-        end
+        model.observe(:title) {|v| new_child.title = v }
 
         # Treeのcurrent orderを更新しておく
         parental_tree.update_attribute(:order, parental_tree.serialize_nestable, {:trigger => false})

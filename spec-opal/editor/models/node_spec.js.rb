@@ -50,10 +50,12 @@ describe 'Editor::Model::Node' do
     before do
       root.observe(:children) { @root_changed = true }
       child1.observe(:children) { @child1_changed = true }
-      @new_child = child1.add_child
+      @new_child = child1.add_child(1)
     end
     it { expect(child1.children.size).to eq 4 }
-    it { expect(child1.children.last).to eq @new_child }
+    it { expect(child1.children[0]).to eq child1_1 }
+    it { expect(child1.children[1]).to eq @new_child }
+    it { expect(child1.children[2]).to eq child1_2 }
     it { expect(@new_child.id).not_to be_empty }
     it { expect(@root_changed).to be_nil }
     it { expect(@child1_changed).to eq true }
