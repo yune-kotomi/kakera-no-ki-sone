@@ -30,6 +30,26 @@ describe 'Editor::View::Tree' do
     it { expect(parental_tree).to eq tree }
   end
 
+  describe '編集対象の指定' do
+    let(:current) do
+      ret = nil
+      tree.observe(:current_target) {|v| ret = v }
+      child1_1.dom_element(:title).trigger(:click)
+      ret
+    end
+    it { expect(current).to eq child1_1.id }
+    it { current; expect(child1_1.dom_element(:title).has_class?('selected')).to eq true }
+
+    describe '前の編集対象からremove_class' do
+      before do
+        child1_1.dom_element(:title).trigger(:click)
+        child1_3.dom_element(:title).trigger(:click)
+      end
+      it { expect(child1_1.dom_element(:title).has_class?('selected')).to eq false }
+      it { expect(child1_3.dom_element(:title).has_class?('selected')).to eq true }
+    end
+  end
+
   context '並べ替え処理' do
     before do
       tree.rearrange_observe do |target, from, to, position|

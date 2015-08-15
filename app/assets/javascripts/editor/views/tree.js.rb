@@ -41,6 +41,7 @@ module Editor
       EOS
 
       attribute :id
+      attribute :target, :default => false
       element :title, :selector => 'div.dd-content'
       element :children, :selector => 'ol.dd-list:first', :type => Leaf
 
@@ -51,6 +52,19 @@ module Editor
           # 子がない場合に不要なものを削除
           dom_element(:children).remove
           dom_element.find('button').remove
+        end
+
+        # タイトルのクリックでTreeの編集対象にする
+        observe(:title, :click) do
+          parental_tree.current_target = self.id
+          self.target = true
+        end
+        observe(:target) do |v|
+          if v
+            dom_element(:title).add_class('selected')
+          else
+            dom_element(:title).remove_class('selected')
+          end
         end
       end
 
@@ -108,6 +122,8 @@ module Editor
       element :title, :selector => 'span.root'
       element :children, :selector => 'div.dd>ol.dd-list', :type => Leaf
       element :nestable, :selector => 'div.dd'
+      attribute :current_target
+      attribute :target
 
       def initialize(data = {}, parent = nil)
         super(data, parent)
@@ -115,6 +131,9 @@ module Editor
         @rearrange_change_observers = []
         observe(:order) {|current, previous| rearranged(previous, current) }
         rearrange_observe {|t, f, to, pos| rearrange_leaves(t, f, to, pos) }
+
+        # current_targetが変わった場合に前のやつを取り下げる
+        observe(:current_target) {|c, prev| find(prev).target = false }
       end
 
       def find(target_id)

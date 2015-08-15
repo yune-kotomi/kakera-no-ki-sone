@@ -165,6 +165,7 @@ module Juso
             else
               if value.is_a?(options[:type])
                 child = value
+                child.parent = self
               else
                 child = options[:type].new(value, self)
               end
