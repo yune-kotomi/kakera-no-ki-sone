@@ -69,11 +69,27 @@ module Editor
           model_attributes = model.attributes
         end
 
-        new_child = Leaf.new(model_attributes)
+        new_child = Leaf.new(model_attributes, self)
         children.push(new_child)
         dom_element(:children).append(new_child.dom_element)
 
+        # 変更内容伝搬用
+        unless model.is_a?(Hash)
+          model.observe(:title) {|v| new_child.title = v }
+        end
+
+        # Treeのcurrent orderを更新しておく
+        parental_tree.update_attribute(:order, parental_tree.serialize_nestable, {:trigger => false})
+
         new_child
+      end
+
+      def parental_tree
+        if self.parent.is_a?(Tree)
+          self.parent
+        else
+          self.parent.parental_tree
+        end
       end
     end
 

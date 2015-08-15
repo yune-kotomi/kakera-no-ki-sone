@@ -25,6 +25,11 @@ describe 'Editor::View::Tree' do
     expect(tree.order).to eq [{"id"=>'c1', "children"=>[{"id"=>"1-1", "children"=>[{"id"=>"1-1-1"}]}, {"id"=>"1-2"}, {"id"=>"1-3"}]}]
   end
 
+  describe '操作' do
+    let(:parental_tree) { child1_1_1.parental_tree }
+    it { expect(parental_tree).to eq tree }
+  end
+
   context '並べ替え処理' do
     before do
       tree.rearrange_observe do |target, from, to, position|
@@ -157,6 +162,12 @@ describe 'Editor::View::Tree' do
       it { expect(child1.children.last).to eq child1_4 }
       it { expect(dom_element['data-id']).to eq '1-4' }
       it { expect(dom_element.find('.dd-content').text).to eq 'child1-4' }
+      it { expect(tree.order).to eq [{"id"=>'c1', "children"=>[{"id"=>"1-1", "children"=>[{"id"=>"1-1-1"}]}, {"id"=>"1-2"}, {"id"=>"1-3"}, {"id"=>"1-4"}]}] }
+
+      describe 'ModelからViewへの変更伝搬' do
+        before { model.title = 'child1-4 title' }
+        it { expect(child1_4.title).to eq 'child1-4 title' }
+      end
     end
   end
 end
