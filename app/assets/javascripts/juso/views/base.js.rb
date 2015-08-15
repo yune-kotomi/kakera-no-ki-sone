@@ -98,7 +98,7 @@ module Juso
             if options[:selector].nil?
               @rendered
             else
-              @rendered.find(options[:selector])
+              @rendered.find(options[:selector]).first
             end
           end
         end
