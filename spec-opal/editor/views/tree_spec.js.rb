@@ -61,6 +61,9 @@ describe 'Editor::View::Tree' do
       tree.order = new_order
     end
 
+    let(:parent) { tree.find(@to) }
+    let(:target) { tree.find(@target) }
+
     describe '1-2を1-1の子に' do
       let(:new_order) { [{"id"=>'c1', "children"=>[{"id"=>"1-1", "children"=>[{"id"=>"1-1-1"}, {"id"=>"1-2"}]}, {"id"=>"1-3"}]}] }
 
@@ -68,6 +71,7 @@ describe 'Editor::View::Tree' do
       it { expect(@from).to eq 'c1' }
       it { expect(@to).to eq '1-1' }
       it { expect(@position).to eq 1 }
+      it { expect(target.parent).to eq parent }
 
       context '子要素の構造' do
         it { expect(child1_1.children.last).to eq child1_2 }
@@ -84,6 +88,7 @@ describe 'Editor::View::Tree' do
         expect(@to).to be_nil
         expect(@position).to eq 0
       end
+      it { expect(target.parent).to eq parent }
 
       context '子要素' do
         it { expect(tree.children.first).to eq child1_1 }
@@ -100,6 +105,7 @@ describe 'Editor::View::Tree' do
         expect(@to).to be_nil
         expect(@position).to eq 1
       end
+      it { expect(target.parent).to eq parent }
 
       context '子要素' do
         it { expect(tree.children.last).to eq child1_2 }
@@ -114,6 +120,7 @@ describe 'Editor::View::Tree' do
       it { expect(@from).to eq 'c1' }
       it { expect(@to).to eq 'c1' }
       it { expect(@position).to eq 0 }
+      it { expect(target.parent).to eq parent }
 
       context '子要素' do
         it { expect(child1.children.first).to eq child1_3 }
@@ -129,6 +136,7 @@ describe 'Editor::View::Tree' do
       it { expect(@from).to eq '1-1' }
       it { expect(@to).to eq 'c1' }
       it { expect(@position).to eq 1 }
+      it { expect(target.parent).to eq parent }
 
       context '子要素' do
         it { expect(child1.children[1]).to eq child1_1_1 }
@@ -153,6 +161,7 @@ describe 'Editor::View::Tree' do
       it { expect(@from).to eq '1-2' }
       it { expect(@to).to eq '1-1' }
       it { expect(@position).to eq 0 }
+      it { expect(target.parent).to eq parent }
     end
   end
 

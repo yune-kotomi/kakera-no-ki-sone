@@ -223,6 +223,7 @@ module Editor
         to = find(to_id)
         from.children.delete(target)
         to.children.insert(position, target)
+        target.parent = to
       end
     end
   end
