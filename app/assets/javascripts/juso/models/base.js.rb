@@ -16,6 +16,8 @@
 module Juso
   module Model
     class Base
+      attr_accessor :parent
+
       # 属性の定義
       # default: デフォルト値
       def self.attribute(name, options = {})
@@ -126,6 +128,7 @@ module Juso
             trigger(name, :change, value, previous_value) if options[:trigger]
           end
         else
+          # 子クラスが指定されている
           if value.is_a?(Array)
             value.each{|v| raise AttributeMustBeAHashOrClassError.new unless [Hash, attribute_definition[:type]].include?(v.class) }
 
@@ -138,12 +141,14 @@ module Juso
 
               unless previous_attributes == value
                 values = value.map{|v| attribute_definition[:type].new(v) }
+                values.each {|v| v.parent = self }
                 @attributes[name] = values
                 trigger(name, :change, values, previous_value) if options[:trigger]
               end
             else
               unless previous_value == value
                 @attributes[name] = value
+                value.each {|v| v.parent = self }
                 trigger(name, :change, value, previous_value) if options[:trigger]
               end
             end
@@ -154,6 +159,8 @@ module Juso
               else
                 @attributes[name] = value
               end
+              @attributes[name].parent = self unless @attributes[name].nil?
+
               trigger(name, :change, value, previous_value) if options[:trigger]
             end
           end

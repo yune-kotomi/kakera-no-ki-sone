@@ -19,8 +19,6 @@ require 'jsrender'
 module Juso
   module View
     class Base < Juso::Model::Base
-      attr_accessor :parent
-
       # 要素の定義
       def self.element(name, options = {})
         attribute(name, options)

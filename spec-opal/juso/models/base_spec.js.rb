@@ -39,13 +39,15 @@ describe 'Juso::Model::Base' do
       it { expect(test.attr3).not_to be_nil }
       it { expect(test.attr3.is_a?(JusoModelBaseTest2)).to be true }
       it { expect(test.attr3.attr1).to eq value[:attr1] }
+      it { expect(test.attr3.parent).to eq test }
     end
 
-    describe '子クラスのインスタンスを与える do' do
+    describe '子クラスのインスタンスを与える' do
       let(:child) { JusoModelBaseTest2.new(:attr1 => 'test value') }
       let(:test) { JusoModelBaseTest.new(:attr3 => child) }
       it { expect(test.attr3).not_to be_nil }
       it { expect(test.attr3).to eq child }
+      it { expect(test.attr3.parent).to eq test }
     end
   end
 
