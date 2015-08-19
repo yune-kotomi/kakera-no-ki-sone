@@ -41,7 +41,7 @@ module Editor
 
       private
       def render_plaintext(src)
-        text = src
+        text = src.to_s
         ({
           '&' => '&amp;',
           '>' => '&gt;',
@@ -186,10 +186,15 @@ module Editor
 
       def add_child(target_id, src)
         new_content = Content.new(src.attributes)
-        prev_content = find(target_id)
-        position = children.index {|c| c.id == target_id }
-        children.insert(position + 1, new_content)
-        prev_content.dom_element.after(new_content.dom_element)
+
+        if target_id.nil?
+          self.children = [new_content]
+        else
+          prev_content = find(target_id)
+          position = children.index {|c| c.id == target_id }
+          children.insert(position + 1, new_content)
+          prev_content.dom_element.after(new_content.dom_element)
+        end
 
         new_content.observe(:title) {|v| src.title = v }
         new_content.observe(:body) {|v| src.body = v }

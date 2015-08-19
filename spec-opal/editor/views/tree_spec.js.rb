@@ -48,6 +48,13 @@ describe 'Editor::View::Tree' do
       it { expect(child1_1.dom_element(:title).has_class?('selected')).to eq false }
       it { expect(child1_3.dom_element(:title).has_class?('selected')).to eq true }
     end
+
+    describe 'rootのクリック' do
+      before { tree.dom_element(:title).trigger(:click) }
+      it { expect(tree.current_target).to eq tree.id }
+      it { expect(tree.target).to eq true }
+      it { expect(tree.dom_element(:title).has_class?('selected')).to eq true }
+    end
   end
 
   context '並べ替え処理' do
@@ -85,7 +92,7 @@ describe 'Editor::View::Tree' do
       it do
         expect(@target).to eq '1-1'
         expect(@from).to eq 'c1'
-        expect(@to).to be_nil
+        expect(@to).to eq 'id'
         expect(@position).to eq 0
       end
       it { expect(target.parent).to eq parent }
@@ -163,6 +170,17 @@ describe 'Editor::View::Tree' do
       it { expect(@position).to eq 0 }
       it { expect(target.parent).to eq parent }
     end
+
+    describe '1-3を1-2の子にする' do
+      let(:new_order) { [{"id"=>'c1', "children"=>[{"id"=>"1-1", "children"=>[{"id"=>"1-1-1"}]}, {"id"=>"1-2", "children" => [{"id"=>"1-3"}]}]}] }
+      it { expect(@target).to eq '1-3' }
+      it { expect(@from).to eq 'c1' }
+      it { expect(@to).to eq '1-2' }
+      it { expect(@position).to eq 0 }
+      it { expect(target.parent).to eq parent }
+      it { expect(parent.children.size).to eq 1 }
+      it { expect(parent.children.first).to eq target }
+    end
   end
 
   describe '子要素の追加' do
@@ -195,6 +213,15 @@ describe 'Editor::View::Tree' do
         it { expect(dom_elements.at(0)['data-id']).to eq '1-4' }
         it { expect(dom_elements.at(1)['data-id']).to eq '1-1' }
         it { expect(tree.order).to eq [{"id"=>'c1', "children"=>[{"id"=>"1-4"}, {"id"=>"1-1", "children"=>[{"id"=>"1-1-1"}]}, {"id"=>"1-2"}, {"id"=>"1-3"}]}] }
+      end
+
+      describe '空のtreeに追加' do
+        let(:tree) { Editor::View::Tree.new(source.update(:children => [])) }
+        before { tree.add_child(0, model) }
+        let(:new_child) { tree.find(model.id) }
+
+        it { expect(tree.children.size).to eq 1 }
+        it { expect(new_child.id).to eq model.id }
       end
     end
   end

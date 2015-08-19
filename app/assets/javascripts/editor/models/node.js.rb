@@ -32,6 +32,15 @@ module Editor
         trigger(:children, :change, children, old_children)
         new_child
       end
+
+      def last_child
+        if children.empty?
+          # 子がなければ自分自身が最後
+          self
+        else
+          children.last.last_child
+        end
+      end
     end
 
     class Root < Node
@@ -43,14 +52,6 @@ module Editor
       def save
         HTTP.post("/documents/#{self.id}.json", :payload => self.attributes.to_json) do |response|
           yield(response)
-        end
-      end
-
-      def find(target_id)
-        if target_id.nil?
-          self
-        else
-          children.map{|c| c.find(target_id) }.compact.first
         end
       end
 

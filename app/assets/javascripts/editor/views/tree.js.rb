@@ -56,12 +56,13 @@ module Editor
 
         # タイトルのクリックでTreeの編集対象にする
         observe(:title, :click) do
-          parental_tree.current_target = self.id
           self.target = true
         end
+
         observe(:target) do |v|
           if v
             dom_element(:title).add_class('selected')
+            parental_tree.current_target = self.id
           else
             dom_element(:title).remove_class('selected')
           end
@@ -106,7 +107,7 @@ module Editor
     class Tree < Juso::View::Base
       template <<-EOS
       <div class="tree">
-        <span class="root" data-id="{{attr:id}}">{{:title}}</span>
+        <div class="root" data-id="{{attr:id}}">{{:title}}</div>
         <div class="dd">
           <ol class="dd-list"></ol>
         </div>
@@ -115,7 +116,7 @@ module Editor
 
       attribute :id
       attribute :order
-      element :title, :selector => 'span.root'
+      element :title, :selector => 'div.root'
       element :children, :selector => 'div.dd>ol.dd-list', :type => Leaf
       element :nestable, :selector => 'div.dd'
       attribute :current_target
@@ -129,15 +130,49 @@ module Editor
         rearrange_observe {|t, f, to, pos| rearrange_leaves(t, f, to, pos) }
 
         # current_targetが変わった場合に前のやつを取り下げる
-        observe(:current_target) {|c, prev| find(prev).target = false }
+        observe(:current_target) do |c, prev_id|
+          prev = find(prev_id)
+          prev.target = false unless prev.nil?
+        end
+
+        # クリックで自分自身を選択状態に
+        observe(:title, :click) do
+          self.target = true
+        end
+        observe(:target) do |v|
+          if v
+            dom_element(:title).add_class('selected')
+            self.current_target = self.id
+          else
+            dom_element(:title).remove_class('selected')
+          end
+        end
       end
 
       def find(target_id)
-        if target_id.nil?
+        if id == target_id
           self
         else
           children.map{|c| c.find(target_id) }.compact.first
         end
+      end
+
+      def add_child(position, model)
+        new_child = Leaf.new(model.attributes, self)
+        children.insert(position, new_child)
+        if position == 0
+          dom_element(:children).prepend(new_child.dom_element)
+        else
+          dom_element(:children).children.at(position - 1).after(new_child.dom_element)
+        end
+
+        # 変更内容伝搬用
+        model.observe(:title) {|v| new_child.title = v }
+
+        # current orderを更新しておく
+        update_attribute(:order, serialize_nestable, {:trigger => false})
+
+        new_child
       end
 
       # 並び替えイベントのオブザーバ登録
@@ -186,13 +221,13 @@ module Editor
         tmp = removed.value.split("\n").first.split(":")
         target = tmp.pop
         from = tmp.last
-        from = nil if from == ''
+        from = self.id if from == '' # ルートノード
         # 子の挿入先を探す
         added = diff.find{|d| d.added? }
         tmp = added.value.split("\n").first.split(":")
         tmp.pop
         to = tmp.last
-        to = nil if to == ''
+        to = self.id if to == '' # ルートノード
         # 子の挿入位置検出
         children = curr_text.split("\n").
           select{|s| s.split(':').size == tmp.size + 1 }.

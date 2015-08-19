@@ -42,7 +42,11 @@ module Juso
             )
           end
         end
-        @attributes = Hash[@attribute_definitions.map{|k, v| [k, v[:default]] }]
+        @attributes = @attribute_definitions.map do |k, v|
+          value = v[:default]
+          value = v[:default].dup unless v[:default].nil?
+          [k, value]
+        end.to_h
         @observers = {}
         @wide_observers = []
 

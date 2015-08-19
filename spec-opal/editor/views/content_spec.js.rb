@@ -90,6 +90,7 @@ describe 'Editor::View::Contents' do
         :title => 'child1-4',
         :body => 'child1-4 body'
       } }
+
     describe 'Modelで追加' do
       let(:new_model) { Editor::Model::Node.new(data) }
       before { contents.add_child('1-3', new_model) }
@@ -106,6 +107,12 @@ describe 'Editor::View::Contents' do
         end
         it { expect(new_model.title).to eq 'child1-4 edit' }
         it { expect(new_model.body).to eq 'child1-4 body edit' }
+      end
+
+      describe '空の状態で追加' do
+        let(:contents2) { Editor::View::Contents.new(source.update(:children => [])) }
+        before { contents2.add_child(nil, new_model) }
+        it { expect(contents2.children.size).to eq 1 }
       end
     end
   end

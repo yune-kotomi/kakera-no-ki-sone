@@ -47,6 +47,31 @@ module Editor
       end
       @tree.observe(:order) {|v| @contents.rearrange(v) }
     end
+
+    # 編集対象の要素の弟ノードを追加する
+    def add_child
+      default_values = {:title => '(無題)'}
+      target = @document.find(@tree.current_target)
+
+      if target.is_a?(Editor::Model::Root)
+        position = target.children.size
+        node = target.add_child(position, default_values)
+        leaf = @tree.add_child(position, node)
+        if position == 0
+          content = @contents.add_child(nil, node)
+        else
+          content = @contents.add_child(target.children[target.children.size - 2].last_child.id, node)
+        end
+      else
+        position = target.parent.children.index(target) + 1
+        node = target.parent.add_child(position, default_values)
+        leaf = @tree.find(target.parent.id).add_child(position, node)
+        content = @contents.add_child(target.last_child.id, node)
+      end
+
+      # 生成した新ノードを選択状態にする
+      leaf.target = true
+    end
   end
 end
 
@@ -55,5 +80,9 @@ Document.ready? do
     editor = Editor::Editor.new
     editor.load_from_dom
     editor.attach(Element.find('#document-editor'))
+
+    Element.find('#add-button').on(:click) do
+      editor.add_child
+    end
   end
 end
