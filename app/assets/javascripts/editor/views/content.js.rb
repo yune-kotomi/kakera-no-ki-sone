@@ -13,6 +13,10 @@ module Editor
         <div class="display">
           <h2><span class="number">{{:number}}</span><span class="title">{{:title}}</span></h2>
           <div class="body-display"></div>
+          <div class="controls">
+            <button class="delete">削除</button>
+            <button class="edit">編集</button>
+          </div>
           <ul class="tags"></ul>
         </div>
       EOS
@@ -20,6 +24,8 @@ module Editor
       element :number, :selector => 'h2>span.number'
       element :title, :selector => 'h2>span.title'
       element :body_display, :selector => 'div.body-display'
+      element :edit_button, :selector => 'button.edit'
+      element :delete_button, :selector => 'button.delete'
       element :tags, :selector => 'ul.tags', :default => [], :type => Tag
 
       attribute :mode, :default => 'plaintext'
@@ -71,12 +77,16 @@ module Editor
           <div>
             <input type="text" class="tag-str" value="{{attr:tag_str}}">
           </div>
+          <div>
+            <button class="close">閉じる</button>
+          </div>
         </div>
       EOS
 
       element :title, :selector => 'div>input.title'
       element :body, :selector => 'div>textarea.body'
       element :tag_str, :selector => 'div>input.tag-str'
+      element :close_button, :selector => 'button.close'
 
       attribute :tags, :default => []
 
@@ -133,6 +143,9 @@ module Editor
         editor.observe(:title) {|t| self.title = t }
         editor.observe(:body) {|b| self.body = b }
         editor.observe(:tags) {|t| self.tags = t.map{|s| {:str => s} } }
+
+        display.observe(:edit_button, :click) { edit }
+        editor.observe(:close_button, :click) { show }
       end
 
       def edit

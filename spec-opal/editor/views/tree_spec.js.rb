@@ -109,7 +109,7 @@ describe 'Editor::View::Tree' do
       it do
         expect(@target).to eq '1-2'
         expect(@from).to eq 'c1'
-        expect(@to).to be_nil
+        expect(@to).to eq 'id'
         expect(@position).to eq 1
       end
       it { expect(target.parent).to eq parent }
