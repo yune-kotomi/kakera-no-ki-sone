@@ -83,7 +83,7 @@ describe 'Editor::Model::Node' do
     end
   end
 
-  describe '走査' do
+  describe 'last_child' do
     # content挿入用
     describe '1の最後の子は1-3' do
       it { expect(child1.last_child).to eq child1_3 }
@@ -91,6 +91,38 @@ describe 'Editor::Model::Node' do
 
     describe '1-2の最後の子は自分自身' do
       it { expect(child1_2.last_child).to eq child1_2 }
+    end
+  end
+
+  describe 'scan' do
+    before do
+      @ret = []
+      child1.scan {|leaf| @ret.push(leaf.id) }
+    end
+
+    it { expect(@ret).to eq ['c1', '1-1', '1-1-1', '1-2', '1-3'] }
+  end
+
+  describe '削除' do
+    describe '末端の葉' do
+      before do
+        child1_1_1.observe(nil, :destroy) { @triggered = true }
+        child1_1.observe(:children) {|n, o| @children = [n, o] }
+        @ret = child1_1_1.destroy
+      end
+      let(:new_children) { @children.first }
+      let(:old_children) { @children.last }
+      it { expect(child1_1.children).to be_empty }
+      it { expect(@ret).to eq child1_1_1 }
+      it { expect(@triggered).to eq true }
+      it { expect(new_children).to be_empty }
+      it { expect(old_children).to eq [child1_1_1] }
+    end
+
+    describe '枝の途中' do
+      before { @ret = child1_1.destroy }
+      it { expect(child1.children.size).to eq 2 }
+      it { expect(@ret).to eq child1_1 }
     end
   end
 end

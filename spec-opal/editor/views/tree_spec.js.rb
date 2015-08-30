@@ -225,6 +225,14 @@ describe 'Editor::View::Tree' do
       end
     end
   end
+
+  describe '削除' do
+    before { @ret = child1_1.destroy }
+    it { expect(@ret).to eq child1_1 }
+    it { expect(child1.children.size).to eq 2 }
+    it { expect(child1.children.first).to eq child1_2 }
+    it { expect(child1.dom_element(:children).find("li[data-id='#{child1_1.id}']")).to be_empty }
+  end
 end
 
 describe 'Editor::JsDiff' do

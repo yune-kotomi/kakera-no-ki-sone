@@ -116,4 +116,12 @@ describe 'Editor::View::Contents' do
       end
     end
   end
+
+  describe '削除' do
+    let(:content_1_1) { contents.find('1-1') }
+    let(:content_1_1_1) { contents.find('1-1-1') }
+    before { content_1_1.destroy }
+    let(:dom_1_1) { contents.dom_element(:children).find("[data-id='#{content_1_1.id}']") }
+    it { expect(dom_1_1).to be_empty }
+  end
 end

@@ -14,7 +14,7 @@ module Editor
 
       def scan(&block)
         block.call(self)
-        children.each {|c| block.call(c) }
+        children.each {|c| c.scan(&block) }
       end
 
       def find(target_id)
@@ -40,6 +40,12 @@ module Editor
         else
           children.last.last_child
         end
+      end
+
+      def destroy
+        @parent.children = @parent.children.reject{|c| c == self }
+        trigger(nil, :destroy)
+        self
       end
     end
 

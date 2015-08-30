@@ -38,6 +38,12 @@ module Editor
           node.observe(:title) {|t| leaf.title = t }
           content.observe(:title) {|t| node.title = t }
           content.observe(:body) {|b| node.body = b }
+          content.destroy_clicked { node.destroy }
+          node.observe(nil, :destroy) do
+            leaf.destroy
+            # 表示領域はツリー上の親子関係を持たないのでnodeが持つ子をすべて明示的に消す
+            node.scan {|n| @contents.find(n.id).destroy }
+          end
         end
       end
 

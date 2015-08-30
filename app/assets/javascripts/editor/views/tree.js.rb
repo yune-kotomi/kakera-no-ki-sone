@@ -89,10 +89,21 @@ module Editor
         # 変更内容伝搬用
         model.observe(:title) {|v| new_child.title = v }
 
+        # 削除
+        model.observe(nil, :destroy) { new_child.destroy }
+
         # Treeのcurrent orderを更新しておく
         parental_tree.update_attribute(:order, parental_tree.serialize_nestable, {:trigger => false})
 
         new_child
+      end
+
+      def destroy
+        parent.children.delete(self)
+        self.dom_element.remove
+        parental_tree.update_order_silently
+
+        self
       end
 
       def parental_tree
@@ -169,8 +180,11 @@ module Editor
         # 変更内容伝搬用
         model.observe(:title) {|v| new_child.title = v }
 
+        # 削除
+        model.observe(nil, :destroy) { new_child.destroy }
+
         # current orderを更新しておく
-        update_attribute(:order, serialize_nestable, {:trigger => false})
+        update_order_silently
 
         new_child
       end
@@ -184,6 +198,11 @@ module Editor
       def rearrange_observe(&block)
         @rearrange_change_observers.push(block)
         block
+      end
+
+      # ノードの追加/削除時にchangeイベントを発生させずに保持しているオーダーを更新する
+      def update_order_silently
+        update_attribute(:order, serialize_nestable, {:trigger => false})
       end
 
       private

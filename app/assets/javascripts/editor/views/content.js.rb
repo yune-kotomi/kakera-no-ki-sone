@@ -157,6 +157,16 @@ module Editor
         dom_element.find('.editor-container').hide
         dom_element(:display).show
       end
+
+      def destroy_clicked
+        display.observe(:delete_button, :click) { yield }
+      end
+
+      def destroy
+        parent.children.delete(self)
+        self.dom_element.remove
+        self
+      end
     end
 
     class Contents < Juso::View::Base
@@ -197,8 +207,8 @@ module Editor
         end
       end
 
-      def add_child(target_id, src)
-        new_content = Content.new(src.attributes)
+      def add_child(target_id, model)
+        new_content = Content.new(model.attributes, self)
 
         if target_id.nil?
           self.children = [new_content]
@@ -209,8 +219,10 @@ module Editor
           prev_content.dom_element.after(new_content.dom_element)
         end
 
-        new_content.observe(:title) {|v| src.title = v }
-        new_content.observe(:body) {|v| src.body = v }
+        new_content.observe(:title) {|v| model.title = v }
+        new_content.observe(:body) {|v| model.body = v }
+        new_content.destroy_clicked { model.destroy }
+        model.observe(nil, :destroy) { model.scan{|n| find(n.id).destroy } }
 
         new_content
       end
