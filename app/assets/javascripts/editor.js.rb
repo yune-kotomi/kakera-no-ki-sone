@@ -36,6 +36,11 @@ module Editor
           content = @contents.find(node.id)
 
           node.observe(:title) {|t| leaf.title = t }
+          node.observe(:chapter_number) do |c|
+            leaf.chapter_number = c
+            content.chapter_number = c
+          end
+
           content.observe(:title) {|t| node.title = t }
           content.observe(:body) {|b| node.body = b }
           content.destroy_clicked { node.destroy }

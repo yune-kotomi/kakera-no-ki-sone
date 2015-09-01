@@ -144,7 +144,7 @@ module Juso
               end
 
               unless previous_attributes == value
-                values = value.map{|v| attribute_definition[:type].new(v) }
+                values = value.map{|v| attribute_definition[:type].new(v, self) }
                 values.each {|v| v.parent = self }
                 @attributes[name] = values
                 trigger(name, :change, values, previous_value) if options[:trigger]
@@ -159,7 +159,7 @@ module Juso
           else
             if previous_value.nil? || previous_value.attributes != value
               if value.is_a?(Hash)
-                @attributes[name] = attribute_definition[:type].new(value)
+                @attributes[name] = attribute_definition[:type].new(value, self)
               else
                 @attributes[name] = value
               end

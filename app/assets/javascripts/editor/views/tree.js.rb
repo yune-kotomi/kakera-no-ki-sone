@@ -35,14 +35,19 @@ module Editor
       <li class="dd-item" data-id="{{attr:id}}">
         <button data-action="collapse" type="button">Collapse</button>
         <button data-action="expand" type="button" style="display: none;">Expand</button>
-        <div class="dd-handle">Drag</div><div class="dd-content">{{:title}}</div>
+        <div class="dd-handle">Drag</div>
+        <div class="dd-content">
+          <span class="chapter_number">{{:chapter_number}}</span>
+          <span class="title">{{:title}}</span>
+        </div>
         <ol class="dd-list"></ol>
       </li>
       EOS
 
       attribute :id
       attribute :target, :default => false
-      element :title, :selector => 'div.dd-content'
+      element :chapter_number, :selector => 'div.dd-content>span.chapter_number'
+      element :title, :selector => 'div.dd-content>span.title'
       element :children, :selector => 'ol.dd-list:first', :type => Leaf
 
       def initialize(data = {}, parent = nil)
@@ -88,12 +93,13 @@ module Editor
 
         # 変更内容伝搬用
         model.observe(:title) {|v| new_child.title = v }
+        model.observe(:chapter_number) {|c| new_child.chapter_number = c }
 
         # 削除
         model.observe(nil, :destroy) { new_child.destroy }
 
         # Treeのcurrent orderを更新しておく
-        parental_tree.update_attribute(:order, parental_tree.serialize_nestable, {:trigger => false})
+        parental_tree.update_order_silently
 
         new_child
       end
@@ -179,6 +185,7 @@ module Editor
 
         # 変更内容伝搬用
         model.observe(:title) {|v| new_child.title = v }
+        model.observe(:chapter_number) {|c| new_child.chapter_number = c }
 
         # 削除
         model.observe(nil, :destroy) { new_child.destroy }

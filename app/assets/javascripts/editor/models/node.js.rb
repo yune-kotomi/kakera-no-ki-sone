@@ -2,6 +2,7 @@ module Editor
   module Model
     class Node < Juso::Model::Base
       attribute :id
+      attribute :chapter_number, :default => ''
       attribute :title
       attribute :body
       attribute :metadatum, :default => {}
@@ -10,6 +11,9 @@ module Editor
       def initialize(data = {}, parent = nil)
         super(data)
         @parent = parent
+
+        observe(:chapter_number) { update_chapter_number }.call
+        observe(:children) { update_chapter_number }
       end
 
       def scan(&block)
@@ -47,6 +51,12 @@ module Editor
         trigger(nil, :destroy)
         self
       end
+
+      def update_chapter_number
+        children.each_with_index do |child, index|
+          child.chapter_number = [chapter_number, index + 1].reject{|s| s == '' }.join('.')
+        end
+      end
     end
 
     class Root < Node
@@ -63,10 +73,17 @@ module Editor
 
       def rearrange(target_id, from_id, to_id, position)
         target = find(target_id)
+
         from = find(from_id)
+        children = from.children.clone
+        children.delete(target)
+        from.children = children
+
         to = find(to_id)
-        from.children.delete(target)
-        to.children.insert(position, target)
+        children = to.children.clone
+        children.insert(position, target)
+        to.children = children
+
         target.parent = to
       end
     end

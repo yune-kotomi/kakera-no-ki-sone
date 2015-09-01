@@ -11,7 +11,7 @@ module Editor
     class Display < Juso::View::Base
       template <<-EOS
         <div class="display">
-          <h2><span class="number">{{:number}}</span><span class="title">{{:title}}</span></h2>
+          <h2><span class="chapter_number">{{:chapter_number}}</span><span class="title">{{:title}}</span></h2>
           <div class="body-display"></div>
           <div class="controls">
             <button class="delete">削除</button>
@@ -21,7 +21,7 @@ module Editor
         </div>
       EOS
 
-      element :number, :selector => 'h2>span.number'
+      element :chapter_number, :selector => 'h2>span.chapter_number'
       element :title, :selector => 'h2>span.title'
       element :body_display, :selector => 'div.body-display'
       element :edit_button, :selector => 'button.edit'
@@ -116,7 +116,7 @@ module Editor
       element :display, :selector => '.display-container', :type => Display
 
       attribute :id
-      attribute :number
+      attribute :chapter_number
       attribute :title
       attribute :body
       attribute :mode, :default => 'plaintext'
@@ -131,7 +131,7 @@ module Editor
         self.display = Display.new(
           data.merge(:tags => (data[:tags]||[]).map{|t| {:str => t} })
         )
-        observe(:number) {|n| display.number = n }
+        observe(:chapter_number) {|n| display.chapter_number = n }
         observe(:title) {|t| display.title = t }
         observe(:mode) {|m| display.mode = m }
         observe(:body) {|b| display.body = b }
@@ -223,6 +223,7 @@ module Editor
         new_content.observe(:body) {|v| model.body = v }
         new_content.destroy_clicked { model.destroy }
         model.observe(nil, :destroy) { model.scan{|n| find(n.id).destroy } }
+        model.observe(:chapter_number) {|c| new_content.chapter_number = c }
 
         new_content
       end

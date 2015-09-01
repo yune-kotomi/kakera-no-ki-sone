@@ -24,6 +24,8 @@ describe 'Editor::Model::Node' do
       before { root.rearrange('1-2', 'c1', '1-1', 1) }
       it { expect(child1_1.children[1]).to eq child1_2 }
       it { expect(child1_2.parent).to eq child1_1 }
+      it { expect(child1_2.chapter_number).to eq '1.1.2' }
+      it { expect(child1_3.chapter_number).to eq '1.2' }
     end
 
     describe '1-1を1の前に' do
@@ -72,6 +74,8 @@ describe 'Editor::Model::Node' do
     it { expect(@new_child.id).not_to be_empty }
     it { expect(@root_changed).to be_nil }
     it { expect(@child1_changed).to eq true }
+    it { expect(@new_child.chapter_number).to eq '1.2' }
+    it { expect(child1_2.chapter_number).to eq '1.3' }
 
     describe '空の場合' do
       let(:empty_root) do
@@ -124,5 +128,12 @@ describe 'Editor::Model::Node' do
       it { expect(child1.children.size).to eq 2 }
       it { expect(@ret).to eq child1_1 }
     end
+  end
+
+  describe '章番号' do
+    it { expect(child1.chapter_number).to eq '1' }
+    it { expect(child1_1.chapter_number).to eq '1.1' }
+    it { expect(child1_1_1.chapter_number).to eq '1.1.1' }
+    it { expect(child1_2.chapter_number).to eq '1.2' }
   end
 end
