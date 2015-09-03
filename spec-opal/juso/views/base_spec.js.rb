@@ -66,8 +66,28 @@ describe 'Juso::View::Base' do
     end
 
     describe '複数の子' do
-      let(:init_data) { {:test4 => [{:test1 => 'test4-1'}, {:test1 => 'test4-2'}]} }
-      it { expect(test4_dom.find('li').count).to eq 2 }
+      let(:init_data) { {:test4 => [{:test1 => 'test4-1'}, {:test1 => 'test4-2'}, {:test1 => 'test4-3'}]} }
+      it { expect(test4_dom.find('li').count).to eq 3 }
+
+      describe '更新' do
+        before do
+          @test4_1 = test.test4[0]
+          @test4_2 = test.test4[1]
+
+          new_test4 = test.test4.clone
+          new_test4.insert(1, {:test1 => 'test4-2-new'})
+          new_test4.pop
+          test.test4 = new_test4
+        end
+
+        it { expect(test.test4.first).to eq @test4_1 }
+        it { expect(test.test4.first.dom_element).to eq @test4_1.dom_element }
+        it { expect(test.test4.last).to eq @test4_2 }
+        it { expect(test.test4.last.dom_element).to eq @test4_2.dom_element }
+        it { expect(test.test4.size).to eq 3 }
+        it { expect(test.test4[1].test1).to eq 'test4-2-new' }
+        it { expect(test.dom_element(:test4).find('li').map(&:text)).to eq ['test4-1', 'test4-2-new', 'test4-2'] }
+      end
     end
   end
 

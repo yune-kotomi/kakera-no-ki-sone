@@ -145,19 +145,25 @@ module Juso
         options = element_options(name)
 
         if !options[:type].nil?
-          old_dom_elements = elem.children
           # 小クラスに更新を依頼
           if value.is_a?(Array)
             value.each{|v| raise AttributeMustBeAHashOrClassError.new unless [Hash, options[:type]].include?(v.class) }
 
-            if value.first.is_a?(Hash)
-              children = value.map{|v| options[:type].new(v, self) }
-            else
-              children = value
+            children = value.map do |v|
+              if v.is_a?(Hash)
+                options[:type].new(v, self)
+              else
+                v
+              end
             end
             children.each{|c| elem.append(c.dom_element) }
+
+            # 使われなくなったDOM要素を始末
+            (self.send(name) - children).each{|c| c.dom_element.remove }
+
             update_attribute(name, children)
           else
+            old_dom_elements = elem.children
             if value.nil?
               child = nil
             else
@@ -169,10 +175,10 @@ module Juso
               end
               elem.append(child.dom_element)
             end
+            old_dom_elements.remove if child.nil? || child != self.send(name)
+
             update_attribute(name, child)
           end
-          # 古いものを削除
-          old_dom_elements.remove
 
         elsif !options[:dom_attribute].nil?
           # 指定されたDOM attributeに値を投入
