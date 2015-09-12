@@ -105,6 +105,16 @@ module Editor
       end
 
       def destroy
+        # 選択状態の切り替え
+        if self.target
+          position = parent.children.index(self)
+          if position > 0
+            parent.children[position - 1].target = true
+          else
+            parent.target = true
+          end
+        end
+
         parent.children.delete(self)
         self.dom_element.remove
         parental_tree.update_order_silently
