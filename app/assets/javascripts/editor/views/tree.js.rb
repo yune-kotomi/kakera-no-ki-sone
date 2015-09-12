@@ -152,10 +152,6 @@ module Editor
           prev.target = false unless prev.nil?
         end
 
-        # クリックで自分自身を選択状態に
-        observe(:title, :click) do
-          self.target = true
-        end
         observe(:target) do |v|
           if v
             dom_element(:title).add_class('selected')
@@ -164,6 +160,10 @@ module Editor
             dom_element(:title).remove_class('selected')
           end
         end
+        # クリックで自分自身を選択状態に
+        observe(:title, :click) do
+          self.target = true
+        end.call
       end
 
       def find(target_id)
