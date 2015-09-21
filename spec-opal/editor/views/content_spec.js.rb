@@ -23,7 +23,7 @@ describe 'Editor::View::Contents' do
     before do
       contents.rearrange(new_order)
       @order = contents.children.map(&:id)
-      @dom_order = contents.dom_element.find('span.title').to_a.map(&:text)
+      @dom_order = contents.dom_element(:children).find('span.title').to_a.map(&:text)
     end
     let(:dom_expected) { expected.map{|s| s.to_s } }
 

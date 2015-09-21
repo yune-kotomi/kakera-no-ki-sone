@@ -7,7 +7,7 @@ module Editor
       title = Element.find('#document-title').value
       description = Element.find('#document-description').value
       children = JSON.parse(Element.find('#document-body').value)
-      private = JSON.parse(Element.find('#document-private').value)
+      priv = JSON.parse(Element.find('#document-private').value)
       archived = JSON.parse(Element.find('#document-archived').value)
       markup = JSON.parse(Element.find('#document-markup').value)
 
@@ -16,7 +16,7 @@ module Editor
         :title => title,
         :body => description,
         :children => children,
-        :private => private,
+        :private => priv,
         :archived => archived,
         :markup => markup
       )
@@ -28,6 +28,11 @@ module Editor
       element.find('.tree-view').append(@tree.dom_element)
       @contents = Editor::View::Contents.new(@document.attributes)
       element.find('.content-view').append(@contents.dom_element)
+
+      # ルートノードの編集操作
+      @contents.observe(:title) {|t| @document.title = t }
+      @contents.observe(:body) {|b| @document.body = b }
+      @document.observe(:title) {|t| @tree.title = t }
 
       # 各属性を接続
       @document.children.each do |c|

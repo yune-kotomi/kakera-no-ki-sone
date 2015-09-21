@@ -70,9 +70,14 @@ module Juso
         when :change
           super(name, event) {|*args| block.call(*args) }
         else
-          # 知らないイベントはDOMイベントとする
-          # 親要素にイベントが伝搬しないようにする
-          elem.on(event) {|*args| block.call(*args); false }
+          if elem.nil?
+            # 継承先でマークアップが変更された場合、dom_elementがnilを返す場合がある
+            Proc.new{}
+          else
+            # 知らないイベントはDOMイベントとする
+            # 親要素にイベントが伝搬しないようにする
+            elem.on(event) {|*args| block.call(*args); false }
+          end
         end
       end
 
@@ -142,6 +147,8 @@ module Juso
       # 表示の更新
       def update_element(name, value)
         elem = dom_element(name)
+        return if elem.nil?
+
         options = element_options(name)
 
         if !options[:type].nil?

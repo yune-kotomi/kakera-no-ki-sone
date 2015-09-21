@@ -169,18 +169,64 @@ module Editor
       end
     end
 
+    class RootDisplay < Display
+      template <<-EOS
+        <div class="display">
+          <h2><span class="title">{{:title}}</span></h2>
+          <div class="body-display"></div>
+          <div class="controls">
+            <button class="edit">編集</button>
+          </div>
+        </div>
+      EOS
+    end
+
     class Contents < Juso::View::Base
       template <<-EOS
+        <div class="root">
+          <div class="display"></div>
+          <div class="editor" style="display:none">
+            <div>
+              <input type="text" class="title" value="{{attr:title}}">
+            </div>
+            <div>
+              <textarea class="body">{{:body}}</textarea>
+            </div>
+            <div>
+              <button class="close">閉じる</button>
+            </div>
+          </div>
+        </div>
         <div>
           <div class="children"></div>
         </div>
       EOS
 
+      element :display, :selector => 'div.display', :type => RootDisplay
+      element :editor, :selector => 'div.editor'
+      element :title, :selector => 'input.title'
+      element :body, :selector => 'textarea.body'
+      element :close_button, :selector => 'button.close'
       element :children, :selector => 'div.children', :type => Content
 
       def initialize(data = {}, parent = nil)
-        data['children'] = flatten_children(data['children'])
+        data.update(
+          'children' => flatten_children(data['children']),
+          'display' => data.select{|k, v| ['title', 'body', 'markup'].include?(k) }
+        )
         super(data, parent)
+
+        # ルートノードの編集処理
+        observe(:title) {|t| display.title = t }
+        observe(:body) {|b| display.body = b }
+        display.observe(:edit_button, :click) do
+          dom_element(:editor).show
+          display.dom_element.hide
+        end
+        observe(:close_button, :click) do
+          dom_element(:editor).hide
+          display.dom_element.show
+        end
       end
 
       def find(target_id)
