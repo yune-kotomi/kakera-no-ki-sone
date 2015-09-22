@@ -28,6 +28,8 @@ module Editor
       element.find('.tree-view').append(@tree.dom_element)
       @contents = Editor::View::Contents.new(@document.attributes)
       element.find('.content-view').append(@contents.dom_element)
+      @tags = Editor::View::Tags.new(:tags => @document.tags)
+      element.find('div.tag-list').append(@tags.dom_element)
 
       # ルートノードの編集操作
       @contents.observe(:title) {|t| @document.title = t }
@@ -48,7 +50,9 @@ module Editor
 
           content.observe(:title) {|t| node.title = t }
           content.observe(:body) {|b| node.body = b }
+          content.observe(:tags) {|t| node.metadatum = node.metadatum.clone.update('tags' => t.map{|e| e['str'] }) }
           content.destroy_clicked { node.destroy }
+
           node.observe(nil, :destroy) do
             leaf.destroy
             # 表示領域はツリー上の親子関係を持たないのでnodeが持つ子をすべて明示的に消す
@@ -62,6 +66,9 @@ module Editor
         @document.rearrange(target, from, to, position)
       end
       @tree.observe(:order) {|v| @contents.rearrange(v) }
+
+      # 文書全体の編集操作
+      @document.observe(:tags) {|t| @tags.tags = t }
     end
 
     # 編集対象の要素の弟ノードを追加する

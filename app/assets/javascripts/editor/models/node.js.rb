@@ -14,11 +14,14 @@ module Editor
 
         observe(:chapter_number) { update_chapter_number }.call
         observe(:children) { update_chapter_number }
+        observe { @parent.trigger(nil, :document_update) unless parent.nil? }
+        observe(nil, :document_update) { @parent.trigger(nil, :document_update) unless parent.nil? }
       end
 
       def scan(&block)
-        block.call(self)
-        children.each {|c| c.scan(&block) }
+        ret = [block.call(self)]
+        ret.push children.map {|c| c.scan(&block) }
+        ret.flatten
       end
 
       def find(target_id)
@@ -64,6 +67,15 @@ module Editor
       attribute :archived, :default => false
       attribute :password
       attribute :markup, :default => 'plaintext'
+      attribute :tags, :default => []
+
+      def initialize(data = {}, parent = nil)
+        super
+
+        observe(nil, :document_update) do
+          self.tags = children.map {|c| c.scan {|n| n.metadatum['tags'] } }.flatten.uniq.compact.sort
+        end.call
+      end
 
       def save
         HTTP.post("/documents/#{self.id}.json", :payload => self.attributes.to_json) do |response|

@@ -18,6 +18,7 @@ class JusoViewBaseTest < Juso::View::Base
     <input type="text" class="test2" value="{{attr:test2}}">
     <div class="test3" data-value="{{attr:test3}}"></div>
     <ul class="test4"></ul>
+    <input type="checkbox">
   </div>
   EOS
 
@@ -25,6 +26,7 @@ class JusoViewBaseTest < Juso::View::Base
   element :test2, :selector => 'input.test2'
   element :test3, :selector => 'div.test3', :dom_attribute => 'data-value'
   element :test4, :selector => 'ul.test4', :type => JusoViewBaseTest2
+  element :test5, :selector => 'input[type="checkbox"]', :default => false
 end
 
 describe 'Juso::View::Base' do
@@ -92,15 +94,22 @@ describe 'Juso::View::Base' do
   end
 
   describe '入力イベント' do
-    let(:values) do
-      v = []
-      test.observe(:test2) {|n, o| v = [n, o] }
-      test.dom_element(:test2).value = 'input'
-      test.dom_element(:test2).trigger(:input)
-      v
+    describe 'text_field' do
+      let(:values) do
+        v = []
+        test.observe(:test2) {|n, o| v = [n, o] }
+        test.dom_element(:test2).value = 'input'
+        test.dom_element(:test2).trigger(:input)
+        v
+      end
+
+      it { expect(values).to eq ['input', nil] }
     end
 
-    it { expect(values).to eq ['input', nil] }
+    describe 'checkbox' do
+      before { test.dom_element(:test5).trigger(:click) }
+      it { expect(test.test5).to eq true }
+    end
   end
 
   describe 'DOMイベント' do

@@ -267,6 +267,7 @@ module Editor
 
         new_content.observe(:title) {|v| model.title = v }
         new_content.observe(:body) {|v| model.body = v }
+        new_content.observe(:tags) {|t| model.metadatum = model.metadatum.clone.update('tags' => t.map{|e| e['str'] }) }
         new_content.destroy_clicked { model.destroy }
         model.observe(nil, :destroy) { model.scan{|n| find(n.id).destroy } }
         model.observe(:chapter_number) {|c| new_content.chapter_number = c }

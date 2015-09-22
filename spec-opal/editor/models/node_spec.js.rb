@@ -136,4 +136,16 @@ describe 'Editor::Model::Node' do
     it { expect(child1_1_1.chapter_number).to eq '1.1.1' }
     it { expect(child1_2.chapter_number).to eq '1.2' }
   end
+
+  describe '変更の伝搬' do
+    before do
+      root.observe(nil, :document_update) { @changed = true }
+      child1_1_1.title = 'new'
+    end
+    it { expect(@changed).to eq true }
+  end
+
+  describe '全タグ' do
+    it { expect(root.tags).to eq ['t1', 't11', 't111', 't12', 't13'] }
+  end
 end

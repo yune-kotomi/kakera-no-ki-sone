@@ -56,8 +56,18 @@ module Juso
           each{|n, _| update_element(n, attributes[n]) }
 
         element_options.keys.each do |name|
-          # 入力 -> 属性
-          observe(name, :input) {|e| send("#{name}=", e.current_target.value) }
+          elem = dom_element(name)
+          unless elem.nil?
+            if elem.tag_name == 'input' && elem['type'] == 'checkbox'
+              elem.on('click') do |e|
+                send("#{name}=", e.current_target.prop('checked'))
+                true
+              end
+            else
+              # 入力 -> 属性
+              observe(name, :input) {|e| send("#{name}=", e.current_target.value) }
+            end
+          end
         end
 
         self
@@ -154,7 +164,7 @@ module Juso
         if !options[:type].nil?
           # 小クラスに更新を依頼
           if value.is_a?(Array)
-            value.each{|v| raise AttributeMustBeAHashOrClassError.new unless [Hash, options[:type]].include?(v.class) }
+            value.each{|v| raise Juso::Model::AttributeMustBeAHashOrClassError.new unless [Hash, options[:type]].include?(v.class) }
 
             children = value.map do |v|
               if v.is_a?(Hash)
