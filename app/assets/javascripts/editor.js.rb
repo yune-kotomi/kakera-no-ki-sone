@@ -69,6 +69,9 @@ module Editor
 
       # 文書全体の編集操作
       @document.observe(:tags) {|t| @tags.tags = t }
+
+      # タグ選択
+      @tags.observe(:selected_tags) {|t| highlight_by_tags(t) }
     end
 
     # 編集対象の要素の弟ノードを追加する
@@ -94,6 +97,31 @@ module Editor
 
       # 生成した新ノードを選択状態にする
       leaf.target = true
+    end
+
+    # タグ選択でのハイライト処理
+    # タグが一つ以上選択されたらそのタグを持たないノードを落とす
+    # 選択タグが0の場合は全ノードを通常表示
+    def highlight_by_tags(selected_tags)
+      @document.scan do |node|
+        next if node == @document # ルートノードには手を付けない
+
+        leaf = @tree.find(node.id)
+        content = @contents.find(node.id)
+
+        if selected_tags.empty?
+          leaf.unfade
+          content.unfade
+        else
+          if (selected_tags - (node.metadatum['tags'] || [])).size < selected_tags.size
+            leaf.unfade
+            content.unfade
+          else
+            leaf.fade
+            content.fade
+          end
+        end
+      end
     end
   end
 end

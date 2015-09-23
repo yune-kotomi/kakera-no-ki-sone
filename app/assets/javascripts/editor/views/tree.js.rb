@@ -129,6 +129,16 @@ module Editor
           self.parent.parental_tree
         end
       end
+
+      def fade
+        dom_element(:chapter_number).effect(:fade_to, 'fast', 0.3)
+        dom_element(:title).effect(:fade_to, 'fast', 0.3)
+      end
+
+      def unfade
+        dom_element(:chapter_number).effect(:fade_to, 'fast', 1)
+        dom_element(:title).effect(:fade_to, 'fast', 1)
+      end
     end
 
     class Tree < Juso::View::Base

@@ -167,6 +167,14 @@ module Editor
         self.dom_element.remove
         self
       end
+
+      def fade
+        dom_element.effect(:fade_to, 'fast', 0.3)
+      end
+
+      def unfade
+        dom_element.effect(:fade_to, 'fast', 1)
+      end
     end
 
     class RootDisplay < Display
