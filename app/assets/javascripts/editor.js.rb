@@ -27,14 +27,15 @@ module Editor
       @document
     end
 
-    def attach(element)
+    def attach(elements)
       # view生成
       @tree = Editor::View::Tree.new(@document.attributes)
-      element.find('.tree-view').append(@tree.dom_element)
+      elements[:tree].append(@tree.dom_element)
       @contents = Editor::View::Contents.new(@document.attributes)
-      element.find('.content-view').append(@contents.dom_element)
+      elements[:contents].append(@contents.dom_element)
       @tags = Editor::View::Tags.new(:tags => @document.tags)
-      element.find('div.tag-list').append(@tags.dom_element)
+      elements[:tags].append(@tags.dom_element)
+      @save_indicator = elements[:save_indicator]
 
       # ルートノードの編集操作
       @contents.observe(:title) {|t| @document.title = t }
@@ -133,8 +134,8 @@ module Editor
 
     def save_enable
       @save = true
-      Element.find('#save-indicator>.saved').hide
-      Element.find('#save-indicator>.working').effect(:fade_in)
+      @save_indicator.find('.saved').hide
+      @save_indicator.find('.working').effect(:fade_in)
     end
 
     # 保存ループの処理実体
@@ -155,8 +156,8 @@ module Editor
           if request.ok?
             @save = false
             @sent_data = data
-            Element.find('#save-indicator>.working').hide
-            Element.find('#save-indicator>.saved').effect(:fade_in)
+            @save_indicator.find('.working').hide
+            @save_indicator.find('.saved').effect(:fade_in)
           else
           end
         end
@@ -169,7 +170,12 @@ Document.ready? do
   unless Element.find('#document-editor').empty?
     editor = Editor::Editor.new
     editor.load_from_dom
-    editor.attach(Element.find('#document-editor'))
+    editor.attach(
+      :tree => Element.find('#document-editor>.tree-view'),
+      :contents => Element.find('#document-editor>.content-view'),
+      :tags => Element.find('#document-editor>.tag-list'),
+      :save_indicator => Element.find('#save-indicator')
+    )
 
     Element.find('#add-button').on(:click) do
       editor.add_child
