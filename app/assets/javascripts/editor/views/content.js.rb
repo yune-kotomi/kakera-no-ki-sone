@@ -135,14 +135,14 @@ module Editor
         observe(:title) {|t| display.title = t }
         observe(:mode) {|m| display.mode = m }
         observe(:body) {|b| display.body = b }
-        observe(:tags) {|t| display.tags = t }
+        observe(:tags) {|t| display.tags = (t||[]).map{|s| {:str => s} } }
 
         # editorと結合
         self.editor = Editor.new(data)
         dom_element.find('.editor-container').append(editor.dom_element)
         editor.observe(:title) {|t| self.title = t }
         editor.observe(:body) {|b| self.body = b }
-        editor.observe(:tags) {|t| self.tags = t.map{|s| {:str => s} } }
+        editor.observe(:tags) {|t| self.tags = t }
 
         display.observe(:edit_button, :click) { edit }
         editor.observe(:close_button, :click) { show }
@@ -262,7 +262,13 @@ module Editor
       end
 
       def add_child(target_id, model)
-        new_content = Content.new(model.attributes, self)
+        if model.metadatum && model.metadatum[:tags]
+          tags = node.metadatum[:tags]
+        else
+          tags = []
+        end
+
+        new_content = Content.new(model.attributes.update(:tags => tags), self)
 
         if target_id.nil?
           self.children = [new_content]
@@ -275,7 +281,7 @@ module Editor
 
         new_content.observe(:title) {|v| model.title = v }
         new_content.observe(:body) {|v| model.body = v }
-        new_content.observe(:tags) {|t| model.metadatum = model.metadatum.clone.update('tags' => t.map{|e| e['str'] }) }
+        new_content.observe(:tags) {|t| model.metadatum = model.metadatum.clone.update('tags' => t) }
         new_content.destroy_clicked { model.destroy }
         model.observe(nil, :destroy) { model.scan{|n| find(n.id).destroy } }
         model.observe(:chapter_number) {|c| new_content.chapter_number = c }

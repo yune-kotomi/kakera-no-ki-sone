@@ -48,6 +48,10 @@ module Editor
           leaf = @tree.find(node.id)
           content = @contents.find(node.id)
 
+          if node.metadatum && node.metadatum[:tags]
+            content.tags = node.metadatum[:tags]
+          end
+
           node.observe(:title) {|t| leaf.title = t }
           node.observe(:chapter_number) do |c|
             leaf.chapter_number = c
@@ -56,7 +60,7 @@ module Editor
 
           content.observe(:title) {|t| node.title = t }
           content.observe(:body) {|b| node.body = b }
-          content.observe(:tags) {|t| node.metadatum = node.metadatum.clone.update('tags' => t.map{|e| e['str'] }) }
+          content.observe(:tags) {|t| node.metadatum = node.metadatum.clone.update('tags' => t) }
           content.destroy_clicked { node.destroy }
 
           node.observe(nil, :destroy) do
