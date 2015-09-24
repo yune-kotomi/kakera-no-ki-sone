@@ -1,4 +1,9 @@
 <% @title = "編集: #{@document.title}" %>
+<div id="save-indicator">
+  <span class="working" style="display:none">保存しています...</span>
+  <span class="saved" style="display:none">保存しました</span>
+</div>
+
 <button id="add-button">add</button>
 <div class="row" id="document-editor">
   <div class="tag-list"></div>

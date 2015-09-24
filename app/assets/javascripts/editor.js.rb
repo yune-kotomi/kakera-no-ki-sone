@@ -20,6 +20,11 @@ module Editor
         :archived => archived,
         :markup => markup
       )
+
+      #保存ループ起動
+      `setInterval(function(){#{save_loop}}, 5000)`
+
+      @document
     end
 
     def attach(element)
@@ -69,6 +74,8 @@ module Editor
 
       # 文書全体の編集操作
       @document.observe(:tags) {|t| @tags.tags = t }
+      @document.observe(nil, :document_update) { save_enable }
+      @document.observe { save_enable }
 
       # タグ選択
       @tags.observe(:selected_tags) {|t| highlight_by_tags(t) }
@@ -119,6 +126,38 @@ module Editor
           else
             leaf.fade
             content.fade
+          end
+        end
+      end
+    end
+
+    def save_enable
+      @save = true
+      Element.find('#save-indicator>.saved').hide
+      Element.find('#save-indicator>.working').effect(:fade_in)
+    end
+
+    # 保存ループの処理実体
+    def save_loop
+      save if @save
+    end
+
+    # PATCH /documents/ID.jsonを発行する
+    def save
+      data = @document.attributes(:reject => [:chapter_number])
+      data = data.update(
+        'description' => data['body'],
+        'body' => data['children'].to_json,
+      ).reject{|k, v| ['id', 'tags', 'children', 'metadatum'].include?(k) }
+
+      unless data == @sent_data # 内容が更新されていなければ保存しない
+        HTTP.patch("/documents/#{@document.id}.json", :payload => {'document' => data}) do |request|
+          if request.ok?
+            @save = false
+            @sent_data = data
+            Element.find('#save-indicator>.working').hide
+            Element.find('#save-indicator>.saved').effect(:fade_in)
+          else
           end
         end
       end

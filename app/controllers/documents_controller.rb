@@ -44,9 +44,9 @@ class DocumentsController < ApplicationController
   # PATCH/PUT /documents/1.json
   def update
     respond_to do |format|
-      if @document.update(document_params)
+      if @document.update(document_params.update(:body => JSON.parse(document_params[:body] || '[]')))
         format.html { redirect_to @document, notice: 'Document was successfully updated.' }
-        format.json { render :text => 'ok' }
+        format.json { render :json => true }
       else
         format.html { render :edit }
         format.json { render json: @document.errors, status: :unprocessable_entity }

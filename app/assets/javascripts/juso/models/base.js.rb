@@ -74,20 +74,23 @@ module Juso
         end
       end
 
-      def attributes
+      def attributes(params = {})
         ret = @attributes.map do |k, v|
           case v
           when Array
             v = v.map do |v|
-              v = v.attributes if v.respond_to?(:attributes)
+              v = v.attributes(params) if v.respond_to?(:attributes)
               v
             end
           else
-            v = v.attributes if v.respond_to?(:attributes)
+            v = v.attributes(params) if v.respond_to?(:attributes)
           end
           [k, v]
         end
-        Hash[ret]
+        ret = Hash[ret]
+        ret = ret.reject{|k, v| params[:reject].include?(k) } if params[:reject]
+
+        ret
       end
 
       def update_attributes(source)

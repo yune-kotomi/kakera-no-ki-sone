@@ -65,6 +65,11 @@ describe 'Juso::Model::Base' do
           :attr2 => 'default1',
           :attr3 => {:attr1 => 'test value'}
         }) }
+
+      describe '指定キーのreject' do
+        let(:attributes) { test.attributes(:reject => [:attr1]) }
+        it { expect(attributes).to eq ({:attr2 => 'default1', :attr3 => {}})}
+      end
     end
 
     describe '生成時の値' do

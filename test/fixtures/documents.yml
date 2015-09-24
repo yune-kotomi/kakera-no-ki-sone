@@ -19,10 +19,12 @@ document2:
       title: node1
       body: body text 1
       children: []
+      metadatum: {}
     - id: 5d33a7be-c4a8-413b-897e-b882b396f0d8
       title: node2
       body: body text 2
       children: []
+      metadatum: {}
   private: false
   archived: false
   password:
