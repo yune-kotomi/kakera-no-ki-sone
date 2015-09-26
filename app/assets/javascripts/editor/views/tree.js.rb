@@ -139,25 +139,39 @@ module Editor
         dom_element(:chapter_number).effect(:fade_to, 'fast', 1)
         dom_element(:title).effect(:fade_to, 'fast', 1)
       end
+
+      def offset_top
+        dom_element(:title).offset.top
+      end
+
+      def offset_bottom
+        offset_top + dom_element(:title).outer_height
+      end
     end
 
     class Tree < Juso::View::Base
       template <<-EOS
-      <div class="tree">
-        <div class="root" data-id="{{attr:id}}">{{:title}}</div>
-        <div class="dd">
-          <ol class="dd-list"></ol>
+        <div class="scroll-container">
+          <div class="tree">
+            <div class="root" data-id="{{attr:id}}">{{:title}}</div>
+            <div class="dd">
+              <ol class="dd-list"></ol>
+            </div>
+          </div>
         </div>
-      </div>
       EOS
 
+      element :children, :selector => 'div.dd>ol.dd-list', :type => Leaf
+      element :container
+      element :nestable, :selector => 'div.dd'
+      element :title, :selector => 'div.root'
+
+      attribute :current_target
       attribute :id
       attribute :order
-      element :title, :selector => 'div.root'
-      element :children, :selector => 'div.dd>ol.dd-list', :type => Leaf
-      element :nestable, :selector => 'div.dd'
-      attribute :current_target
       attribute :target
+
+      attr_reader :scroll_direction
 
       def initialize(data = {}, parent = nil)
         super(data, parent)
@@ -184,6 +198,17 @@ module Editor
         observe(:title, :click) do
           self.target = true
         end.call
+
+        # スクロール方向判定
+        observe(:container, :scroll) do
+          c = dom_element(:container)
+          if @prev_scroll_top.to_i < c.scroll_top
+            @scroll_direction = :down
+          else
+            @scroll_direction = :up
+          end
+          @prev_scroll_top = c.scroll_top
+        end
       end
 
       def find(target_id)
@@ -230,6 +255,31 @@ module Editor
       # ノードの追加/削除時にchangeイベントを発生させずに保持しているオーダーを更新する
       def update_order_silently
         update_attribute(:order, serialize_nestable, {:trigger => false})
+      end
+
+      # 可視ノードのIDを返す
+      def visible_contents
+        # 表示領域
+        visible_min = dom_element(:container).offset.top
+        visible_max = visible_min + dom_element(:container).height
+
+        flatten_leaf(self).select {|c| (visible_min < c.offset_bottom && c.offset_bottom <= visible_max) || (visible_min < c.offset_top && c.offset_top <= visible_max) }.map(&:id)
+      end
+
+      def offset_top
+        dom_element(:title).offset.top
+      end
+
+      def offset_bottom
+        offset_top + dom_element(:title).outer_height
+      end
+
+      def scroll_to(id)
+        target = find(id)
+        offset = target.offset_top +
+          dom_element(:container).scroll_top -
+          dom_element(:container).offset.top
+        dom_element(:container).scroll_top = offset
       end
 
       private
@@ -305,6 +355,10 @@ module Editor
         from.children.delete(target)
         to.children.insert(position, target)
         target.parent = to
+      end
+
+      def flatten_leaf(target)
+        [target, target.children.map{|c| flatten_leaf(c) }].flatten
       end
     end
   end

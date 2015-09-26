@@ -84,6 +84,33 @@ module Editor
 
       # タグ選択
       @tags.observe(:selected_tags) {|t| highlight_by_tags(t) }
+
+      # スクロール制御
+      @tree.observe(:current_target) {|t| @contents.scroll_to(t) }
+
+      @tree.observe(:container, :scroll) do
+        # targetが不可視になったら可視範囲にあるノードをtargetにする
+        visible_contents = @tree.visible_contents
+        unless visible_contents.include?(@tree.current_target)
+          if @tree.scroll_direction == :down
+            target = visible_contents.first
+          else
+            target = visible_contents.last
+          end
+
+          @tree.find(target).target = true
+        end
+      end
+
+      @contents.observe(:container, :scroll) do
+        contents = @contents.visible_contents
+        tree = @tree.visible_contents
+        # contentとtreeの可視範囲がずれたら追従させる
+        if (contents & tree).size == 0
+          @tree.scroll_to(contents.first)
+          @tree.find(contents.first).target = true
+        end
+      end
     end
 
     # 編集対象の要素の弟ノードを追加する

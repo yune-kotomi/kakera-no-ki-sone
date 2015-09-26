@@ -2,8 +2,20 @@
 // They will automatically be included in application.css.
 // You can use Sass (SCSS) here: http://sass-lang.com/
 .tree-view {
-  .selected {
-    font-weight: bold;
-    background-color: yellow;
+  .scroll-container {
+    height: 400px;
+    overflow: auto;
+
+    .selected {
+      background-color: yellow;
+      font-weight: bold;
+    }
+  }
+}
+
+.content-view {
+  .scroll-container {
+    height: 400px;
+    overflow: auto;
   }
 }

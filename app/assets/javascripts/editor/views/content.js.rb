@@ -175,6 +175,14 @@ module Editor
       def unfade
         dom_element.effect(:fade_to, 'fast', 1)
       end
+
+      def offset_top
+        dom_element.offset.top
+      end
+
+      def offset_bottom
+        offset_top + dom_element.outer_height
+      end
     end
 
     class RootDisplay < Display
@@ -191,22 +199,24 @@ module Editor
 
     class Contents < Juso::View::Base
       template <<-EOS
-        <div class="root">
-          <div class="display"></div>
-          <div class="editor" style="display:none">
-            <div>
-              <input type="text" class="title" value="{{attr:title}}">
-            </div>
-            <div>
-              <textarea class="body">{{:body}}</textarea>
-            </div>
-            <div>
-              <button class="close">閉じる</button>
+        <div class="scroll-container">
+          <div class="root">
+            <div class="display"></div>
+            <div class="editor" style="display:none">
+              <div>
+                <input type="text" class="title" value="{{attr:title}}">
+              </div>
+              <div>
+                <textarea class="body">{{:body}}</textarea>
+              </div>
+              <div>
+                <button class="close">閉じる</button>
+              </div>
             </div>
           </div>
-        </div>
-        <div>
-          <div class="children"></div>
+          <div>
+            <div class="children"></div>
+          </div>
         </div>
       EOS
 
@@ -216,6 +226,9 @@ module Editor
       element :body, :selector => 'textarea.body'
       element :close_button, :selector => 'button.close'
       element :children, :selector => 'div.children', :type => Content
+      element :container
+
+      attribute :id
 
       def initialize(data = {}, parent = nil)
         data.update(
@@ -238,7 +251,11 @@ module Editor
       end
 
       def find(target_id)
-        children.find{|c| c.id == target_id }
+        if self.id == target_id
+          self
+        else
+          children.find{|c| c.id == target_id }
+        end
       end
 
       def rearrange(new_order)
@@ -287,6 +304,37 @@ module Editor
         model.observe(:chapter_number) {|c| new_content.chapter_number = c }
 
         new_content
+      end
+
+      # 可視ノードのIDを返す
+      def visible_contents
+        # 表示領域
+        visible_min = dom_element(:container).offset.top
+        visible_max = visible_min + dom_element(:container).height
+
+        ret = children.select {|c| (visible_min < c.offset_bottom && c.offset_bottom <= visible_max) || (visible_min < c.offset_top && c.offset_top <= visible_max) }.map(&:id)
+
+        if (visible_min < offset_bottom && offset_bottom <= visible_max) || (visible_min < offset_top && offset_top <= visible_max)
+          ret.push(self.id)
+        end
+
+        ret
+      end
+
+      def offset_top
+        dom_element(:display).offset.top
+      end
+
+      def offset_bottom
+        offset_top + dom_element(:display).outer_height
+      end
+
+      def scroll_to(id)
+        target = find(id)
+        offset = target.offset_top +
+          dom_element(:container).scroll_top -
+          dom_element(:container).offset.top
+        dom_element(:container).scroll_top = offset
       end
 
       private
