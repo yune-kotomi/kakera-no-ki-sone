@@ -58,6 +58,8 @@ module Editor
             content.chapter_number = c
           end
 
+          leaf.observe(:open) {|o| node.metadatum = node.metadatum.clone.update(:open => o) }
+
           content.observe(:title) {|t| node.title = t }
           content.observe(:body) {|b| node.body = b }
           content.observe(:tags) {|t| node.metadatum = node.metadatum.clone.update('tags' => t) }

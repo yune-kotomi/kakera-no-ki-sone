@@ -33,30 +33,39 @@ module Editor
     class Leaf < Juso::View::Base
       template <<-EOS
       <li class="dd-item" data-id="{{attr:id}}">
-        <button data-action="collapse" type="button">Collapse</button>
-        <button data-action="expand" type="button" style="display: none;">Expand</button>
         <div class="dd-handle">Drag</div>
         <div class="dd-content">
           <span class="chapter_number">{{:chapter_number}}</span>
           <span class="title">{{:title}}</span>
         </div>
-        <ol class="dd-list"></ol>
+        <ol class="dd-list" {{if open}}{{else}}style="display:none"{{/if}}></ol>
       </li>
       EOS
 
       attribute :id
       attribute :target, :default => false
+      attribute :open, :default => true
       element :chapter_number, :selector => 'div.dd-content>span.chapter_number'
       element :title, :selector => 'div.dd-content>span.title'
       element :children, :selector => 'ol.dd-list:first', :type => Leaf
+      element :collapse, :selector => 'button[data-action="collapse"]'
+      element :expand, :selector => 'button[data-action="expand"]'
 
       def initialize(data = {}, parent = nil)
+        if data[:metadatum] && data[:metadatum].has_key?(:open)
+          open = data[:metadatum][:open]
+        elsif data.has_key?(:open)
+          open = data[:open]
+        else
+          open = true
+        end
+        data = data.update(:open => open)
+
         super(data, parent)
 
         if self.children.nil? || self.children.empty?
           # 子がない場合に不要なものを削除
           dom_element(:children).remove
-          dom_element.find('button').remove
         end
 
         # タイトルのクリックでTreeの編集対象にする
@@ -72,6 +81,12 @@ module Editor
             dom_element(:title).remove_class('selected')
           end
         end
+      end
+
+      def scan(&block)
+        ret = [block.call(self)]
+        ret.push children.map {|c| c.scan(&block) }
+        ret.flatten
       end
 
       def find(target_id)
@@ -94,6 +109,7 @@ module Editor
         # 変更内容伝搬用
         model.observe(:title) {|v| new_child.title = v }
         model.observe(:chapter_number) {|c| new_child.chapter_number = c }
+        new_child.observe(:open) {|o| model.metadatum = model.metadatum.clone.update(:open => o) }
 
         # 削除
         model.observe(nil, :destroy) { new_child.destroy }
@@ -147,6 +163,11 @@ module Editor
       def offset_bottom
         offset_top + dom_element(:title).outer_height
       end
+
+      def observe_open_close
+        dom_element(:collapse).on(:click) { self.open = false; true } if dom_element(:collapse)
+        dom_element(:expand).on(:click) { self.open = true; true } if dom_element(:expand)
+      end
     end
 
     class Tree < Juso::View::Base
@@ -176,6 +197,17 @@ module Editor
       def initialize(data = {}, parent = nil)
         super(data, parent)
         init_nestable
+
+        # 開閉状態を反映
+        children.each do |leaf|
+          leaf.scan do |l|
+            unless l.open
+              l.dom_element(:collapse).hide if l.dom_element(:collapse)
+              l.dom_element(:expand).show if l.dom_element(:expand)
+            end
+          end
+        end
+
         @rearrange_change_observers = []
         observe(:order) {|current, previous| rearranged(previous, current) }
         rearrange_observe {|t, f, to, pos| rearrange_leaves(t, f, to, pos) }
@@ -299,6 +331,9 @@ module Editor
           target.on('change', function(){#{rearrange}});
         }
         update_attribute(:order, serialize_nestable, {:trigger => false})
+
+        # 開閉状態の反映
+        children.each {|l| l.scan {|leaf| leaf.observe_open_close } }
       end
 
       def rearrange
@@ -323,7 +358,11 @@ module Editor
         tmp = added.value.split("\n").first.split(":")
         tmp.pop
         to = tmp.last
-        to = self.id if to == '' # ルートノード
+        if to == ''
+          to = self.id # ルートノード
+        else
+          find(to).observe_open_close
+        end
         # 子の挿入位置検出
         children = curr_text.split("\n").
           select{|s| s.split(':').size == tmp.size + 1 }.

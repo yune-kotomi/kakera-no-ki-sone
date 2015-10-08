@@ -43,8 +43,16 @@ module Juso
           end
         end
         @attributes = @attribute_definitions.map do |k, v|
-          value = v[:default]
-          value = v[:default].dup unless v[:default].nil?
+          if v.keys.include?(:default)
+            case v[:default]
+            when TrueClass, FalseClass, NilClass
+              value = v[:default]
+            else
+              value = v[:default].dup
+            end
+          else
+            value = nil
+          end
           [k, value]
         end.to_h
         @observers = {}
