@@ -169,6 +169,7 @@ module Editor
       @save = true
       @save_indicator.find('.saved').hide
       @save_indicator.find('.working').effect(:fade_in)
+      Window.on(:beforeunload) { close_confirm }
     end
 
     # 保存ループの処理実体
@@ -191,10 +192,15 @@ module Editor
             @sent_data = data
             @save_indicator.find('.working').hide
             @save_indicator.find('.saved').effect(:fade_in)
+            Window.off(:beforeunload)
           else
           end
         end
       end
+    end
+
+    def close_confirm
+      'まだ保存されていません。よろしいですか？'
     end
   end
 end
