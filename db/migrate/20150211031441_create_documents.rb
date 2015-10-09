@@ -5,7 +5,7 @@ class CreateDocuments < ActiveRecord::Migration
       t.text :description
       t.text :body_yaml, :default => '--- []', :null => false
       t.text :fulltext
-      t.boolean :private, :default => true, :null => false
+      t.boolean :public, :default => false, :null => false
       t.boolean :archived, :default => false, :null => false
       t.string :password
       t.string :markup, :default => :plaintext, :null => false

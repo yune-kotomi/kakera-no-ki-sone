@@ -12,7 +12,7 @@ class UsersController < ApplicationController
       order("updated_at desc").
       page(params[:page])
 
-    @documents = @documents.where(:private => false) unless @user == @login_user
+    @documents = @documents.where(:public => true) unless @user == @login_user
   end
 
   def login

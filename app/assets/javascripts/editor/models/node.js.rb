@@ -63,7 +63,7 @@ module Editor
     end
 
     class Root < Node
-      attribute :private, :default => true
+      attribute :public, :default => false
       attribute :archived, :default => false
       attribute :password
       attribute :markup, :default => 'plaintext'

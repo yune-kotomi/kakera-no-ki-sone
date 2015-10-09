@@ -41,7 +41,7 @@ def document_source
       :title => 'title',
       :body => 'description',
       :children => children,
-      :private => false,
+      :public => true,
       :archived => false,
       :markup => 'plaintext'
     }

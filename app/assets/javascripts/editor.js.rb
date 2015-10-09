@@ -7,7 +7,7 @@ module Editor
       title = Element.find('#document-title').value
       description = Element.find('#document-description').value
       children = JSON.parse(Element.find('#document-body').value)
-      priv = JSON.parse(Element.find('#document-private').value)
+      publ = JSON.parse(Element.find('#document-public').value)
       archived = JSON.parse(Element.find('#document-archived').value)
       markup = JSON.parse(Element.find('#document-markup').value)
 
@@ -16,7 +16,7 @@ module Editor
         :title => title,
         :body => description,
         :children => children,
-        :private => priv,
+        :public => publ,
         :archived => archived,
         :markup => markup
       )

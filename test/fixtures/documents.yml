@@ -4,7 +4,7 @@ document1:
   title: document 1
   description: document 1 description
   body_yaml: --- []
-  private: false
+  public: true
   archived: false
   password:
   markup: plaintext
@@ -25,7 +25,7 @@ document2:
       body: body text 2
       children: []
       metadatum: {}
-  private: false
+  public: true
   archived: false
   password:
   markup: plaintext
@@ -35,7 +35,7 @@ document3:
   title: document 3
   description: document 3 description
   body_yaml: --- []
-  private: true
+  public: false
   archived: false
   password:
   markup: plaintext
@@ -45,7 +45,7 @@ document4:
   title: document 4
   description: document 4 description
   body_yaml: --- []
-  private: false
+  public: true
   archived: true
   password:
   markup: plaintext
@@ -55,7 +55,7 @@ document5:
   title: document 5
   description: document 5 description
   body_yaml: --- []
-  private: true
+  public: false
   archived: true
   password:
   markup: plaintext

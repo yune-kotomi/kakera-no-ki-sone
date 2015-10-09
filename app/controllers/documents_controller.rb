@@ -8,7 +8,7 @@ class DocumentsController < ApplicationController
   # GET /documents.json
   def index
     @documents = Document.
-      where(:private => false).
+      where(:public => true).
       order("updated_at desc").
       offset(offset).
       limit(41)
@@ -17,7 +17,7 @@ class DocumentsController < ApplicationController
   # GET /documents/1
   # GET /documents/1.json
   def show
-    forbidden if @document.private && @document.user != @login_user
+    forbidden if !@document.public && @document.user != @login_user
   end
 
   # GET /documents/1/edit
@@ -75,7 +75,7 @@ class DocumentsController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def document_params
-      params.require(:document).permit(:title, :description, :body, :private, :archived, :password, :markup)
+      params.require(:document).permit(:title, :description, :body, :public, :archived, :password, :markup)
     end
 
     def owner_required

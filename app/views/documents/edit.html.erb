@@ -15,6 +15,6 @@
 <%= hidden_field_tag :title, @document.title, :id => 'document-title' %>
 <%= hidden_field_tag :description, @document.description, :id => 'document-description' %>
 <%= hidden_field_tag :body, @document.body.to_json, :id => 'document-body' %>
-<%= hidden_field_tag :private, @document.private.to_json, :id => 'document-private' %>
+<%= hidden_field_tag :public, @document.public.to_json, :id => 'document-public' %>
 <%= hidden_field_tag :archived, @document.archived.to_json, :id => 'document-archived' %>
 <%= hidden_field_tag :markup, @document.markup.to_json, :id => 'document-markup' %>
