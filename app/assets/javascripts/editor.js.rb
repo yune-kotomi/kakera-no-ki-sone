@@ -113,6 +113,22 @@ module Editor
           @tree.find(contents.first).target = true
         end
       end
+
+      # 公開/非公開
+      if @document.public
+        elements[:public_checkbox].prop('checked', true)
+      else
+        elements[:public_checkbox].prop('checked', false)
+      end
+      elements[:public_checkbox].on(:click) do |e|
+        if e.current_target.prop('checked')
+          @document.public = true
+        else
+          @document.public = false
+        end
+
+        true
+      end
     end
 
     # 編集対象の要素の弟ノードを追加する
@@ -213,7 +229,8 @@ Document.ready? do
       :tree => Element.find('#document-editor>.tree-view'),
       :contents => Element.find('#document-editor>.content-view'),
       :tags => Element.find('#document-editor>.tag-list'),
-      :save_indicator => Element.find('#save-indicator')
+      :save_indicator => Element.find('#save-indicator'),
+      :public_checkbox => Element.find('#public-checkbox')
     )
 
     Element.find('#add-button').on(:click) do
