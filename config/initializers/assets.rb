@@ -8,7 +8,8 @@ Rails.application.config.assets.version = '1.0'
 Rails.application.config.assets.paths.concat([
   'vendor/Nestable',
   'vendor/jsdiff',
-  'vendor/uuidjs/dist'
+  'vendor/uuidjs/dist',
+  'vendor/text-hatena.js'
 ])
 
 # Precompile additional assets.

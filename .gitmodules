@@ -7,3 +7,6 @@
 [submodule "vendor/uuidjs"]
 	path = vendor/uuidjs
 	url = https://github.com/LiosK/UUID.js.git
+[submodule "vendor/text-hatena.js"]
+	path = vendor/text-hatena.js
+	url = https://github.com/nitoyon/text-hatena.js.git
