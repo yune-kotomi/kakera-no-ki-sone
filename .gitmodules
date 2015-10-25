@@ -10,3 +10,6 @@
 [submodule "vendor/text-hatena.js"]
 	path = vendor/text-hatena.js
 	url = https://github.com/nitoyon/text-hatena.js.git
+[submodule "vendor/showdown"]
+	path = vendor/showdown
+	url = https://github.com/showdownjs/showdown.git

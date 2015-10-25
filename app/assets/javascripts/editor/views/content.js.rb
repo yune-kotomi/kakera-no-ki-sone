@@ -46,6 +46,8 @@ module Editor
           self.body_display = render_plaintext(body)
         when 'hatena'
           self.body_display = render_hatena(body)
+        when 'markdown'
+          self.body_display = render_markdown(body)
         else
           raise UnknownMarkupError.new({})
         end
@@ -69,6 +71,12 @@ module Editor
 
       def render_hatena(src)
         parser = Text::Hatena.new(:sectionanchor => "■")
+        parser.parse(src)
+        parser.to_html
+      end
+
+      def render_markdown(src)
+        parser = Markdown::Parser.new
         parser.parse(src)
         parser.to_html
       end

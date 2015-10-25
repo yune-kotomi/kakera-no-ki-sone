@@ -9,7 +9,8 @@ Rails.application.config.assets.paths.concat([
   'vendor/Nestable',
   'vendor/jsdiff',
   'vendor/uuidjs/dist',
-  'vendor/text-hatena.js'
+  'vendor/text-hatena.js',
+  'vendor/showdown/dist'
 ])
 
 # Precompile additional assets.
