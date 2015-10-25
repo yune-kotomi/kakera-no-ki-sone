@@ -7,6 +7,8 @@
 <button id="add-button">add</button>
 <input type="checkbox" id="public-checkbox">
 <label for="public-checkbox">公開する</label>
+<%= select_tag :markup,
+  options_for_select([['記法なし', :plaintext], ['はてな記法', :hatena]], @document.markup) %>
 
 <div class="row" id="document-editor">
   <div class="tag-list"></div>

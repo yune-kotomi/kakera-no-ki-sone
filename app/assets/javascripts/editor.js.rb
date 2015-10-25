@@ -41,6 +41,7 @@ module Editor
       @contents.observe(:title) {|t| @document.title = t }
       @contents.observe(:body) {|b| @document.body = b }
       @document.observe(:title) {|t| @tree.title = t }
+      @document.observe(:markup) {|m| @contents.markup = m }
 
       # 各属性を接続
       @document.children.each do |c|
@@ -128,6 +129,11 @@ module Editor
         end
 
         true
+      end
+
+      # 記法
+      elements[:markup_selector].on(:change) do |e|
+        @document.markup = e.current_target.value
       end
     end
 
@@ -230,7 +236,8 @@ Document.ready? do
       :contents => Element.find('#document-editor>.content-view'),
       :tags => Element.find('#document-editor>.tag-list'),
       :save_indicator => Element.find('#save-indicator'),
-      :public_checkbox => Element.find('#public-checkbox')
+      :public_checkbox => Element.find('#public-checkbox'),
+      :markup_selector => Element.find('#markup')
     )
 
     Element.find('#add-button').on(:click) do

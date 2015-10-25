@@ -28,24 +28,29 @@ module Editor
       element :delete_button, :selector => 'button.delete'
       element :tags, :selector => 'ul.tags', :default => [], :type => Tag
 
-      attribute :mode, :default => 'plaintext'
+      attribute :markup, :default => 'plaintext'
       attribute :body, :default => ''
 
       def initialize(data = {}, parent = nil)
         super(data, parent)
 
-        observe(:body) do |body|
-          # 記法展開して表示
-          case mode
-          when 'plaintext'
-            self.body_display = render_plaintext(body)
-          else
-            raise UnknownMarkupError.new({})
-          end
-        end.call(self.body)
+        observe(:body) {|b| render(self.markup, b) }
+        observe(:markup) {|m| render(m, self.body) }.call(self.markup)
       end
 
       private
+      def render(markup, text)
+        # 記法展開して表示
+        case markup
+        when 'plaintext'
+          self.body_display = render_plaintext(body)
+        when 'hatena'
+          self.body_display = render_hatena(body)
+        else
+          raise UnknownMarkupError.new({})
+        end
+      end
+
       def render_plaintext(src)
         text = src.to_s
         ({
@@ -60,6 +65,12 @@ module Editor
           text = text.gsub(k, v)
         end
         text
+      end
+
+      def render_hatena(src)
+        parser = Text::Hatena.new(:sectionanchor => "■")
+        parser.parse(src)
+        parser.to_html
       end
 
       class UnknownMarkupError < StandardError; end
@@ -119,7 +130,7 @@ module Editor
       attribute :chapter_number
       attribute :title
       attribute :body
-      attribute :mode, :default => 'plaintext'
+      attribute :markup, :default => 'plaintext'
       attribute :tags, :default => []
 
       attr_accessor :editor
@@ -133,7 +144,7 @@ module Editor
         )
         observe(:chapter_number) {|n| display.chapter_number = n }
         observe(:title) {|t| display.title = t }
-        observe(:mode) {|m| display.mode = m }
+        observe(:markup) {|m| display.markup = m }
         observe(:body) {|b| display.body = b }
         observe(:tags) {|t| display.tags = (t||[]).map{|s| {:str => s} } }
 
@@ -229,10 +240,11 @@ module Editor
       element :container
 
       attribute :id
+      attribute :markup
 
       def initialize(data = {}, parent = nil)
         data.update(
-          'children' => flatten_children(data['children']),
+          'children' => flatten_children(data['children']).map{|s| s.update(:markup => data[:markup]) },
           'display' => data.select{|k, v| ['title', 'body', 'markup'].include?(k) }
         )
         super(data, parent)
@@ -247,6 +259,12 @@ module Editor
         observe(:close_button, :click) do
           dom_element(:editor).hide
           display.dom_element.show
+        end
+
+        # 記法変更
+        observe(:markup) do |m|
+          display.markup = m
+          children.each {|c| c.markup = m }
         end
       end
 
