@@ -13,3 +13,6 @@
 [submodule "vendor/showdown"]
 	path = vendor/showdown
 	url = https://github.com/showdownjs/showdown.git
+[submodule "vendor/rickdom"]
+	path = vendor/rickdom
+	url = https://github.com/hasegawayosuke/rickdom.git

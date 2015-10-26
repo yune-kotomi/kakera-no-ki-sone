@@ -10,7 +10,8 @@ Rails.application.config.assets.paths.concat([
   'vendor/jsdiff',
   'vendor/uuidjs/dist',
   'vendor/text-hatena.js',
-  'vendor/showdown/dist'
+  'vendor/showdown/dist',
+  'vendor/rickdom/src'
 ])
 
 # Precompile additional assets.

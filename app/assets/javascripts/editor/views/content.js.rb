@@ -1,3 +1,5 @@
+require 'rickdom'
+
 module Editor
   module View
     class Tag < Juso::View::Base
@@ -41,16 +43,19 @@ module Editor
       private
       def render(markup, text)
         # 記法展開して表示
-        case markup
+        html = case markup
         when 'plaintext'
-          self.body_display = render_plaintext(body)
+          render_plaintext(body)
         when 'hatena'
-          self.body_display = render_hatena(body)
+          render_hatena(body)
         when 'markdown'
-          self.body_display = render_markdown(body)
+          render_markdown(body)
         else
           raise UnknownMarkupError.new({})
         end
+
+        # 危険なタグを除去
+        self.body_display = RickDOM.new.build(html)
       end
 
       def render_plaintext(src)
