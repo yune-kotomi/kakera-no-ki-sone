@@ -47,29 +47,13 @@ module Editor
       @document.children.each do |c|
         c.scan do |node|
           leaf = @tree.find(node.id)
+          leaf.attach(node)
+
           content = @contents.find(node.id)
+          content.attach(node)
 
           if node.metadatum && node.metadatum[:tags]
             content.tags = node.metadatum[:tags]
-          end
-
-          node.observe(:title) {|t| leaf.title = t }
-          node.observe(:chapter_number) do |c|
-            leaf.chapter_number = c
-            content.chapter_number = c
-          end
-
-          leaf.observe(:open) {|o| node.metadatum = node.metadatum.clone.update(:open => o) }
-
-          content.observe(:title) {|t| node.title = t }
-          content.observe(:body) {|b| node.body = b }
-          content.observe(:tags) {|t| node.metadatum = node.metadatum.clone.update('tags' => t) }
-          content.destroy_clicked { node.destroy }
-
-          node.observe(nil, :destroy) do
-            leaf.destroy
-            # 表示領域はツリー上の親子関係を持たないのでnodeが持つ子をすべて明示的に消す
-            node.scan {|n| @contents.find(n.id).destroy }
           end
         end
       end

@@ -106,18 +106,24 @@ module Editor
           dom_element(:children).children.at(position - 1).after(new_child.dom_element)
         end
 
-        # 変更内容伝搬用
-        model.observe(:title) {|v| new_child.title = v }
-        model.observe(:chapter_number) {|c| new_child.chapter_number = c }
-        new_child.observe(:open) {|o| model.metadatum = model.metadatum.clone.update(:open => o) }
-
-        # 削除
-        model.observe(nil, :destroy) { new_child.destroy }
+        new_child.attach(model)
 
         # Treeのcurrent orderを更新しておく
         parental_tree.update_order_silently
 
         new_child
+      end
+
+      def attach(model)
+        # 変更内容伝搬用
+        model.observe(:title) {|v| self.title = v }
+        model.observe(:chapter_number) {|c| self.chapter_number = c }
+        observe(:open) {|o| model.metadatum = model.metadatum.clone.update(:open => o) }
+
+        # 削除
+        model.observe(nil, :destroy) { self.destroy }
+
+        model
       end
 
       def destroy

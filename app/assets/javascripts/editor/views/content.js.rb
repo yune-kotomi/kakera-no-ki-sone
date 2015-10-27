@@ -207,6 +207,16 @@ module Editor
       def offset_bottom
         offset_top + dom_element.outer_height
       end
+
+      def attach(model)
+        observe(:title) {|v| model.title = v }
+        observe(:body) {|v| model.body = v }
+        observe(:tags) {|t| model.metadatum = model.metadatum.clone.update('tags' => t) }
+        destroy_clicked { model.destroy }
+        # 表示領域はツリー上の親子関係を持たないのでnodeが持つ子をすべて明示的に消す
+        model.observe(nil, :destroy) { model.scan{|n| parent.find(n.id).destroy } }
+        model.observe(:chapter_number) {|c| self.chapter_number = c }
+      end
     end
 
     class RootDisplay < Display
@@ -327,12 +337,7 @@ module Editor
           prev_content.dom_element.after(new_content.dom_element)
         end
 
-        new_content.observe(:title) {|v| model.title = v }
-        new_content.observe(:body) {|v| model.body = v }
-        new_content.observe(:tags) {|t| model.metadatum = model.metadatum.clone.update('tags' => t) }
-        new_content.destroy_clicked { model.destroy }
-        model.observe(nil, :destroy) { model.scan{|n| find(n.id).destroy } }
-        model.observe(:chapter_number) {|c| new_content.chapter_number = c }
+        new_content.attach(model)
 
         new_content
       end
