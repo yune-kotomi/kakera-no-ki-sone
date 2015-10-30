@@ -100,6 +100,12 @@ module Editor
       def add_child(position, model)
         new_child = Leaf.new(model.attributes, self)
         children.insert(position, new_child)
+        if dom_element(:children).nil?
+          element = Element.new('ol')
+          element.add_class('dd-list')
+          dom_element.append(element)
+        end
+
         if position == 0
           dom_element(:children).prepend(new_child.dom_element)
         else
@@ -152,6 +158,37 @@ module Editor
         end
       end
 
+      def visible_previous
+        position = parent.children.index(self)
+        if position == 0
+          parent
+        else
+          parent.children[position - 1].last_child(true)
+        end
+      end
+
+      def last_child(visible = false)
+        if children.empty? || (self.open == false && visible)
+          self
+        else
+          children.last.last_child(visible)
+        end
+      end
+
+      def visible_next(force_close = false)
+        position = parent.children.index(self)
+
+        if self.open && force_close == false && !children.empty?
+          children.first
+        else
+          if position < parent.children.size - 1
+            parent.children[position + 1]
+          else
+            parent.visible_next(true)
+          end
+        end
+      end
+
       def fade
         dom_element(:chapter_number).effect(:fade_to, 'fast', 0.3)
         dom_element(:title).effect(:fade_to, 'fast', 0.3)
@@ -173,6 +210,24 @@ module Editor
       def observe_open_close
         dom_element(:collapse).on(:click) { self.open = false; true } if dom_element(:collapse)
         dom_element(:expand).on(:click) { self.open = true; true } if dom_element(:expand)
+      end
+
+      def collapse
+        if dom_element(:children)
+          dom_element(:expand).show
+          dom_element(:collapse).hide
+          dom_element(:children).hide
+          self.open = false
+        end
+      end
+
+      def expand
+        if dom_element(:children)
+          dom_element(:expand).hide
+          dom_element(:collapse).show
+          dom_element(:children).show
+          self.open = true
+        end
       end
     end
 
@@ -318,6 +373,18 @@ module Editor
           dom_element(:container).scroll_top -
           dom_element(:container).offset.top
         dom_element(:container).scroll_top = offset
+      end
+
+      def visible_previous
+        nil
+      end
+
+      def visible_next(force_close = false)
+        if force_close
+          nil
+        else
+          children.first
+        end
       end
 
       private

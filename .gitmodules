@@ -16,3 +16,6 @@
 [submodule "vendor/rickdom"]
 	path = vendor/rickdom
 	url = https://github.com/hasegawayosuke/rickdom.git
+[submodule "vendor/mousetrap"]
+	path = vendor/mousetrap
+	url = https://github.com/ccampbell/mousetrap.git

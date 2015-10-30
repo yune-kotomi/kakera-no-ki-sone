@@ -11,7 +11,8 @@ Rails.application.config.assets.paths.concat([
   'vendor/uuidjs/dist',
   'vendor/text-hatena.js',
   'vendor/showdown/dist',
-  'vendor/rickdom/src'
+  'vendor/rickdom/src',
+  'vendor/mousetrap'
 ])
 
 # Precompile additional assets.

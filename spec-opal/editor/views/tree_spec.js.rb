@@ -197,7 +197,7 @@ describe 'Editor::View::Tree' do
         it { expect(child1.children[1]).to eq child1_4 }
         it { expect(child1.children[2]).to eq child1_2 }
         it { expect(dom_elements.at(1)['data-id']).to eq '1-4' }
-        it { expect(dom_elements.at(1).find('.dd-content').text).to eq 'child1-4' }
+        it { expect(dom_elements.at(1).find('.dd-content').text.strip).to eq 'child1-4' }
         it { expect(tree.order).to eq [{"id"=>'c1', "children"=>[{"id"=>"1-1", "children"=>[{"id"=>"1-1-1"}]}, {"id"=>"1-4"}, {"id"=>"1-2"}, {"id"=>"1-3"}]}] }
 
         describe 'ModelからViewへの変更伝搬' do
@@ -232,6 +232,84 @@ describe 'Editor::View::Tree' do
     it { expect(child1.children.size).to eq 2 }
     it { expect(child1.children.first).to eq child1_2 }
     it { expect(child1.dom_element(:children).find("li[data-id='#{child1_1.id}']")).to be_empty }
+  end
+
+  describe '前後ノード' do
+    describe '前' do
+      describe '1-1が開いている場合、1-2の前は1-1-1' do
+        it { expect(child1_2.visible_previous).to eq child1_1_1 }
+      end
+
+      describe '1-1が閉じている場合、1-2の前は1-1' do
+        before { child1_1.open = false }
+        it { expect(child1_2.visible_previous).to eq child1_1 }
+      end
+
+      describe '1-3の前は1-2' do
+        it { expect(child1_3.visible_previous).to eq child1_2 }
+      end
+
+      describe '1-1の前はc1' do
+        it { expect(child1_1.visible_previous).to eq child1 }
+      end
+
+      describe '1-1-1-1が存在する場合、1-2の前は1-1-1-1' do
+        let(:child1_1_1_1) do
+          model = Editor::Model::Node.new(
+            "id"=>"1-1-1-1",
+            "title"=>"1-1-1-1",
+            "body"=>"body 1-1-1-1",
+            "children"=>[],
+            "metadatum" => {"tags" => []}
+          )
+          child1_1_1.add_child(0, model)
+        end
+        before { child1_1_1_1 }
+        it { expect(child1_2.visible_previous).to eq child1_1_1_1 }
+      end
+
+      describe 'treeの前は存在しない' do
+        it { expect(tree.visible_previous).to eq nil }
+      end
+    end
+
+    describe '次' do
+      describe '1-1が開いている場合、1-1の次は1-1-1' do
+        it { expect(child1_1.visible_next).to eq child1_1_1 }
+      end
+
+      describe '1-1が閉じている場合、1-1の次は1-2' do
+        before { child1_1.open = false }
+        it { expect(child1_1.visible_next).to eq child1_2 }
+      end
+
+      describe '1-2の次は1-3' do
+        it { expect(child1_2.visible_next).to eq child1_3 }
+      end
+
+      describe 'c2が存在する場合1-3の次はc2' do
+        let(:child2) do
+          model = Editor::Model::Node.new(
+            "id"=>"c2",
+            "title"=>"1-1-1-1",
+            "body"=>"body 1-1-1-1",
+            "children"=>[],
+            "metadatum" => {"tags" => []}
+          )
+          tree.add_child(1, model)
+        end
+        before { child2 }
+        it { expect(child1_3.visible_next.id).to eq child2.id }
+      end
+
+      describe '1-3の次は存在しない' do
+        it { expect(child1_3.visible_next).to eq nil }
+      end
+
+      describe 'treeの次はc1' do
+        it { expect(tree.visible_next).to eq child1 }
+      end
+    end
   end
 end
 

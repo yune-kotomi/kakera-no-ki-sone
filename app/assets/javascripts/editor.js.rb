@@ -1,6 +1,9 @@
 module Editor
   class Editor
     attr_reader :document
+    attr_reader :tree
+    attr_reader :contents
+    attr_reader :tags
 
     def load_from_dom
       id = Element.find('#document-id').value
@@ -119,6 +122,9 @@ module Editor
       elements[:markup_selector].on(:change) do |e|
         @document.markup = e.current_target.value
       end
+
+      # ホットキーを有効に
+      @hotkeys = Hotkeys.new(self, @tree, @contents)
     end
 
     # 編集対象の要素の弟ノードを追加する
@@ -207,6 +213,116 @@ module Editor
 
     def close_confirm
       'まだ保存されていません。よろしいですか？'
+    end
+
+    class Hotkeys
+      def initialize(parent, tree, contents)
+        @parent = parent
+        @tree = tree
+        @contents = contents
+
+        @focus = :tree
+
+        Mousetrap.bind('up') {|e| up(e) }
+        Mousetrap.bind('down') {|e| down(e) }
+        Mousetrap.bind('left') {|e| left(e) }
+        Mousetrap.bind('right') {|e| right(e) }
+
+        Mousetrap.bind('mod+up') {|e| ctrl_up(e) }
+        Mousetrap.bind('mod+down') {|e| ctrl_down(e) }
+        Mousetrap.bind('mod+left') {|e| ctrl_left(e) }
+        Mousetrap.bind('mod+right') {|e| ctrl_right(e) }
+
+        Mousetrap.bind('mod+del') {|e| ctrl_del(e) }
+        Mousetrap.bind('enter') {|e| enter(e) }
+        Mousetrap.bind('mod+0') {|e| ctrl_0(e) }
+        Mousetrap.bind('mod+e') {|e| ctrl_e(e) }
+        Mousetrap.bind('escape') {|e| escape(e) }
+      end
+
+      def deactivate
+        Mousetrap.unbind('up')
+        Mousetrap.unbind('down')
+        Mousetrap.unbind('left')
+        Mousetrap.unbind('right')
+
+        Mousetrap.unbind('mod+up')
+        Mousetrap.unbind('mod+down')
+        Mousetrap.unbind('mod+left')
+        Mousetrap.unbind('mod+right')
+
+        Mousetrap.unbind('mod+del')
+        Mousetrap.unbind('enter')
+        Mousetrap.unbind('mod+0')
+        Mousetrap.unbind('mod+e')
+        Mousetrap.unbind('escape')
+      end
+
+      private
+      def up(event)
+        if @focus == :tree
+          current = @tree.find(@tree.current_target)
+          target = current.visible_previous
+          unless target.nil?
+            target.target = true
+            @tree.scroll_to(target.id)
+            event.prevent_default
+          end
+        end
+      end
+
+      def down(event)
+        if @focus == :tree
+          current = @tree.find(@tree.current_target)
+          target = current.visible_next
+          unless target.nil?
+            target.target = true
+            @tree.scroll_to(target.id)
+            event.prevent_default
+          end
+        end
+      end
+
+      def left(event)
+        if @focus == :tree
+          current = @tree.find(@tree.current_target)
+          current.collapse
+        end
+      end
+
+      def right(event)
+        if @focus == :tree
+          current = @tree.find(@tree.current_target)
+          current.expand
+        end
+      end
+
+      def ctrl_up(event)
+      end
+
+      def ctrl_down(event)
+      end
+
+      def ctrl_left(event)
+      end
+
+      def ctrl_right(event)
+      end
+
+      def ctrl_del(event)
+      end
+
+      def enter(event)
+      end
+
+      def ctrl_0(event)
+      end
+
+      def ctrl_e(event)
+      end
+
+      def escape(event)
+      end
     end
   end
 end
