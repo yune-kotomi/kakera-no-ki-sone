@@ -158,12 +158,23 @@ module Editor
         end
       end
 
-      def visible_previous
+      def brother
         position = parent.children.index(self)
         if position == 0
-          parent
+          elder = nil
         else
-          parent.children[position - 1].last_child(true)
+          elder = parent.children[position - 1]
+        end
+        younger = parent.children[position + 1]
+
+        [elder, younger]
+      end
+
+      def visible_previous
+        if brother.first
+          brother.first.last_child(true)
+        else
+          parent
         end
       end
 
@@ -176,13 +187,11 @@ module Editor
       end
 
       def visible_next(force_close = false)
-        position = parent.children.index(self)
-
         if self.open && force_close == false && !children.empty?
           children.first
         else
-          if position < parent.children.size - 1
-            parent.children[position + 1]
+          if brother.last
+            brother.last
           else
             parent.visible_next(true)
           end

@@ -235,6 +235,17 @@ describe 'Editor::View::Tree' do
   end
 
   describe '前後ノード' do
+    describe '兄' do
+      it { expect(child1.brother.first).to eq nil }
+      it { expect(child1_1.brother.first).to eq nil }
+      it { expect(child1_2.brother.first).to eq child1_1 }
+    end
+
+    describe '弟' do
+      it { expect(child1_1.brother.last).to eq child1_2 }
+      it { expect(child1_3.brother.last).to eq nil }
+    end
+
     describe '前' do
       describe '1-1が開いている場合、1-2の前は1-1-1' do
         it { expect(child1_2.visible_previous).to eq child1_1_1 }

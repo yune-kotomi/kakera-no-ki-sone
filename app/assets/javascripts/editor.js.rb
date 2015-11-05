@@ -261,6 +261,7 @@ module Editor
       private
       def up(event)
         if @focus == :tree
+          # 前のノードにフォーカス
           current = @tree.find(@tree.current_target)
           target = current.visible_previous
           unless target.nil?
@@ -273,6 +274,7 @@ module Editor
 
       def down(event)
         if @focus == :tree
+          # 次のノードへフォーカス
           current = @tree.find(@tree.current_target)
           target = current.visible_next
           unless target.nil?
@@ -285,6 +287,7 @@ module Editor
 
       def left(event)
         if @focus == :tree
+          # フォーカスが当たっているノードを閉じる
           current = @tree.find(@tree.current_target)
           current.collapse
         end
@@ -292,30 +295,86 @@ module Editor
 
       def right(event)
         if @focus == :tree
+          # フォーカスが当たっているノードを開く
           current = @tree.find(@tree.current_target)
           current.expand
         end
       end
 
       def ctrl_up(event)
+        if @focus == :tree
+          # フォーカスが当たっているノードを兄と入れ替える
+          current = @tree.find(@tree.current_target)
+          if current.brother.first
+            current_position = current.parent.children.index(current)
+            brother_position = current.parent.children.index(current.brother.first)
+
+            new_children = []
+            current.parent.children.each_with_index do |c, i|
+              case i
+              when current_position
+                new_children.push(current.brother.first)
+              when brother_position
+                new_children.push(current)
+              else
+                new_children.push(c)
+              end
+            end
+
+            current.parent.children = new_children
+          end
+        end
       end
 
       def ctrl_down(event)
+        if @focus == :tree
+          # フォーカスが当たっているノードを弟と入れ替える
+          current = @tree.find(@tree.current_target)
+          if current.brother.last
+            current_position = current.parent.children.index(current)
+            brother_position = current.parent.children.index(current.brother.last)
+
+            new_children = []
+            current.parent.children.each_with_index do |c, i|
+              case i
+              when current_position
+                new_children.push(current.brother.last)
+              when brother_position
+                new_children.push(current)
+              else
+                new_children.push(c)
+              end
+            end
+
+            current.parent.children = new_children
+          end
+        end
       end
 
       def ctrl_left(event)
+        if @focus == :tree
+        end
       end
 
       def ctrl_right(event)
+        if @focus == :tree
+        end
       end
 
       def ctrl_del(event)
+        if @focus == :tree
+        end
       end
 
       def enter(event)
+        if @focus == :tree
+        end
       end
 
       def ctrl_0(event)
+        if @focus == :tree
+        else
+        end
       end
 
       def ctrl_e(event)
