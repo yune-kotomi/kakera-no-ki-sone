@@ -396,6 +396,24 @@ module Editor
         end
       end
 
+      def brother
+        []
+      end
+
+      # 指定したleafを昇格させる
+      def move_leaf_up(target)
+        if target.brother.last.nil? && target.parent != self
+          prev_parent = target.parent
+          prev_parent.dom_element.after(target.dom_element)
+          rearrange
+          if prev_parent.children.empty?
+            prev_parent.dom_element.find('[data-action="collapse"]:first').remove
+            prev_parent.dom_element.find('[data-action="expand"]:first').remove
+            prev_parent.dom_element(:children).remove
+          end
+        end
+      end
+
       private
       def serialize_nestable
         JSON.parse(`JSON.stringify(#{dom_element(:nestable)}.nestable('serialize'))`)
@@ -459,7 +477,7 @@ module Editor
       def generate_id_text(src)
         id = src['id']
         result = [id]
-        unless src['children'].nil?
+        unless src['children'].nil? || src['children'].empty?
           ret = src['children'].map {|c| generate_id_text(c) }.join("\n")
           ret = ret.split("\n").map{|s| "#{id}:#{s}" }.join("\n")
           result.push(ret)

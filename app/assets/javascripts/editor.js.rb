@@ -353,6 +353,9 @@ module Editor
 
       def ctrl_left(event)
         if @focus == :tree
+          # 上の階層へ
+          current = @tree.find(@tree.current_target)
+          @tree.move_leaf_up(current)
         end
       end
 
