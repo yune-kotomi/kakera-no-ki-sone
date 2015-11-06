@@ -361,6 +361,8 @@ module Editor
 
       def ctrl_right(event)
         if @focus == :tree
+          current = @tree.find(@tree.current_target)
+          @tree.move_leaf_down(current)
         end
       end
 

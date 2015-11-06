@@ -238,6 +238,34 @@ module Editor
           self.open = true
         end
       end
+
+      # 子がある状態に表示をあわせる
+      def enable_child_list
+        ol = Element.new('ol')
+        ol.add_class('dd-list')
+        dom_element.append(ol)
+
+        collapse_button = Element.new('button')
+        collapse_button['type'] = 'button'
+        collapse_button['data-action'] = 'collapse'
+        collapse_button.css('display', 'block')
+        collapse_button.text = 'Collapse'
+        dom_element.find('.dd-handle').before(collapse_button)
+
+        expand_button = Element.new('button')
+        expand_button['type'] = 'button'
+        expand_button['data-action'] = 'expand'
+        expand_button.hide
+        expand_button.text = 'Expand'
+        dom_element.find('.dd-handle').before(expand_button)
+      end
+
+      # 子がない状態に表示をあわせる
+      def disable_child_list
+        dom_element.find('[data-action="collapse"]:first').remove
+        dom_element.find('[data-action="expand"]:first').remove
+        dom_element(:children).remove
+      end
     end
 
     class Tree < Juso::View::Base
@@ -406,11 +434,17 @@ module Editor
           prev_parent = target.parent
           prev_parent.dom_element.after(target.dom_element)
           rearrange
-          if prev_parent.children.empty?
-            prev_parent.dom_element.find('[data-action="collapse"]:first').remove
-            prev_parent.dom_element.find('[data-action="expand"]:first').remove
-            prev_parent.dom_element(:children).remove
-          end
+          prev_parent.disable_child_list if prev_parent.children.empty?
+        end
+      end
+
+      # 指定したleafを降格させる
+      def move_leaf_down(target)
+        brother = target.brother.first
+        if brother
+          brother.enable_child_list if brother.children.empty?
+          brother.dom_element(:children).append(target.dom_element)
+          rearrange
         end
       end
 
