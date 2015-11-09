@@ -124,7 +124,7 @@ module Editor
       end
 
       # ホットキーを有効に
-      @hotkeys = Hotkeys.new(self, @tree, @contents)
+      @hotkeys = Hotkeys.new(self, @document, @tree, @contents)
     end
 
     # 編集対象の要素の弟ノードを追加する
@@ -216,8 +216,9 @@ module Editor
     end
 
     class Hotkeys
-      def initialize(parent, tree, contents)
+      def initialize(parent, document, tree, contents)
         @parent = parent
+        @document = document
         @tree = tree
         @contents = contents
 
@@ -368,6 +369,8 @@ module Editor
 
       def ctrl_del(event)
         if @focus == :tree
+          node = @document.find(@tree.current_target)
+          node.destroy
         end
       end
 
