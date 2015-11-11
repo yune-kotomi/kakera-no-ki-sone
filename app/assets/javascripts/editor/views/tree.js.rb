@@ -127,7 +127,10 @@ module Editor
         observe(:open) {|o| model.metadatum = model.metadatum.clone.update(:open => o) }
 
         # 削除
-        model.observe(nil, :destroy) { self.destroy }
+        model.observe(nil, :destroy) do
+          self.destroy
+          parent.disable_child_list if parent.children.empty? && !parent.is_a?(Tree)
+        end
 
         model
       end
@@ -359,11 +362,7 @@ module Editor
         end
 
         # 変更内容伝搬用
-        model.observe(:title) {|v| new_child.title = v }
-        model.observe(:chapter_number) {|c| new_child.chapter_number = c }
-
-        # 削除
-        model.observe(nil, :destroy) { new_child.destroy }
+        new_child.attach(model)
 
         # current orderを更新しておく
         update_order_silently
