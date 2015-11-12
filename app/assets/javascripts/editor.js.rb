@@ -123,6 +123,10 @@ module Editor
         @document.markup = e.current_target.value
       end
 
+      # ツリービューにフォーカスを当てる
+      @tree.observe(:focused) {|f| @contents.focused = !f }
+      @tree.focused = true
+
       # ホットキーを有効に
       @hotkeys = Hotkeys.new(self, @document, @tree, @contents)
     end
@@ -222,8 +226,6 @@ module Editor
         @tree = tree
         @contents = contents
 
-        @focus = :tree
-
         Mousetrap.bind('up') {|e| up(e) }
         Mousetrap.bind('down') {|e| down(e) }
         Mousetrap.bind('left') {|e| left(e) }
@@ -261,7 +263,7 @@ module Editor
 
       private
       def up(event)
-        if @focus == :tree
+        if @tree.focused
           # 前のノードにフォーカス
           current = @tree.find(@tree.current_target)
           target = current.visible_previous
@@ -274,7 +276,7 @@ module Editor
       end
 
       def down(event)
-        if @focus == :tree
+        if @tree.focused
           # 次のノードへフォーカス
           current = @tree.find(@tree.current_target)
           target = current.visible_next
@@ -287,7 +289,7 @@ module Editor
       end
 
       def left(event)
-        if @focus == :tree
+        if @tree.focused
           # フォーカスが当たっているノードを閉じる
           current = @tree.find(@tree.current_target)
           current.collapse
@@ -295,7 +297,7 @@ module Editor
       end
 
       def right(event)
-        if @focus == :tree
+        if @tree.focused
           # フォーカスが当たっているノードを開く
           current = @tree.find(@tree.current_target)
           current.expand
@@ -303,7 +305,7 @@ module Editor
       end
 
       def ctrl_up(event)
-        if @focus == :tree
+        if @tree.focused
           # フォーカスが当たっているノードを兄と入れ替える
           current = @tree.find(@tree.current_target)
           if current.brother.first
@@ -328,7 +330,7 @@ module Editor
       end
 
       def ctrl_down(event)
-        if @focus == :tree
+        if @tree.focused
           # フォーカスが当たっているノードを弟と入れ替える
           current = @tree.find(@tree.current_target)
           if current.brother.last
@@ -353,7 +355,7 @@ module Editor
       end
 
       def ctrl_left(event)
-        if @focus == :tree
+        if @tree.focused
           # 上の階層へ
           current = @tree.find(@tree.current_target)
           @tree.move_leaf_up(current)
@@ -361,28 +363,26 @@ module Editor
       end
 
       def ctrl_right(event)
-        if @focus == :tree
+        if @tree.focused
           current = @tree.find(@tree.current_target)
           @tree.move_leaf_down(current)
         end
       end
 
       def ctrl_del(event)
-        if @focus == :tree
+        if @tree.focused
           node = @document.find(@tree.current_target)
           node.destroy
         end
       end
 
       def enter(event)
-        if @focus == :tree
+        if @tree.focused
         end
       end
 
       def ctrl_0(event)
-        if @focus == :tree
-        else
-        end
+        @tree.focused = !@tree.focused
       end
 
       def ctrl_e(event)

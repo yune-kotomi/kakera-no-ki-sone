@@ -292,6 +292,7 @@ module Editor
       attribute :id
       attribute :order
       attribute :target
+      attribute :focused, :default => false
 
       attr_reader :scroll_direction
 
@@ -342,6 +343,15 @@ module Editor
           end
           @prev_scroll_top = c.scroll_top
         end
+
+        # ツリービューへのフォーカス
+        observe(:focused) do |v|
+          if v
+            dom_element.find('.tree').add_class('focused')
+          else
+            dom_element.find('.tree').remove_class('focused')
+          end
+        end.call
       end
 
       def find(target_id)

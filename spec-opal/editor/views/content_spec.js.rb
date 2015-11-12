@@ -124,4 +124,17 @@ describe 'Editor::View::Contents' do
     let(:dom_1_1) { contents.dom_element(:children).find("[data-id='#{content_1_1.id}']") }
     it { expect(dom_1_1).to be_empty }
   end
+
+  context '本文領域へのフォーカス' do
+    let(:dom_element) { contents.dom_element.find('.contents') }
+    describe 'focused' do
+      before { contents.focused = true }
+      it { expect(dom_element.has_class?('focused')).to eq true }
+    end
+
+    describe 'unfocused' do
+      before { contents.focused = false }
+      it { expect(dom_element.has_class?('focused')).to eq false }
+    end
+  end
 end

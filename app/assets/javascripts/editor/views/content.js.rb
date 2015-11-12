@@ -234,22 +234,24 @@ module Editor
     class Contents < Juso::View::Base
       template <<-EOS
         <div class="scroll-container">
-          <div class="root">
-            <div class="display"></div>
-            <div class="editor" style="display:none">
-              <div>
-                <input type="text" class="title" value="{{attr:title}}">
-              </div>
-              <div>
-                <textarea class="body">{{:body}}</textarea>
-              </div>
-              <div>
-                <button class="close">閉じる</button>
+          <div class="contents">
+            <div class="root">
+              <div class="display"></div>
+              <div class="editor" style="display:none">
+                <div>
+                  <input type="text" class="title" value="{{attr:title}}">
+                </div>
+                <div>
+                  <textarea class="body">{{:body}}</textarea>
+                </div>
+                <div>
+                  <button class="close">閉じる</button>
+                </div>
               </div>
             </div>
-          </div>
-          <div>
-            <div class="children"></div>
+            <div>
+              <div class="children"></div>
+            </div>
           </div>
         </div>
       EOS
@@ -264,6 +266,7 @@ module Editor
 
       attribute :id
       attribute :markup
+      attribute :focused, :default => false
 
       def initialize(data = {}, parent = nil)
         data.update(
@@ -289,6 +292,15 @@ module Editor
           display.markup = m
           children.each {|c| c.markup = m }
         end
+
+        # フォーカス
+        observe(:focused) do |v|
+          if v
+            dom_element.find('.contents').add_class('focused')
+          else
+            dom_element.find('.contents').remove_class('focused')
+          end
+        end.call
       end
 
       def find(target_id)

@@ -322,6 +322,20 @@ describe 'Editor::View::Tree' do
       end
     end
   end
+
+  context 'ツリービューへのフォーカス' do
+    let(:dom_element) { tree.dom_element.find('.tree') }
+
+    describe 'フォーカスが当たっている' do
+      before { tree.focused = true }
+      it { expect(dom_element.has_class?('focused')).to eq true }
+    end
+
+    describe 'フォーカスが当たっていない' do
+      before { tree.focused = false }
+      it { expect(dom_element.has_class?('focused')).to eq false }
+    end
+  end
 end
 
 describe 'Editor::JsDiff' do
