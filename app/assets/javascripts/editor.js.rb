@@ -76,7 +76,7 @@ module Editor
       @tags.observe(:selected_tags) {|t| highlight_by_tags(t) }
 
       # スクロール制御
-      @tree.observe(:current_target) {|t| @contents.scroll_to(t) }
+      @tree.observe(:current_target) {|t| @contents.current_target = t }
 
       @tree.observe(:container, :scroll) do
         # targetが不可視になったら可視範囲にあるノードをtargetにする
@@ -378,6 +378,8 @@ module Editor
 
       def enter(event)
         if @tree.focused
+          @tree.focused = false
+          @contents.find(@contents.current_target).edit
         end
       end
 

@@ -137,4 +137,21 @@ describe 'Editor::View::Contents' do
       it { expect(dom_element.has_class?('focused')).to eq false }
     end
   end
+
+  context '編集対象' do
+    let(:content_1_1) { contents.find('1-1') }
+    let(:content_1_2) { contents.find('1-2') }
+    before { content_1_1.target = true }
+    it { expect(content_1_1.dom_element.has_class?('target')).to eq true }
+    it { expect(content_1_2.target).to eq false }
+    it { expect(contents.current_target).to eq content_1_1.id }
+
+    describe '別のノードをターゲットにすると前のターゲットは解除' do
+      before { content_1_2.target = true }
+      it { expect(content_1_1.dom_element.has_class?('target')).to eq false }
+      it { expect(content_1_2.dom_element.has_class?('target')).to eq true }
+      it { expect(content_1_1.target).to eq false }
+      it { expect(contents.current_target).to eq content_1_2.id }
+    end
+  end
 end

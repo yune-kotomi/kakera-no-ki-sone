@@ -127,6 +127,10 @@ module Editor
           self.tag_str = tags.join(' ')
         end.call(self.tags)
       end
+
+      def edit
+        dom_element(:title).focus
+      end
     end
 
     class Content < Juso::View::Base
@@ -145,6 +149,7 @@ module Editor
       attribute :body
       attribute :markup, :default => 'plaintext'
       attribute :tags, :default => []
+      attribute :target, :default => false
 
       attr_accessor :editor
 
@@ -170,11 +175,22 @@ module Editor
 
         display.observe(:edit_button, :click) { edit }
         editor.observe(:close_button, :click) { show }
+
+        observe(:target) do |v|
+          if v
+            dom_element.add_class('target')
+            parent.current_target = self.id
+          else
+            dom_element.remove_class('target')
+          end
+        end.call(target)
       end
 
       def edit
         dom_element(:display).hide
         dom_element.find('.editor-container').show
+
+        editor.edit
       end
 
       def show
@@ -229,6 +245,20 @@ module Editor
           </div>
         </div>
       EOS
+
+      attribute :target, :default => true
+
+      def initialize(data = {}, parent = nil)
+        super(data, parent)
+
+        observe(:target) do |t|
+          if t
+            dom_element.add_class('target')
+          else
+            dom_element.remove_class('target')
+          end
+        end.call(target)
+      end
     end
 
     class Contents < Juso::View::Base
@@ -267,6 +297,8 @@ module Editor
       attribute :id
       attribute :markup
       attribute :focused, :default => false
+      attribute :target, :default => true
+      attribute :current_target
 
       def initialize(data = {}, parent = nil)
         data.update(
@@ -278,14 +310,8 @@ module Editor
         # ルートノードの編集処理
         observe(:title) {|t| display.title = t }
         observe(:body) {|b| display.body = b }
-        display.observe(:edit_button, :click) do
-          dom_element(:editor).show
-          display.dom_element.hide
-        end
-        observe(:close_button, :click) do
-          dom_element(:editor).hide
-          display.dom_element.show
-        end
+        display.observe(:edit_button, :click) { edit }
+        observe(:close_button, :click) { show }
 
         # 記法変更
         observe(:markup) do |m|
@@ -300,7 +326,22 @@ module Editor
           else
             dom_element.find('.contents').remove_class('focused')
           end
-        end.call
+        end.call(focused)
+
+        # ターゲットの排他処理
+        observe(:current_target) do |n, o|
+          target = find(n)
+          prev_target = find(o)
+          target.target = true unless target.nil?
+          prev_target.target = false unless prev_target.nil?
+        end
+        self.current_target = id
+
+        # 自分自身へのターゲット指定
+        observe(:target) {|t| display.target = t }.call(target)
+
+        # スクロール
+        observe(:current_target) {|t| scroll_to(t) }
       end
 
       def find(target_id)
@@ -383,6 +424,18 @@ module Editor
           dom_element(:container).scroll_top -
           dom_element(:container).offset.top
         dom_element(:container).scroll_top = offset
+      end
+
+      def edit
+        dom_element(:editor).show
+        display.dom_element.hide
+
+        dom_element(:title).focus
+      end
+
+      def show
+        dom_element(:editor).hide
+        display.dom_element.show
       end
 
       private
