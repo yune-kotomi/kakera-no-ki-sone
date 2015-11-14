@@ -239,6 +239,7 @@ module Editor
         Mousetrap.bind('mod+del') {|e| ctrl_del(e) }
         Mousetrap.bind('enter') {|e| enter(e) }
         Mousetrap.bind('mod+0') {|e| ctrl_0(e) }
+        Mousetrap.bind('mod+alt+n') {|e| ctrl_n(e) }
         Mousetrap.bind('mod+e') {|e| ctrl_e(e) }
         Mousetrap.bind('escape') {|e| escape(e) }
       end
@@ -257,6 +258,7 @@ module Editor
         Mousetrap.unbind('mod+del')
         Mousetrap.unbind('enter')
         Mousetrap.unbind('mod+0')
+        Mousetrap.unbind('mod+alt+n')
         Mousetrap.unbind('mod+e')
         Mousetrap.unbind('escape')
       end
@@ -385,6 +387,10 @@ module Editor
 
       def ctrl_0(event)
         @tree.focused = !@tree.focused
+      end
+
+      def ctrl_n(event)
+        @parent.add_child
       end
 
       def ctrl_e(event)
