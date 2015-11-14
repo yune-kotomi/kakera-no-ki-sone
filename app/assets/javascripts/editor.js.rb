@@ -396,6 +396,9 @@ module Editor
       end
 
       def escape(event)
+        if @contents.focused
+          @contents.find(@contents.current_target).show
+        end
       end
     end
   end
