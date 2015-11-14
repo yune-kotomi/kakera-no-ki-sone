@@ -240,7 +240,7 @@ module Editor
         Mousetrap.bind('enter') {|e| enter(e) }
         Mousetrap.bind('mod+0') {|e| ctrl_0(e) }
         Mousetrap.bind('mod+alt+n') {|e| ctrl_n(e) }
-        Mousetrap.bind('mod+e') {|e| ctrl_e(e) }
+        Mousetrap.bind('mod+alt+e') {|e| ctrl_e(e) }
         Mousetrap.bind('escape') {|e| escape(e) }
       end
 
@@ -259,7 +259,7 @@ module Editor
         Mousetrap.unbind('enter')
         Mousetrap.unbind('mod+0')
         Mousetrap.unbind('mod+alt+n')
-        Mousetrap.unbind('mod+e')
+        Mousetrap.unbind('mod+alt+e')
         Mousetrap.unbind('escape')
       end
 
@@ -379,10 +379,8 @@ module Editor
       end
 
       def enter(event)
-        if @tree.focused
-          @tree.focused = false
-          @contents.find(@contents.current_target).edit
-        end
+        @tree.focused = false
+        @contents.find(@contents.current_target).edit
       end
 
       def ctrl_0(event)
@@ -394,6 +392,7 @@ module Editor
       end
 
       def ctrl_e(event)
+        enter(event)
       end
 
       def escape(event)
