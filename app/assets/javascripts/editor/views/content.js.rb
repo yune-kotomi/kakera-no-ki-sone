@@ -184,6 +184,9 @@ module Editor
             dom_element.remove_class('target')
           end
         end.call(target)
+
+        # 本文領域からフォーカスが外れたら編集終了
+        parent.observe(:focused) {|f| show unless f }
       end
 
       def edit
@@ -191,6 +194,9 @@ module Editor
         dom_element.find('.editor-container').show
 
         editor.edit
+        parent.focused = true
+        parent.show
+        parent.children.reject{|c| c == self }.each{|c| c.show }
       end
 
       def show
@@ -325,6 +331,7 @@ module Editor
             dom_element.find('.contents').add_class('focused')
           else
             dom_element.find('.contents').remove_class('focused')
+            show # フォーカスが外れたら編集終了
           end
         end.call(focused)
 
@@ -431,6 +438,8 @@ module Editor
         display.dom_element.hide
 
         dom_element(:title).focus
+        self.focused = true
+        children.each {|c| c.show }
       end
 
       def show

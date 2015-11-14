@@ -13,6 +13,8 @@ require 'editor/fixtures'
 describe 'Editor::View::Contents' do
   document_source
   let(:contents) { Editor::View::Contents.new(source) }
+  let(:content_1_1) { contents.find('1-1') }
+  let(:content_1_2) { contents.find('1-2') }
 
   before { @order = contents.children.map(&:id) }
   it '初期orderのチェック' do
@@ -139,8 +141,6 @@ describe 'Editor::View::Contents' do
   end
 
   context '編集対象' do
-    let(:content_1_1) { contents.find('1-1') }
-    let(:content_1_2) { contents.find('1-2') }
     before { content_1_1.target = true }
     it { expect(content_1_1.dom_element.has_class?('target')).to eq true }
     it { expect(content_1_2.target).to eq false }
@@ -152,6 +152,54 @@ describe 'Editor::View::Contents' do
       it { expect(content_1_2.dom_element.has_class?('target')).to eq true }
       it { expect(content_1_1.target).to eq false }
       it { expect(contents.current_target).to eq content_1_2.id }
+    end
+  end
+
+  context '編集モードの排他制御' do
+    describe '通常ノード' do
+      describe '編集に入ると本文領域にフォーカスが当たる' do
+        before { content_1_1.edit }
+        it { expect(contents.focused).to eq true }
+
+        describe '本文領域からフォーカスを外すと編集も終了' do
+          before { contents.focused = false }
+          it { expect(content_1_1.dom_element.find('.editor-container').css('display')).to eq 'none' }
+          it { expect(content_1_1.dom_element(:display).css('display')).to eq 'block' }
+        end
+
+        describe '別のノードを編集開始したら前のノードは編集終了' do
+          before { content_1_2.edit }
+          it { expect(content_1_1.dom_element.find('.editor-container').css('display')).to eq 'none' }
+          it { expect(content_1_1.dom_element(:display).css('display')).to eq 'block' }
+          it { expect(content_1_2.dom_element.find('.editor-container').css('display')).to eq 'block' }
+          it { expect(content_1_2.dom_element(:display).css('display')).to eq 'none' }
+        end
+
+        describe 'ルートノードを編集開始したら前のノードは編集終了' do
+          before { contents.edit }
+          it { expect(content_1_1.dom_element.find('.editor-container').css('display')).to eq 'none' }
+          it { expect(content_1_1.dom_element(:display).css('display')).to eq 'block' }
+        end
+      end
+    end
+
+    describe 'ルートノード' do
+      describe '編集に入ると本文領域にフォーカスが当たる' do
+        before { contents.edit }
+        it { expect(contents.focused).to eq true }
+
+        describe '本文領域からフォーカスを外すと編集も終了' do
+          before { contents.focused = false }
+          it { expect(contents.dom_element(:editor).css('display')).to eq 'none' }
+          it { expect(contents.display.dom_element.css('display')).to eq 'block' }
+        end
+
+        describe '別のノードを編集開始したら前のノードは編集終了' do
+          before { content_1_2.edit }
+          it { expect(contents.dom_element(:editor).css('display')).to eq 'none' }
+          it { expect(contents.display.dom_element.css('display')).to eq 'block' }
+        end
+      end
     end
   end
 end
