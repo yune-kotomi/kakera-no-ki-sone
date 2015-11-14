@@ -13,8 +13,22 @@ require 'editor/fixtures'
 describe 'Editor::View::Contents' do
   document_source
   let(:contents) { Editor::View::Contents.new(source) }
+  let(:content_1) { contents.find('c1') }
   let(:content_1_1) { contents.find('1-1') }
+  let(:content_1_1_1) { contents.find('1-1-1') }
   let(:content_1_2) { contents.find('1-2') }
+  let(:content_1_3) { contents.find('1-3') }
+
+  describe '走査' do
+    it { expect(contents.previous).to eq nil }
+    it { expect(contents.next_content).to eq content_1 }
+    it { expect(content_1.previous).to eq contents }
+    it { expect(content_1_1.previous).to eq content_1 }
+    it { expect(content_1_1_1.next_content).to eq content_1_2 }
+    it { expect(content_1_2.previous).to eq content_1_1_1 }
+    it { expect(content_1_2.next_content).to eq content_1_3 }
+    it { expect(content_1_3.next_content).to eq nil }
+  end
 
   before { @order = contents.children.map(&:id) }
   it '初期orderのチェック' do
@@ -96,7 +110,6 @@ describe 'Editor::View::Contents' do
     describe 'Modelで追加' do
       let(:new_model) { Editor::Model::Node.new(data) }
       before { contents.add_child('1-3', new_model) }
-      let(:content_1_3) { contents.find('1-3') }
 
       it { expect(content_1_3.dom_element.next).not_to be_nil }
       it { expect(content_1_3.dom_element.next['data-id']).to eq '1-4' }
@@ -120,8 +133,6 @@ describe 'Editor::View::Contents' do
   end
 
   describe '削除' do
-    let(:content_1_1) { contents.find('1-1') }
-    let(:content_1_1_1) { contents.find('1-1-1') }
     before { content_1_1.destroy }
     let(:dom_1_1) { contents.dom_element(:children).find("[data-id='#{content_1_1.id}']") }
     it { expect(dom_1_1).to be_empty }

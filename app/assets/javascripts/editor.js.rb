@@ -75,8 +75,9 @@ module Editor
       # タグ選択
       @tags.observe(:selected_tags) {|t| highlight_by_tags(t) }
 
-      # スクロール制御
+      # 編集対象の同期
       @tree.observe(:current_target) {|t| @contents.current_target = t }
+      @contents.observe(:current_target) {|t| @tree.current_target = t }
 
       @tree.observe(:container, :scroll) do
         # targetが不可視になったら可視範囲にあるノードをtargetにする
@@ -274,6 +275,13 @@ module Editor
             @tree.scroll_to(target.id)
             event.prevent_default
           end
+        else
+          current = @contents.find(@contents.current_target)
+          previous = current.previous
+          unless previous.nil?
+            previous.target = true
+            event.prevent_default
+          end
         end
       end
 
@@ -285,6 +293,13 @@ module Editor
           unless target.nil?
             target.target = true
             @tree.scroll_to(target.id)
+            event.prevent_default
+          end
+        else
+          current = @contents.find(@contents.current_target)
+          next_content = current.next_content
+          unless next_content.nil?
+            next_content.target = true
             event.prevent_default
           end
         end

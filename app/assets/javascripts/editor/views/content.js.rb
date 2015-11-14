@@ -239,6 +239,20 @@ module Editor
         model.observe(nil, :destroy) { model.scan{|n| parent.find(n.id).destroy } }
         model.observe(:chapter_number) {|c| self.chapter_number = c }
       end
+
+      def previous
+        position = @parent.children.index(self)
+        if position == 0
+          @parent
+        else
+          @parent.children[position - 1]
+        end
+      end
+
+      def next_content
+        position = @parent.children.index(self)
+        @parent.children[position + 1]
+      end
     end
 
     class RootDisplay < Display
@@ -345,7 +359,10 @@ module Editor
         self.current_target = id
 
         # 自分自身へのターゲット指定
-        observe(:target) {|t| display.target = t }.call(target)
+        observe(:target) do |t|
+          display.target = t
+          self.current_target = id if t
+        end.call(target)
 
         # スクロール
         observe(:current_target) {|t| scroll_to(t) }
@@ -445,6 +462,14 @@ module Editor
       def show
         dom_element(:editor).hide
         display.dom_element.show
+      end
+
+      def previous
+        nil
+      end
+
+      def next_content
+        children.first
       end
 
       private

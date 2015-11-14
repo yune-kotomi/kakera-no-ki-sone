@@ -318,6 +318,8 @@ module Editor
         observe(:current_target) do |c, prev_id|
           prev = find(prev_id)
           prev.target = false unless prev.nil?
+          find(c).target = true
+          scroll_to(c)
         end
 
         observe(:target) do |v|
