@@ -227,41 +227,42 @@ module Editor
         @tree = tree
         @contents = contents
 
-        Mousetrap.bind('up') {|e| up(e) }
-        Mousetrap.bind('down') {|e| down(e) }
-        Mousetrap.bind('left') {|e| left(e) }
-        Mousetrap.bind('right') {|e| right(e) }
+        @global_trap = Mousetrap::Binding.new
+        @global_trap.bind('up') {|e| up(e) }
+        @global_trap.bind('down') {|e| down(e) }
+        @global_trap.bind('left') {|e| left(e) }
+        @global_trap.bind('right') {|e| right(e) }
 
-        Mousetrap.bind('mod+up') {|e| ctrl_up(e) }
-        Mousetrap.bind('mod+down') {|e| ctrl_down(e) }
-        Mousetrap.bind('mod+left') {|e| ctrl_left(e) }
-        Mousetrap.bind('mod+right') {|e| ctrl_right(e) }
+        @global_trap.bind('mod+up') {|e| ctrl_up(e) }
+        @global_trap.bind('mod+down') {|e| ctrl_down(e) }
+        @global_trap.bind('mod+left') {|e| ctrl_left(e) }
+        @global_trap.bind('mod+right') {|e| ctrl_right(e) }
 
-        Mousetrap.bind('mod+del') {|e| ctrl_del(e) }
-        Mousetrap.bind('enter') {|e| enter(e) }
-        Mousetrap.bind('mod+0') {|e| ctrl_0(e) }
-        Mousetrap.bind('mod+alt+n') {|e| ctrl_n(e) }
-        Mousetrap.bind('mod+alt+e') {|e| ctrl_e(e) }
-        Mousetrap.bind('escape') {|e| escape(e) }
+        @global_trap.bind('mod+del') {|e| ctrl_del(e) }
+        @global_trap.bind('enter') {|e| enter(e) }
+        @global_trap.bind('mod+0') {|e| ctrl_0(e) }
+        @global_trap.bind('mod+alt+n') {|e| ctrl_n(e) }
+        @global_trap.bind('mod+alt+e') {|e| ctrl_e(e) }
+        @global_trap.bind('escape') {|e| escape(e) }
       end
 
       def deactivate
-        Mousetrap.unbind('up')
-        Mousetrap.unbind('down')
-        Mousetrap.unbind('left')
-        Mousetrap.unbind('right')
+        @global_trap.unbind('up')
+        @global_trap.unbind('down')
+        @global_trap.unbind('left')
+        @global_trap.unbind('right')
 
-        Mousetrap.unbind('mod+up')
-        Mousetrap.unbind('mod+down')
-        Mousetrap.unbind('mod+left')
-        Mousetrap.unbind('mod+right')
+        @global_trap.unbind('mod+up')
+        @global_trap.unbind('mod+down')
+        @global_trap.unbind('mod+left')
+        @global_trap.unbind('mod+right')
 
-        Mousetrap.unbind('mod+del')
-        Mousetrap.unbind('enter')
-        Mousetrap.unbind('mod+0')
-        Mousetrap.unbind('mod+alt+n')
-        Mousetrap.unbind('mod+alt+e')
-        Mousetrap.unbind('escape')
+        @global_trap.unbind('mod+del')
+        @global_trap.unbind('enter')
+        @global_trap.unbind('mod+0')
+        @global_trap.unbind('mod+alt+n')
+        @global_trap.unbind('mod+alt+e')
+        @global_trap.unbind('escape')
       end
 
       private

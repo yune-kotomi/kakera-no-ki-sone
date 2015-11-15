@@ -2,42 +2,51 @@ require 'mousetrap'
 require 'native'
 
 module Mousetrap
-  module_function
-  def bind(keys, &block)
-    %x{
-      var wrapper = function(evt) {
-        if (evt.preventDefault) {
-          evt = #{Event.new `evt`};
-        }
-        return block.apply(null, arguments);
-      };
-      Mousetrap.bind(#{keys}, wrapper);
-    }
-  end
+  class Binding
+    def initialize(selector = nil)
+      if selector
+        @trap = `Mousetrap(document.querySelector(#{selector}))`
+      else
+        @trap = `Mousetrap`
+      end
+    end
 
-  def unbind(keys)
-    `Mousetrap.unbind(#{keys})`
-  end
-
-  def trigger(keys)
-    `Mousetrap.trigger(#{keys})`
-  end
-
-  def reset
-    `Mousetrap.reset()`
-  end
-
-  def set_stop_callback
-    %x{
-      var wrapper = function(evt) {
-        if (evt.preventDefault) {
-          evt = #{Event.new `evt`};
-        }
-        return block.apply(null, arguments);
-      };
-      Mousetrap.stopCallback = function(e, element, combo) {
-        #{yield(e, element, combo)};
+    def bind(keys, &block)
+      %x{
+        var wrapper = function(evt) {
+          if (evt.preventDefault) {
+            evt = #{Event.new `evt`};
+          }
+          return block.apply(null, arguments);
+        };
+        #{@trap}.bind(#{keys}, wrapper);
       }
-    }
+    end
+
+    def unbind(keys)
+      `#{@trap}.unbind(#{keys})`
+    end
+
+    def trigger(keys)
+      `#{@trap}.trigger(#{keys})`
+    end
+
+    def reset
+      `#{@trap}.reset()`
+    end
+
+    def set_stop_callback
+      %x{
+        var wrapper = function(evt) {
+          if (evt.preventDefault) {
+            evt = #{Event.new `evt`};
+          }
+          return block.apply(null, arguments);
+        };
+        #{@trap}.stopCallback = function(e, element, combo) {
+          #{yield(e, element, combo)};
+        }
+      }
+    end
   end
 end
