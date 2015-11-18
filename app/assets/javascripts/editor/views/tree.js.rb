@@ -1,6 +1,7 @@
 # ツリー表示
 # 葉の増減はNestableを再生成
 #
+
 module Editor
   module JsDiff
     class Diff
@@ -81,6 +82,129 @@ module Editor
             dom_element(:title).remove_class('selected')
           end
         end
+
+        # キーボード・ショートカット
+        @hotkeys = Mousetrap::Pool.instance.get("leaf-#{id}")
+        up = Mousetrap::Handler.new('up') do |handler|
+          handler.condition { parental_tree.focused && self.target }
+          handler.procedure do |event|
+            # 前のノードにフォーカス
+            target = self.visible_previous
+            unless target.nil?
+              target.target = true
+              parental_tree.scroll_to(target.id)
+            end
+          end
+        end
+        @hotkeys.bind_handler(up)
+
+        down = Mousetrap::Handler.new('down') do |h|
+          h.condition { parental_tree.focused && self.target }
+          h.procedure do
+            target = self.visible_next
+            unless target.nil?
+              target.target = true
+              parental_tree.scroll_to(target.id)
+            end
+          end
+        end
+        @hotkeys.bind_handler(down)
+
+        left = Mousetrap::Handler.new('left') do |h|
+          h.condition { parental_tree.focused && self.target }
+          h.procedure { collapse }
+        end
+        @hotkeys.bind_handler(left)
+
+        right = Mousetrap::Handler.new('right') do |h|
+          h.condition { parental_tree.focused && self.target }
+          h.procedure { expand }
+        end
+        @hotkeys.bind_handler(right)
+
+        # 兄と入れ替える
+        ctrl_up = Mousetrap::Handler.new('mod+up') do |h|
+          h.condition { parental_tree.focused && self.target }
+          h.procedure do
+            if brother.first
+              current_position = parent.children.index(self)
+              brother_position = parent.children.index(brother.first)
+
+              new_children = []
+              parent.children.each_with_index do |c, i|
+                case i
+                when current_position
+                  new_children.push(brother.first)
+                when brother_position
+                  new_children.push(self)
+                else
+                  new_children.push(c)
+                end
+              end
+
+              parent.children = new_children
+            end
+          end
+        end
+        @hotkeys.bind_handler(ctrl_up)
+
+        # 弟と入れ替える
+        ctrl_down = Mousetrap::Handler.new('mod+down') do |h|
+          h.condition { parental_tree.focused && self.target }
+          h.procedure do
+            if brother.last
+              current_position = parent.children.index(self)
+              brother_position = parent.children.index(brother.last)
+
+              new_children = []
+              parent.children.each_with_index do |c, i|
+                case i
+                when current_position
+                  new_children.push(brother.last)
+                when brother_position
+                  new_children.push(self)
+                else
+                  new_children.push(c)
+                end
+              end
+
+              parent.children = new_children
+            end
+          end
+        end
+        @hotkeys.bind_handler(ctrl_down)
+
+        ctrl_left = Mousetrap::Handler.new('mod+left') do |h|
+          h.condition { parental_tree.focused && self.target }
+          h.procedure do
+            if brother.last.nil? && self.parent != parental_tree
+              prev_parent = self.parent
+              prev_parent.dom_element.after(dom_element)
+              parental_tree.rearrange
+              prev_parent.disable_child_list if prev_parent.children.empty?
+            end
+          end
+        end
+        @hotkeys.bind_handler(ctrl_left)
+
+        ctrl_right = Mousetrap::Handler.new('mod+right') do |h|
+          h.condition { parental_tree.focused && self.target }
+          h.procedure do
+            b = brother.first
+            if b
+              b.enable_child_list if b.children.empty?
+              b.dom_element(:children).append(dom_element)
+              parental_tree.rearrange
+            end
+          end
+        end
+        @hotkeys.bind_handler(ctrl_right)
+
+        ctrl_del = Mousetrap::Handler.new('mod+del') do |h|
+          h.condition { parental_tree.focused && self.target }
+          h.procedure { @model.destroy }
+        end
+        @hotkeys.bind_handler(ctrl_del)
       end
 
       def scan(&block)
@@ -121,6 +245,8 @@ module Editor
       end
 
       def attach(model)
+        @model = model
+
         # 変更内容伝搬用
         model.observe(:title) {|v| self.title = v }
         model.observe(:chapter_number) {|c| self.chapter_number = c }
@@ -354,6 +480,20 @@ module Editor
             dom_element.find('.tree').remove_class('focused')
           end
         end.call
+
+        # キーボード・ショートカット
+        @hotkeys = Mousetrap::Pool.instance.get("tree-#{id}")
+        down = Mousetrap::Handler.new('down') do |h|
+          h.condition { focused && target }
+          h.procedure do
+            target = visible_next
+            unless target.nil?
+              target.target = true
+              scroll_to(target.id)
+            end
+          end
+        end
+        @hotkeys.bind_handler(down)
       end
 
       def find(target_id)
@@ -437,26 +577,6 @@ module Editor
 
       def brother
         []
-      end
-
-      # 指定したleafを昇格させる
-      def move_leaf_up(target)
-        if target.brother.last.nil? && target.parent != self
-          prev_parent = target.parent
-          prev_parent.dom_element.after(target.dom_element)
-          rearrange
-          prev_parent.disable_child_list if prev_parent.children.empty?
-        end
-      end
-
-      # 指定したleafを降格させる
-      def move_leaf_down(target)
-        brother = target.brother.first
-        if brother
-          brother.enable_child_list if brother.children.empty?
-          brother.dom_element(:children).append(target.dom_element)
-          rearrange
-        end
       end
 
       private

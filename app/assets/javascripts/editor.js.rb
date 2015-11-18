@@ -228,17 +228,6 @@ module Editor
         @contents = contents
 
         @global_trap = Mousetrap::Binding.new
-        @global_trap.bind('up') {|e| up(e) }
-        @global_trap.bind('down') {|e| down(e) }
-        @global_trap.bind('left') {|e| left(e) }
-        @global_trap.bind('right') {|e| right(e) }
-
-        @global_trap.bind('mod+up') {|e| ctrl_up(e) }
-        @global_trap.bind('mod+down') {|e| ctrl_down(e) }
-        @global_trap.bind('mod+left') {|e| ctrl_left(e) }
-        @global_trap.bind('mod+right') {|e| ctrl_right(e) }
-
-        @global_trap.bind('mod+del') {|e| ctrl_del(e) }
         @global_trap.bind('enter') {|e| enter(e) }
         @global_trap.bind('mod+0') {|e| ctrl_0(e) }
         @global_trap.bind('mod+alt+n') {|e| ctrl_n(e) }
@@ -247,17 +236,6 @@ module Editor
       end
 
       def deactivate
-        @global_trap.unbind('up')
-        @global_trap.unbind('down')
-        @global_trap.unbind('left')
-        @global_trap.unbind('right')
-
-        @global_trap.unbind('mod+up')
-        @global_trap.unbind('mod+down')
-        @global_trap.unbind('mod+left')
-        @global_trap.unbind('mod+right')
-
-        @global_trap.unbind('mod+del')
         @global_trap.unbind('enter')
         @global_trap.unbind('mod+0')
         @global_trap.unbind('mod+alt+n')
@@ -268,14 +246,6 @@ module Editor
       private
       def up(event)
         if @tree.focused
-          # 前のノードにフォーカス
-          current = @tree.find(@tree.current_target)
-          target = current.visible_previous
-          unless target.nil?
-            target.target = true
-            @tree.scroll_to(target.id)
-            event.prevent_default
-          end
         else
           current = @contents.find(@contents.current_target)
           previous = current.previous
@@ -288,14 +258,6 @@ module Editor
 
       def down(event)
         if @tree.focused
-          # 次のノードへフォーカス
-          current = @tree.find(@tree.current_target)
-          target = current.visible_next
-          unless target.nil?
-            target.target = true
-            @tree.scroll_to(target.id)
-            event.prevent_default
-          end
         else
           current = @contents.find(@contents.current_target)
           next_content = current.next_content
@@ -303,94 +265,6 @@ module Editor
             next_content.target = true
             event.prevent_default
           end
-        end
-      end
-
-      def left(event)
-        if @tree.focused
-          # フォーカスが当たっているノードを閉じる
-          current = @tree.find(@tree.current_target)
-          current.collapse
-        end
-      end
-
-      def right(event)
-        if @tree.focused
-          # フォーカスが当たっているノードを開く
-          current = @tree.find(@tree.current_target)
-          current.expand
-        end
-      end
-
-      def ctrl_up(event)
-        if @tree.focused
-          # フォーカスが当たっているノードを兄と入れ替える
-          current = @tree.find(@tree.current_target)
-          if current.brother.first
-            current_position = current.parent.children.index(current)
-            brother_position = current.parent.children.index(current.brother.first)
-
-            new_children = []
-            current.parent.children.each_with_index do |c, i|
-              case i
-              when current_position
-                new_children.push(current.brother.first)
-              when brother_position
-                new_children.push(current)
-              else
-                new_children.push(c)
-              end
-            end
-
-            current.parent.children = new_children
-          end
-        end
-      end
-
-      def ctrl_down(event)
-        if @tree.focused
-          # フォーカスが当たっているノードを弟と入れ替える
-          current = @tree.find(@tree.current_target)
-          if current.brother.last
-            current_position = current.parent.children.index(current)
-            brother_position = current.parent.children.index(current.brother.last)
-
-            new_children = []
-            current.parent.children.each_with_index do |c, i|
-              case i
-              when current_position
-                new_children.push(current.brother.last)
-              when brother_position
-                new_children.push(current)
-              else
-                new_children.push(c)
-              end
-            end
-
-            current.parent.children = new_children
-          end
-        end
-      end
-
-      def ctrl_left(event)
-        if @tree.focused
-          # 上の階層へ
-          current = @tree.find(@tree.current_target)
-          @tree.move_leaf_up(current)
-        end
-      end
-
-      def ctrl_right(event)
-        if @tree.focused
-          current = @tree.find(@tree.current_target)
-          @tree.move_leaf_down(current)
-        end
-      end
-
-      def ctrl_del(event)
-        if @tree.focused
-          node = @document.find(@tree.current_target)
-          node.destroy
         end
       end
 
