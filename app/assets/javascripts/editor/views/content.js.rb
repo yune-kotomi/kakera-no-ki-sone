@@ -187,6 +187,29 @@ module Editor
 
         # 本文領域からフォーカスが外れたら編集終了
         parent.observe(:focused) {|f| show unless f }
+
+        # キーボード・ショートカット
+        @hotkeys = Mousetrap::Pool.instance.get("content-#{id}")
+        up = Mousetrap::Handler.new('up') do |handler|
+          handler.condition { parent.focused && self.target }
+          handler.procedure { previous.target = true unless previous.nil? }
+        end
+        @hotkeys.bind_handler(up)
+
+        down = Mousetrap::Handler.new('down') do |handler|
+          handler.condition { parent.focused && self.target }
+          handler.procedure { next_content.target = true unless next_content.nil? }
+        end
+        @hotkeys.bind_handler(down)
+
+        # 入力ボックスにフォーカスがあっても発動させるもの
+        @force_hotkeys = Mousetrap::Pool.instance.get("content-#{id}-force")
+        @hotkeys.set_stop_callback { false }
+        escape = Mousetrap::Handler.new('escape') do |handler|
+          handler.condition { parent.focused && self.target }
+          handler.procedure { show }
+        end
+        @hotkeys.bind_handler(escape)
       end
 
       def edit
@@ -366,6 +389,22 @@ module Editor
 
         # スクロール
         observe(:current_target) {|t| scroll_to(t) }
+
+        @hotkeys = Mousetrap::Pool.instance.get("content-#{id}")
+        down = Mousetrap::Handler.new('down') do |handler|
+          handler.condition { self.focused && self.target }
+          handler.procedure { next_content.target = true unless next_content.nil? }
+        end
+        @hotkeys.bind_handler(down)
+
+        # 入力ボックスにフォーカスがあっても発動させるもの
+        @force_hotkeys = Mousetrap::Pool.instance.get("content-#{id}-force")
+        @hotkeys.set_stop_callback { false }
+        escape = Mousetrap::Handler.new('escape') do |handler|
+          handler.condition { focused && self.target }
+          handler.procedure { show }
+        end
+        @hotkeys.bind_handler(escape)
       end
 
       def find(target_id)

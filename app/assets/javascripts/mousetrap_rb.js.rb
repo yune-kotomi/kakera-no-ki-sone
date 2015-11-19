@@ -90,7 +90,7 @@ module Mousetrap
       `#{@trap}.reset()`
     end
 
-    def set_stop_callback
+    def set_stop_callback(&block)
       %x{
         var wrapper = function(evt) {
           if (evt.preventDefault) {
@@ -98,9 +98,7 @@ module Mousetrap
           }
           return block.apply(null, arguments);
         };
-        #{@trap}.stopCallback = function(e, element, combo) {
-          #{yield(e, element, combo)};
-        }
+        #{@trap}.stopCallback = wrapper;
       }
     end
   end

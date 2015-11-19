@@ -232,7 +232,6 @@ module Editor
         @global_trap.bind('mod+0') {|e| ctrl_0(e) }
         @global_trap.bind('mod+alt+n') {|e| ctrl_n(e) }
         @global_trap.bind('mod+alt+e') {|e| ctrl_e(e) }
-        @global_trap.bind('escape') {|e| escape(e) }
       end
 
       def deactivate
@@ -240,34 +239,9 @@ module Editor
         @global_trap.unbind('mod+0')
         @global_trap.unbind('mod+alt+n')
         @global_trap.unbind('mod+alt+e')
-        @global_trap.unbind('escape')
       end
 
       private
-      def up(event)
-        if @tree.focused
-        else
-          current = @contents.find(@contents.current_target)
-          previous = current.previous
-          unless previous.nil?
-            previous.target = true
-            event.prevent_default
-          end
-        end
-      end
-
-      def down(event)
-        if @tree.focused
-        else
-          current = @contents.find(@contents.current_target)
-          next_content = current.next_content
-          unless next_content.nil?
-            next_content.target = true
-            event.prevent_default
-          end
-        end
-      end
-
       def enter(event)
         @tree.focused = false
         @contents.find(@contents.current_target).edit
@@ -283,12 +257,6 @@ module Editor
 
       def ctrl_e(event)
         enter(event)
-      end
-
-      def escape(event)
-        if @contents.focused
-          @contents.find(@contents.current_target).show
-        end
       end
     end
   end
