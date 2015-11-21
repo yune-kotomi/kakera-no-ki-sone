@@ -29,6 +29,7 @@ module Mousetrap
     def initialize(keys, options = {})
       @keys = keys
       @options = ({:prevented_check => true, :prevent_after_exec => true}).merge(options)
+      @condition = Proc.new { true }
 
       yield(self)
 
@@ -44,7 +45,7 @@ module Mousetrap
     end
 
     def exec(event)
-      enable = @condition.call
+      enable = @condition.call(event)
       enable = false if `#{event}.native.defaultPrevented` && @options[:prevented_check]
 
       if enable
@@ -54,9 +55,13 @@ module Mousetrap
   end
 
   class Binding
-    def initialize(selector = nil)
-      if selector
-        @trap = `new Mousetrap(document.querySelector(#{selector}))`
+    def initialize(target = nil)
+      if target
+        if target.is_a?(String)
+          @trap = `new Mousetrap(document.querySelector(#{target}))`
+        else
+          @trap = `new Mousetrap(#{target.get(0)})`
+        end
       else
         @trap = `new Mousetrap()`
       end

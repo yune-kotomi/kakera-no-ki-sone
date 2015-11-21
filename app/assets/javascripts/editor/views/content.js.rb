@@ -126,10 +126,37 @@ module Editor
           # 与えられたタグを結合して入力ボックスに投入
           self.tag_str = tags.join(' ')
         end.call(self.tags)
+
+        # キーボード・ショートカット
+        @title_hotkey = Mousetrap::Pool.instance.get("editor-#{parent.id}-title")
+        @title_hotkey.set_stop_callback do |e, element, combo|
+          `element != #{self.dom_element(:title).get(0)}`
+        end
+        # Shift+Tabで前のノードを編集対象にし、タグ入力ボックスにフォーカスを当てる
+        shift_tab = Mousetrap::Handler.new('shift+tab') do |h|
+          h.condition { parent.previous }
+          h.procedure { parent.previous.edit(true) }
+        end
+        @title_hotkey.bind_handler(shift_tab)
+
+        @tag_hotkey = Mousetrap::Pool.instance.get("editor-#{parent.id}-tag")
+        @tag_hotkey.set_stop_callback do |e, element, combo|
+          `element != #{self.dom_element(:tag_str).get(0)}`
+        end
+        # Tabで次のノードを編集対象にし、タイトル入力ボックスにフォーカスを当てる
+        tab = Mousetrap::Handler.new('tab') do |h|
+          h.condition { parent.next_content }
+          h.procedure { parent.next_content.edit }
+        end
+        @tag_hotkey.bind_handler(tab)
       end
 
-      def edit
-        dom_element(:title).focus
+      def edit(focus_to_last = false)
+        if focus_to_last
+          dom_element(:tag_str).focus
+        else
+          dom_element(:title).focus
+        end
       end
     end
 
@@ -167,7 +194,7 @@ module Editor
         observe(:tags) {|t| display.tags = (t||[]).map{|s| {:str => s} } }
 
         # editorと結合
-        self.editor = Editor.new(data)
+        self.editor = Editor.new(data, self)
         dom_element.find('.editor-container').append(editor.dom_element)
         editor.observe(:title) {|t| self.title = t }
         editor.observe(:body) {|b| self.body = b }
@@ -212,11 +239,11 @@ module Editor
         @hotkeys.bind_handler(escape)
       end
 
-      def edit
+      def edit(focus_to_last = false)
         dom_element(:display).hide
         dom_element.find('.editor-container').show
 
-        editor.edit
+        editor.edit(focus_to_last)
         parent.focused = true
         parent.show
         parent.children.reject{|c| c == self }.each{|c| c.show }
@@ -405,6 +432,16 @@ module Editor
           handler.procedure { show }
         end
         @hotkeys.bind_handler(escape)
+
+        @content_hotkey = Mousetrap::Pool.instance.get("content-#{id}-content")
+        @content_hotkey.set_stop_callback do |e, element|
+          `element != #{self.dom_element(:body).get(0)}`
+        end
+        tab = Mousetrap::Handler.new('tab') do |h|
+          h.condition { self.next_content }
+          h.procedure { self.next_content.edit }
+        end
+        @content_hotkey.bind_handler(tab)
       end
 
       def find(target_id)
@@ -489,11 +526,15 @@ module Editor
         dom_element(:container).scroll_top = offset
       end
 
-      def edit
+      def edit(focus_to_last = false)
         dom_element(:editor).show
         display.dom_element.hide
 
-        dom_element(:title).focus
+        if focus_to_last
+          dom_element(:body).focus
+        else
+          dom_element(:title).focus
+        end
         self.focused = true
         children.each {|c| c.show }
       end
