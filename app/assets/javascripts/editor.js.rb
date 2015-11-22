@@ -243,8 +243,7 @@ module Editor
 
       private
       def enter(event)
-        @tree.focused = false
-        @contents.find(@contents.current_target).edit
+        ctrl_e(event) if @tree.focused
       end
 
       def ctrl_0(event)
@@ -256,7 +255,8 @@ module Editor
       end
 
       def ctrl_e(event)
-        enter(event)
+        @tree.focused = false
+        @contents.find(@contents.current_target).edit
       end
     end
   end
