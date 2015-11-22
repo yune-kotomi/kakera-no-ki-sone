@@ -209,6 +209,7 @@ module Editor
             parent.current_target = self.id
           else
             dom_element.remove_class('target')
+            show # 編集を終了する
           end
         end.call(target)
 
@@ -245,8 +246,7 @@ module Editor
 
         editor.edit(focus_to_last)
         parent.focused = true
-        parent.show
-        parent.children.reject{|c| c == self }.each{|c| c.show }
+        self.target = true
       end
 
       def show
@@ -411,7 +411,11 @@ module Editor
         # 自分自身へのターゲット指定
         observe(:target) do |t|
           display.target = t
-          self.current_target = id if t
+          if t
+            self.current_target = id
+          else
+            show # 自分自身がターゲットから外れたら編集終了
+          end
         end.call(target)
 
         # スクロール
@@ -536,7 +540,7 @@ module Editor
           dom_element(:title).focus
         end
         self.focused = true
-        children.each {|c| c.show }
+        self.target = true
       end
 
       def show
