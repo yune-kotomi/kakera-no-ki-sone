@@ -48,7 +48,7 @@ module Juso
         # テンプレート評価
         template = self.class.ancestors.find{|klass| !klass.entire_template.nil? }.entire_template
         source = `$.templates(#{template}).render(#{attributes.to_n})`
-        @rendered = Element.parse(source)
+        @rendered = `$(source)`
 
         # 子クラス展開
         element_options.
