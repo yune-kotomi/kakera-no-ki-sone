@@ -254,10 +254,6 @@ module Editor
         dom_element(:display).show
       end
 
-      def destroy_clicked
-        display.observe(:delete_button, :click) { yield }
-      end
-
       def destroy
         parent.children.delete(self)
         self.dom_element.remove
@@ -284,7 +280,11 @@ module Editor
         observe(:title) {|v| model.title = v }
         observe(:body) {|v| model.body = v }
         observe(:tags) {|t| model.metadatum = model.metadatum.clone.update('tags' => t) }
-        destroy_clicked { model.destroy }
+        display.observe(:delete_button, :click) do
+          Dialog::Confirm.new('葉の削除', "#{self.chapter_number} #{self.title} を削除してよろしいですか?", 'はい', 'いいえ') do |d|
+            d.ok { model.destroy }
+          end.open
+        end
         # 表示領域はツリー上の親子関係を持たないのでnodeが持つ子をすべて明示的に消す
         model.observe(nil, :destroy) { model.scan{|n| parent.find(n.id).destroy } }
         model.observe(:chapter_number) {|c| self.chapter_number = c }
