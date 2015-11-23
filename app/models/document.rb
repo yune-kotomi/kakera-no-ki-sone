@@ -1,5 +1,6 @@
 class Document < ActiveRecord::Base
   belongs_to :user
+  has_one :metadatum
   validates :markup, :inclusion => ['plaintext', 'hatena', 'markdown']
   validate :body_validation
 
@@ -19,7 +20,7 @@ class Document < ActiveRecord::Base
 
   private
   def valid_node?(target)
-    target.keys.sort == ['id', 'name', 'body', 'children'].sort &&
+    target.keys.sort == ['id', 'title', 'body', 'children', 'metadatum'].sort &&
       (target['children'].map{|c| valid_node?(c) }.uniq - [true]).blank?
   end
 end

@@ -1,4 +1,6 @@
 Rails.application.routes.draw do
+  get 'javascript_test/index'
+
   get 'users/:domain_name/:screen_name',
     :controller => 'users',
     :to => 'users#show',

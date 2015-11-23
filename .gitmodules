@@ -1,0 +1,21 @@
+[submodule "vendor/Nestable"]
+	path = vendor/Nestable
+	url = https://github.com/uniring/Nestable.git
+[submodule "vendor/jsdiff"]
+	path = vendor/jsdiff
+	url = https://github.com/kpdecker/jsdiff.git
+[submodule "vendor/uuidjs"]
+	path = vendor/uuidjs
+	url = https://github.com/LiosK/UUID.js.git
+[submodule "vendor/text-hatena.js"]
+	path = vendor/text-hatena.js
+	url = https://github.com/nitoyon/text-hatena.js.git
+[submodule "vendor/showdown"]
+	path = vendor/showdown
+	url = https://github.com/showdownjs/showdown.git
+[submodule "vendor/rickdom"]
+	path = vendor/rickdom
+	url = https://github.com/hasegawayosuke/rickdom.git
+[submodule "vendor/mousetrap"]
+	path = vendor/mousetrap
+	url = https://github.com/ccampbell/mousetrap.git

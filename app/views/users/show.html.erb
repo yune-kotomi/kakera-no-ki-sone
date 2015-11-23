@@ -1,5 +1,9 @@
 <%
-  @title = "文書一覧"
+  if params[:archived]
+    @title = "保存記録"
+  else
+    @title = "文書"
+  end
   @title = "#{@title}: #{@user.nickname}" unless @login_user == @user
  %>
 
@@ -23,17 +27,32 @@
 
         <% if @user == @login_user %>
           <div class="card-action">
-            <%= link_to document, :method => :delete, :data => {:confirm => '本当に削除してよろしいですか?'} do %>
+            <%= link_to document,
+              :method => :delete,
+              :data => {:confirm => '本当に削除してよろしいですか?'},
+              :class => 'waves-effect btn-flat' do %>
               <i class="mdi-action-delete"></i>
             <% end %>
 
-            <a href="#"><i class="mdi-content-archive"></i></a>
+            <%= form_for(document) do |f| %>
+              <%= f.button :class => 'waves-effect btn-flat' do %>
+                <% if document.archived %>
+                  <i class="mdi-content-archive-invert"></i>
+                <% else %>
+                  <i class="mdi-content-archive"></i>
+                <% end %>
+              <% end %>
+              <% document.archived = !document.archived %>
+              <%= f.hidden_field :archived %>
+            <% end %>
           </div>
         <% end %>
       </div>
     </div>
   <% end %>
 </div>
+
+<%= paginate(@documents) %>
 
 <div class="fixed-action-btn" style="bottom: 24px; right: 34px;">
   <%= form_for @user.documents.build do %>

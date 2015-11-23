@@ -13,7 +13,12 @@ class UsersController < ApplicationController
         limit(41).
         offset(offset)
 
-      @documents = @documents.where(:private => false) unless @user == @login_user
+      @documents = @user.documents.
+        where(:archived => params[:archived].present?).
+        order("updated_at desc").
+        page(params[:page])
+
+      @documents = @documents.where(:public => true) unless @user == @login_user
     else
       missing
     end

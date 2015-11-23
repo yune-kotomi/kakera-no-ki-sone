@@ -1,0 +1,50 @@
+@import "materialize";
+
+nav {
+  a.button-collapse {
+    display: block !important;
+  }
+
+  li>a {
+    display: block;
+  }
+}
+
+.card {
+  .card-action {
+    display: flex;
+    justify-content: space-between;
+    text-align: right;
+
+    a,button {
+      margin: 0;
+      i {
+        @extend .grey-text, .text-darken-1;
+        font-size: 25px;
+      }
+    }
+
+  }
+}
+
+.pagination {
+  span.page.current>span {
+    @extend .btn-flat, .waves-effect;
+    cursor: auto;
+    font-weight: bold;
+  }
+}
+
+button {
+  &:focus {
+    background-color: inherit;
+  }
+}
+
+i.mdi-content-archive-invert {
+  display: block;
+  height: 25px;
+  width: 25px;
+  background-image: url(/assets/ic_archive_48px.svg);
+  background-size: contain;
+}

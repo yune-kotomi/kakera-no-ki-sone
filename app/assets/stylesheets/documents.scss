@@ -1,3 +1,33 @@
 // Place all the styles related to the documents controller here.
 // They will automatically be included in application.css.
 // You can use Sass (SCSS) here: http://sass-lang.com/
+.tree-view {
+  .scroll-container {
+    height: 400px;
+    overflow: auto;
+
+    .selected {
+      background-color: yellow;
+      font-weight: bold;
+    }
+  }
+}
+
+.content-view {
+  .scroll-container {
+    height: 400px;
+    overflow: auto;
+  }
+
+  .target {
+    border: 1px red solid;
+  }
+}
+
+select {
+  display: block;
+}
+
+.focused {
+  border: 1px blue solid;
+}

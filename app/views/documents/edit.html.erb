@@ -1,6 +1,25 @@
-<h1>Editing Document</h1>
+<% @title = "編集: #{@document.title}" %>
+<div id="save-indicator">
+  <span class="working" style="display:none">保存しています...</span>
+  <span class="saved" style="display:none">保存しました</span>
+</div>
 
-<%= render 'form' %>
+<button id="add-button">add</button>
+<input type="checkbox" id="public-checkbox">
+<label for="public-checkbox">公開する</label>
+<%= select_tag :markup,
+  options_for_select([['記法なし', :plaintext], ['はてな記法', :hatena], ['Markdown', :markdown]], @document.markup) %>
 
-<%= link_to 'Show', @document %> |
-<%= link_to 'Back', documents_path %>
+<div class="row" id="document-editor">
+  <div class="tag-list"></div>
+  <div class="col s12 m4 l5 tree-view"></div>
+  <div class="col s12 m8 l7 content-view"></div>
+</div>
+
+<%= hidden_field_tag :id, @document.id, :id => 'document-id' %>
+<%= hidden_field_tag :title, @document.title, :id => 'document-title' %>
+<%= hidden_field_tag :description, @document.description, :id => 'document-description' %>
+<%= hidden_field_tag :body, @document.body.to_json, :id => 'document-body' %>
+<%= hidden_field_tag :public, @document.public.to_json, :id => 'document-public' %>
+<%= hidden_field_tag :archived, @document.archived.to_json, :id => 'document-archived' %>
+<%= hidden_field_tag :markup, @document.markup.to_json, :id => 'document-markup' %>

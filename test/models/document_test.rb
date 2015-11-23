@@ -33,7 +33,7 @@ class DocumentTest < ActiveSupport::TestCase
   end
 
   test "#bodyの要素に欠落したキーがある場合保存できない" do
-    @document1.body = [{'name' => 'name', 'body' => 'body', 'children' => 'children'}]
+    @document1.body = [{'title' => 'title', 'body' => 'body', 'children' => 'children'}]
     assert !@document1.valid?
   end
 end

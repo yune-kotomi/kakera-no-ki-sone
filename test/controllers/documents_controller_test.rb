@@ -13,7 +13,7 @@ class DocumentsControllerTest < ActionController::TestCase
     get :index
     assert_response :success
     assert_not_nil assigns(:documents)
-    assert !assigns(:documents).map(&:private).include?(true)
+    assert assigns(:documents).map(&:public).include?(true)
   end
 
   test "ゲストは文書を生成できない" do

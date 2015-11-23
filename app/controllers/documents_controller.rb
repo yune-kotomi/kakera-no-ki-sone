@@ -8,7 +8,7 @@ class DocumentsController < ApplicationController
   # GET /documents.json
   def index
     @documents = Document.
-      where(:private => false).
+      where(:public => true).
       order("updated_at desc").
       offset(offset).
       limit(41)
@@ -17,7 +17,7 @@ class DocumentsController < ApplicationController
   # GET /documents/1
   # GET /documents/1.json
   def show
-    forbidden if @document.private && @document.user != @login_user
+    forbidden if !@document.public && @document.user != @login_user
   end
 
   # GET /documents/1/edit
@@ -44,9 +44,9 @@ class DocumentsController < ApplicationController
   # PATCH/PUT /documents/1.json
   def update
     respond_to do |format|
-      if @document.update(document_params)
+      if @document.update(document_params.update(:body => JSON.parse(document_params[:body] || '[]')))
         format.html { redirect_to @document, notice: 'Document was successfully updated.' }
-        format.json { render :show, status: :ok, location: @document }
+        format.json { render :json => true }
       else
         format.html { render :edit }
         format.json { render json: @document.errors, status: :unprocessable_entity }
@@ -75,7 +75,7 @@ class DocumentsController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def document_params
-      params.require(:document).permit(:title, :description, :body, :private, :password, :markup)
+      params.require(:document).permit(:title, :description, :body, :public, :archived, :password, :markup)
     end
 
     def owner_required

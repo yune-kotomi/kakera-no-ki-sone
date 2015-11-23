@@ -35,8 +35,12 @@
             <li class="divider hide-on-large-only"></li>
 
             <li>
-              <%= link_to_user '文書一覧' %>
+              <%= link_to_user '文書' %>
             </li>
+            <li>
+              <%= link_to_user '保存記録', @login_user, :archived => true %>
+            </li>
+
             <li>
               <%= link_to 'ログアウト', users_logout_path %>
             </li>
