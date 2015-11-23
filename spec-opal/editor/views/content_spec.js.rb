@@ -9,6 +9,7 @@ require 'juso/models/base'
 require 'juso/views/base'
 require 'editor/models/node'
 require 'editor/views/content'
+require 'editor/views/contents'
 require 'editor/fixtures'
 
 describe 'Editor::View::Contents' do
