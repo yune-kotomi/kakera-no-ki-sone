@@ -184,7 +184,11 @@ module Editor
 
         ctrl_del = Mousetrap::Handler.new('mod+del') do |h|
           h.condition { parental_tree.focused && self.target }
-          h.procedure { @model.destroy }
+          h.procedure do
+            Dialog::Confirm.new('葉の削除', "#{self.chapter_number} #{self.title} を削除してよろしいですか?", 'はい', 'いいえ') do |d|
+              d.ok { @model.destroy }
+            end.open
+          end
         end
         @hotkeys.bind_handler(ctrl_del)
       end
