@@ -55,6 +55,26 @@ describe 'Editor::View::Tree' do
       it { expect(tree.target).to eq true }
       it { expect(tree.dom_element(:title).has_class?('selected')).to eq true }
     end
+
+    describe '開閉操作' do
+      describe '編集対象の親を閉じるとtargetが親に移る' do
+        before do
+          child1_1_1.target = true
+          child1_1.open = false
+        end
+        it { expect(child1_1.target).to eq true }
+        it { expect(child1_1_1.target).not_to eq true }
+      end
+
+      describe '他のノードを開閉してもtargetに変更はない' do
+        before do
+          child1_2.target = true
+          child1_1.open = false
+        end
+        it { expect(child1_2.target).to eq true }
+        it { expect(child1_1.target).not_to eq true }
+      end
+    end
   end
 
   context '並べ替え処理' do

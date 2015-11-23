@@ -52,6 +52,13 @@ module Editor
           end
         end
 
+        observe(:open) do |o|
+          unless o
+            # 閉じた際に子がターゲットだった場合、自分をターゲットにする
+            self.target = true if scan{|c| c.target }.include?(true)
+          end
+        end
+
         # キーボード・ショートカット
         @hotkeys = Mousetrap::Pool.instance.get("leaf-#{id}")
         up = Mousetrap::Handler.new('up') do |handler|
