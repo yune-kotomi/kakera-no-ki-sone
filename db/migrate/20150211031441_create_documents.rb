@@ -3,8 +3,7 @@ class CreateDocuments < ActiveRecord::Migration
     create_table :documents do |t|
       t.string :title, :default => '新しい文書', :null => false
       t.text :description
-      t.text :body_yaml, :default => '--- []', :null => false
-      t.text :fulltext
+      t.jsonb :body
       t.boolean :public, :default => false, :null => false
       t.boolean :archived, :default => false, :null => false
       t.string :password
@@ -14,6 +13,7 @@ class CreateDocuments < ActiveRecord::Migration
       t.timestamps null: false
     end
 
-    add_index :documents, :fulltext, :using => 'pgroonga'
+    add_index :documents, [:title, :description], :using => 'pgroonga'
+    add_index :documents, :body, :using => 'pgroonga'
   end
 end

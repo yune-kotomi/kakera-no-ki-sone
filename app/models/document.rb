@@ -4,16 +4,8 @@ class Document < ActiveRecord::Base
   validates :markup, :inclusion => ['plaintext', 'hatena', 'markdown']
   validate :body_validation
 
-  def body
-    YAML.load(body_yaml)
-  end
-
-  def body=(value)
-    self.body_yaml = value.to_yaml
-  end
-
   def body_validation
-    unless (body.map{|node| valid_node?(node) }.uniq - [true]).blank?
+    if body.present? && (body.map{|node| valid_node?(node) }.uniq - [true]).present?
       errors.add(:body, 'invalid node(s)')
     end
   end

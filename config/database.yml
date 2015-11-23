@@ -1,6 +1,6 @@
 development:
   adapter: postgresql
-  database: sone
+  database: sone_development
 
 test:
   adapter: postgresql
@@ -8,4 +8,4 @@ test:
 
 production:
   adapter: postgresql
-  database: sone
+  database: sone_production

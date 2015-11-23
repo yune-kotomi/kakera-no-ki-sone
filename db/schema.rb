@@ -20,8 +20,7 @@ ActiveRecord::Schema.define(version: 20150315051127) do
   create_table "documents", force: :cascade do |t|
     t.string   "title",       default: "新しい文書",     null: false
     t.text     "description"
-    t.text     "body_yaml",   default: "--- []",    null: false
-    t.text     "fulltext"
+    t.jsonb    "body"
     t.boolean  "public",      default: false,       null: false
     t.boolean  "archived",    default: false,       null: false
     t.string   "password"
@@ -31,7 +30,8 @@ ActiveRecord::Schema.define(version: 20150315051127) do
     t.datetime "updated_at",                        null: false
   end
 
-  add_index "documents", ["fulltext"], name: "index_documents_on_fulltext", using: :pgroonga
+  add_index "documents", ["body"], name: "index_documents_on_body", using: :pgroonga
+  add_index "documents", ["title", "description"], name: "index_documents_on_title_and_description", using: :pgroonga
 
   create_table "metadata", force: :cascade do |t|
     t.text     "body_yaml"

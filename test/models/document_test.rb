@@ -17,11 +17,6 @@ class DocumentTest < ActiveSupport::TestCase
     assert !document.valid?
   end
 
-  test "#bodyは#body_yamlをパースしたものを返す" do
-    expect = YAML.load(@document2.body_yaml)
-    assert_equal expect, @document2.body
-  end
-
   test "#bodyの構造が正しければ保存可能" do
     @document1.body = @document2.body
     assert @document1.valid?

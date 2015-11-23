@@ -1,62 +1,48 @@
-# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
-
+---
 document1:
   title: document 1
   description: document 1 description
-  body_yaml: --- []
   public: true
   archived: false
   password:
   markup: plaintext
   user: user1
-
+  body: "[]"
 document2:
   title: document 2
   description: document 2 description
-  body_yaml: |
-    ---
-    - id: 05c60f4a-3250-4b54-8a2d-d78b1a5a1ff3
-      title: node1
-      body: body text 1
-      children: []
-      metadatum: {}
-    - id: 5d33a7be-c4a8-413b-897e-b882b396f0d8
-      title: node2
-      body: body text 2
-      children: []
-      metadatum: {}
   public: true
   archived: false
-  password:
+  password: 
   markup: plaintext
   user: user1
-
+  body: '[{"id":"05c60f4a-3250-4b54-8a2d-d78b1a5a1ff3","title":"node1","body":"body
+    text 1","children":[],"metadatum":{}},{"id":"5d33a7be-c4a8-413b-897e-b882b396f0d8","title":"node2","body":"body
+    text 2","children":[],"metadatum":{}}]'
 document3:
   title: document 3
   description: document 3 description
-  body_yaml: --- []
   public: false
   archived: false
   password:
   markup: plaintext
   user: user1
-
+  body: "[]"
 document4:
   title: document 4
   description: document 4 description
-  body_yaml: --- []
   public: true
   archived: true
   password:
   markup: plaintext
   user: user1
-
+  body: "[]"
 document5:
   title: document 5
   description: document 5 description
-  body_yaml: --- []
   public: false
   archived: true
   password:
   markup: plaintext
   user: user1
+  body: "[]"

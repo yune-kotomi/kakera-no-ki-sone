@@ -9,7 +9,7 @@ module Editor
       id = Element.find('#document-id').value
       title = Element.find('#document-title').value
       description = Element.find('#document-description').value
-      children = JSON.parse(Element.find('#document-body').value)
+      children = JSON.parse(Element.find('#document-body').value) || []
       publ = JSON.parse(Element.find('#document-public').value)
       archived = JSON.parse(Element.find('#document-archived').value)
       markup = JSON.parse(Element.find('#document-markup').value)
