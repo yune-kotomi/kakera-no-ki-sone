@@ -88,7 +88,13 @@ module Editor
 
         left = Mousetrap::Handler.new('left') do |h|
           h.condition { parental_tree.focused && self.target }
-          h.procedure { collapse }
+          h.procedure do
+            if self.children.empty? || self.open == false
+              self.parent.target = true
+            else
+              collapse
+            end
+          end
         end
         @hotkeys.bind_handler(left)
 
