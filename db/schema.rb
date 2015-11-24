@@ -18,20 +18,22 @@ ActiveRecord::Schema.define(version: 20150211031441) do
   enable_extension "pgroonga"
 
   create_table "documents", force: :cascade do |t|
-    t.string   "title",       default: "新しい文書",     null: false
+    t.string   "title",              default: "新しい文書",     null: false
     t.text     "description"
     t.jsonb    "body"
-    t.boolean  "public",      default: false,       null: false
-    t.boolean  "archived",    default: false,       null: false
+    t.boolean  "public",             default: false,       null: false
+    t.boolean  "archived",           default: false,       null: false
     t.string   "password"
-    t.string   "markup",      default: "plaintext", null: false
+    t.string   "markup",             default: "plaintext", null: false
     t.integer  "user_id"
-    t.datetime "created_at",                        null: false
-    t.datetime "updated_at",                        null: false
+    t.datetime "content_updated_at",                       null: false
+    t.datetime "created_at",                               null: false
+    t.datetime "updated_at",                               null: false
   end
 
   add_index "documents", ["body"], name: "index_documents_on_body", using: :pgroonga
-  add_index "documents", ["title", "description"], name: "index_documents_on_title_and_description", using: :pgroonga
+  add_index "documents", ["description"], name: "index_documents_on_description", using: :pgroonga
+  add_index "documents", ["title"], name: "index_documents_on_title", using: :pgroonga
 
   create_table "users", force: :cascade do |t|
     t.string   "domain_name"

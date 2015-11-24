@@ -8,12 +8,15 @@ class CreateDocuments < ActiveRecord::Migration
       t.boolean :archived, :default => false, :null => false
       t.string :password
       t.string :markup, :default => :plaintext, :null => false
+
       t.integer :user_id
 
+      t.timestamp :content_updated_at, :null => false
       t.timestamps null: false
     end
 
-    add_index :documents, [:title, :description], :using => 'pgroonga'
+    add_index :documents, :title, :using => 'pgroonga'
+    add_index :documents, :description, :using => 'pgroonga'
     add_index :documents, :body, :using => 'pgroonga'
   end
 end
