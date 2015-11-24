@@ -1,6 +1,5 @@
 class Document < ActiveRecord::Base
   belongs_to :user
-  has_one :metadatum
   validates :markup, :inclusion => ['plaintext', 'hatena', 'markdown']
   validate :body_validation
 
