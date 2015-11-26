@@ -1,50 +1,17 @@
-@import "materialize";
+@import "material";
 
-nav {
-  a.button-collapse {
-    display: block !important;
-  }
+.mdl-layout__drawer {
+  header {
+    padding: 16px;
 
-  li>a {
-    display: block;
-  }
-}
+    .avatar-dropdown {
+      display: flex;
+      padding: 5px 0;
 
-.card {
-  .card-action {
-    display: flex;
-    justify-content: space-between;
-    text-align: right;
-
-    a,button {
-      margin: 0;
-      i {
-        @extend .grey-text, .text-darken-1;
-        font-size: 25px;
+      .username {
+        flex: 1;
+        padding: 6px 0 0 0;
       }
     }
-
   }
-}
-
-.pagination {
-  span.page.current>span {
-    @extend .btn-flat, .waves-effect;
-    cursor: auto;
-    font-weight: bold;
-  }
-}
-
-button {
-  &:focus {
-    background-color: inherit;
-  }
-}
-
-i.mdi-content-archive-invert {
-  display: block;
-  height: 25px;
-  width: 25px;
-  background-image: url(/assets/ic_archive_48px.svg);
-  background-size: contain;
 }

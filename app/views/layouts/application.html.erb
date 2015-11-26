@@ -1,67 +1,82 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no"/>
-  <title><%= @title %>: <%= Sone::Application.config.title %></title>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no"/>
+    <title><%= @title %>: <%= Sone::Application.config.title %></title>
 
-  <%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track' => true %>
-  <%= javascript_include_tag 'application', 'data-turbolinks-track' => true %>
-  <%= csrf_meta_tags %>
-</head>
-<body class="<%= params[:controller] %>">
-  <nav class="indigo lighten-1" role="navigation">
-    <div class="container">
-      <div class="nav-wrapper">
-        <ul class="right hide-on-med-and-down">
-          <% if @login_user.blank? %>
-            <li>
-              <%= link_to 'ユーザ登録/ログイン', users_login_path %>
-            </li>
+    <%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track' => true %>
+    <%= javascript_include_tag 'application', 'data-turbolinks-track' => true %>
+    <%= csrf_meta_tags %>
+  </head>
+
+  <body class="<%= params[:controller] %>">
+    <!-- Always shows a header, even in smaller screens. -->
+    <div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
+      <header class="mdl-layout__header">
+        <div class="mdl-layout__header-row">
+          <!-- Title -->
+          <span class="mdl-layout-title"><%= @title %></span>
+          <!-- Add spacer, to align navigation to the right -->
+          <div class="mdl-layout-spacer"></div>
+          <%= yield :navigation %>
+        </div>
+      </header>
+
+      <div class="mdl-layout__drawer">
+        <header class="drawer-header">
+            <% if @login_user.blank? %>
+            <img src="http://placehold.it/48x48" class="avatar">
+            <div class="avatar-dropdown">
+              <div class="username">ゲスト</div>
+              <button id="accbtn" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
+                <i class="material-icons" role="presentation">arrow_drop_down</i>
+              </button>
+              <ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="accbtn">
+                <%= link_to 'ユーザ登録/ログイン', users_login_path, :class => 'mdl-menu__item' %>
+              </ul>
+            </div>
           <% else %>
-            <li>
-              <%= link_to_user %>
-            </li>
+            <img src="http://placehold.it/48x48" class="avatar">
+            <div class="avatar-dropdown">
+              <div class="username"><%= @login_user.nickname %></div>
+              <button id="accbtn" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
+                <i class="material-icons" role="presentation">arrow_drop_down</i>
+              </button>
+              <ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="accbtn">
+                <%= link_to_profile_edit 'プロフィール編集', :class => 'mdl-menu__item' %>
+                <%= link_to 'ログアウト', users_logout_path, :class => 'mdl-menu__item' %>
+              </ul>
+            </div>
           <% end %>
-        </ul>
+        </header>
 
-        <ul id="nav-mobile" class="side-nav">
+        <nav class="mdl-navigation">
           <% if @login_user.blank? %>
-            <li>
-              <%= link_to 'ユーザ登録/ログイン', users_login_path %>
-            </li>
           <% else %>
-            <li class="deep-orange-text hide-on-large-only"><%= @login_user.nickname %></li>
-            <li class="divider hide-on-large-only"></li>
-
-            <li>
-              <%= link_to_user '文書' %>
-            </li>
-            <li>
-              <%= link_to_user '保存記録', @login_user, :archived => true %>
-            </li>
-
-            <li>
-              <%= link_to 'ログアウト', users_logout_path %>
-            </li>
+            <%= link_to_user '文書', @login_user, {}, :class => 'mdl-navigation__link' %>
+            <%= link_to_user '保存記録', @login_user, {:archived => true}, :class => 'mdl-navigation__link' %>
           <% end %>
-        </ul>
-        <a href="#" data-activates="nav-mobile" class="button-collapse"><i class="mdi-navigation-menu"></i></a>
-        <span><%= @title %></span>
+        </nav>
       </div>
-    </div>
-  </nav>
 
-  <div class="container">
-    <%= yield %>
-  </div>
+      <main class="mdl-layout__content">
+        <div class="page-content"><%= yield %></div>
+      </main>
 
-  <footer class="page-footer indigo lighten-5">
-    <div class="container">
-      <%= link_to root_path do %>
-        <%= image_tag('logo.png') %>
-      <% end %>
+      <footer class="mdl-mini-footer">
+        <div class="mdl-mini-footer__left-section">
+          <div class="mdl-logo">
+            <%= link_to root_path do %>
+              <%= image_tag('logo.png') %>
+            <% end %>
+          </div>
+          <ul class="mdl-mini-footer__link-list">
+            <li><a href="#">Help</a></li>
+            <li><a href="#">Privacy & Terms</a></li>
+          </ul>
+        </div>
+      </footer>
     </div>
-  </footer>
   </body>
 </html>
