@@ -12,7 +12,8 @@ Rails.application.config.assets.paths.concat([
   'vendor/text-hatena.js',
   'vendor/showdown/dist',
   'vendor/rickdom/src',
-  'vendor/mousetrap'
+  'vendor/mousetrap',
+  'vendor/jquery.ex-resize'
 ])
 
 # Precompile additional assets.

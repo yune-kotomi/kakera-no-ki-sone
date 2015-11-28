@@ -2,62 +2,73 @@
   if params[:archived]
     @title = "保存記録"
   else
-    @title = "文書"
+    @title = "文書一覧"
   end
   @title = "#{@title}: #{@user.nickname}" unless @login_user == @user
  %>
 
-<div class="row documents">
-  <% @documents.each do |document| %>
-    <div class="col s12 m4">
-      <div class="card small">
-        <div class="card-content">
-          <%
-            if @user == @login_user
-              link = edit_document_path(document)
-            else
-              link = document
-            end
-          %>
-          <%= link_to link do %>
-            <span class="card-title grey-text text-darken-4"><%= document.title %></span>
-            <p><%= document.description %></p>
-          <% end %>
-        </div>
+<div class="documents">
+  <table class="mdl-data-table mdl-js-data-table">
+    <thead>
+      <tr>
+        <th class="mdl-data-table__cell--non-numeric title">題名</th>
+        <th class="mdl-data-table__cell--non-numeric updated">最終更新</th>
+        <th></th>
+      </tr>
+    </thead>
 
-        <% if @user == @login_user %>
-          <div class="card-action">
-            <%= link_to document,
-              :method => :delete,
-              :data => {:confirm => '本当に削除してよろしいですか?'},
-              :class => 'waves-effect btn-flat' do %>
-              <i class="mdi-action-delete"></i>
-            <% end %>
+    <tbody>
+      <% @documents.each do |document| %>
+        <tr>
+          <td class="mdl-data-table__cell--non-numeric title">
+            <%= link_to document.title, document %>
+          </td>
 
-            <%= form_for(document) do |f| %>
-              <%= f.button :class => 'waves-effect btn-flat' do %>
-                <% if document.archived %>
-                  <i class="mdi-content-archive-invert"></i>
-                <% else %>
-                  <i class="mdi-content-archive"></i>
-                <% end %>
+          <td class="updated">
+            <%= document.content_updated_at %>
+          </td>
+
+          <td class="buttons">
+            <div class="buttons">
+              <%= button_to document,
+                :method => :delete,
+                :data => {:confirm => '本当に削除してよろしいですか?'},
+                :class => 'mdl-button mdl-js-button mdl-button--icon' do %>
+                <i class="material-icons">delete</i>
               <% end %>
-              <% document.archived = !document.archived %>
-              <%= f.hidden_field :archived %>
-            <% end %>
-          </div>
-        <% end %>
-      </div>
-    </div>
-  <% end %>
+
+              <%= form_for(document) do |f| %>
+                <%= f.button :class => 'mdl-button mdl-js-button mdl-button--icon' do %>
+                  <% if document.archived %>
+                    <i class="material-icons">unarchive</i>
+                  <% else %>
+                    <i class="material-icons">archive</i>
+                  <% end %>
+                <% end %>
+                <% document.archived = !document.archived %>
+                <%= f.hidden_field :archived %>
+              <% end %>
+
+              <%= link_to edit_document_path(document) do %>
+                <button class="mdl-button mdl-js-button mdl-button--icon mdl-button--colored">
+                  <i class="material-icons">edit</i>
+                </button>
+              <% end %>
+            </div>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
 </div>
 
 <%= paginate(@documents) %>
 
-<div class="fixed-action-btn" style="bottom: 24px; right: 34px;">
+<div class="add-button right-bottom-fab">
   <%= form_for @user.documents.build do %>
-    <button class="waves-effect waves-light btn-floating btn-large red">
-      <i class="large mdi-content-add"></i>
+    <!-- Colored FAB button with ripple -->
+    <button class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored">
+      <i class="material-icons">add</i>
     </button>
   <% end %>
 </div>

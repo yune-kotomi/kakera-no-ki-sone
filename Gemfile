@@ -11,8 +11,6 @@ gem 'uglifier', '>= 1.3.0'
 
 gem 'jquery-rails'
 gem 'opal-rails'
-gem 'turbolinks'
-gem 'jquery-turbolinks'
 
 gem 'kaminari'
 

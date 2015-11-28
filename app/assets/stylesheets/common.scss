@@ -15,3 +15,16 @@
     }
   }
 }
+
+.pagination {
+  display: flex;
+  margin: 16px 64px;
+
+  .prev,.next {
+    width: 50%;
+  }
+
+  .next {
+    text-align: right;
+  }
+}
