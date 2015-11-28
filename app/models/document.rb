@@ -3,6 +3,7 @@ class Document < ActiveRecord::Base
   validates :markup, :inclusion => ['plaintext', 'hatena', 'markdown']
   validate :body_validation
   before_save :update_content_timestamp
+  before_create { self.content_updated_at = Time.now }
 
   def body_validation
     if body.present? && (body.map{|node| valid_node?(node) }.uniq - [true]).present?
