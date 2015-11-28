@@ -34,6 +34,21 @@ class DocumentTest < ActiveSupport::TestCase
     assert !@document1.valid?
   end
 
+  test '新規作成できる' do
+    document = Document.new
+    assert_nothing_raised do
+      document.save
+    end
+  end
+
+  test '新規作成したのが更新できる' do
+    document = Document.new
+    document.save
+    assert_nothing_raised do
+      document.update_attribute(:body, @document2.body)
+    end
+  end
+
   test 'title変更でcontent_updated_atを更新' do
     @document2.update_attribute(:title, 'new')
     assert_not_equal @orig_timestamp, @document2.content_updated_at
