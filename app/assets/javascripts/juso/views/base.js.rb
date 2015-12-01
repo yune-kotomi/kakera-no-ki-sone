@@ -50,10 +50,20 @@ module Juso
         source = `$.templates(#{template}).render(#{attributes.to_n})`
         @rendered = `$(source)`
 
-        # 子クラス展開
+        # 子クラスのDOM展開
         element_options.
           reject{|_, o| o[:type].nil? }.
-          each{|n, _| update_element(n, attributes[n]) }
+          each do |n, _|
+            attr = @attributes[n]
+            case attr
+            when NilClass
+              # do nothing
+            when Array
+              attr.each{|a| dom_element(n).append(a.dom_element) }
+            else
+              dom_element(n).append(attr.dom_element)
+            end
+          end
 
         element_options.keys.each do |name|
           elem = dom_element(name)

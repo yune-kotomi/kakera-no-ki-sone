@@ -193,6 +193,12 @@ module Editor
         @hotkeys.bind_handler(ctrl_del)
       end
 
+      def ==(value)
+        if value.is_a?(self.class)
+          self.id == value.id
+        end
+      end
+
       def scan(&block)
         ret = [block.call(self)]
         ret.push children.map {|c| c.scan(&block) }

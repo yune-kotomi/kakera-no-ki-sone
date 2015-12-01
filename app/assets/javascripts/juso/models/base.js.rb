@@ -147,25 +147,19 @@ module Juso
           if value.is_a?(Array)
             value.each{|v| raise AttributeMustBeAHashOrClassError.new unless [Hash, attribute_definition[:type]].include?(v.class) }
 
-            if value.first.is_a?(Hash)
-              previous_attributes = if previous_value.nil?
-                nil
+            values = value.map do |v|
+              if v.is_a?(Hash)
+                attribute_definition[:type].new(v, self)
               else
-                previous_value.map{|v| v.attributes }
+                v2 = previous_value.find{|e| e == v }
+                v2 = v if v2.nil?
+                v2
               end
+            end
 
-              unless previous_attributes == value
-                values = value.map{|v| attribute_definition[:type].new(v, self) }
-                values.each {|v| v.parent = self }
-                @attributes[name] = values
-                trigger(name, :change, values, previous_value) if options[:trigger]
-              end
-            else
-              unless previous_value == value
-                @attributes[name] = value
-                value.each {|v| v.parent = self }
-                trigger(name, :change, value, previous_value) if options[:trigger]
-              end
+            unless values == previous_value
+              @attributes[name] = values
+              trigger(name, :change, values, previous_value) if options[:trigger]
             end
           else
             if previous_value.nil? || previous_value.attributes != value
