@@ -9,7 +9,7 @@ module Text
 
     def parse(text)
       `var parser = new TextHatena(#{@option.to_n})`
-      @html = `parser.parse(#{text})`
+      @html = `parser.parse(#{text.to_s})`
     end
 
     def to_html
