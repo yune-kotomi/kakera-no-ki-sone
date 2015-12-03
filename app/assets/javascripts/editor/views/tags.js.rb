@@ -3,8 +3,10 @@ module Editor
     class TagCheckBox < Juso::View::Base
       template <<-EOS
         <li class="tag">
-          <input type="checkbox" id="{{url:value}}">
-          <label for="{{url:value}}">{{>value}}</label>
+          <label class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect">
+            <input type="checkbox" class="mdl-checkbox__input">
+            <span class="mdl-checkbox__label">{{>value}}</span>
+          </label>
         </li>
       EOS
 

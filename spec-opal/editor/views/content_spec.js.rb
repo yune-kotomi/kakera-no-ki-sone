@@ -140,29 +140,20 @@ describe 'Editor::View::Contents' do
     it { expect(dom_1_1).to be_empty }
   end
 
-  context '本文領域へのフォーカス' do
-    let(:dom_element) { contents.dom_element.find('.contents') }
-    describe 'focused' do
-      before { contents.focused = true }
-      it { expect(dom_element.has_class?('focused')).to eq true }
-    end
-
-    describe 'unfocused' do
-      before { contents.focused = false }
-      it { expect(dom_element.has_class?('focused')).to eq false }
-    end
-  end
-
   context '編集対象' do
-    before { content_1_1.target = true }
-    it { expect(content_1_1.dom_element.has_class?('target')).to eq true }
+    before do
+      contents.focused = true
+      content_1_1.target = true
+    end
+
+    it { expect(content_1_1.dom_element.has_class?('mdl-shadow--4dp')).to eq true }
     it { expect(content_1_2.target).to eq false }
     it { expect(contents.current_target).to eq content_1_1.id }
 
     describe '別のノードをターゲットにすると前のターゲットは解除' do
       before { content_1_2.target = true }
-      it { expect(content_1_1.dom_element.has_class?('target')).to eq false }
-      it { expect(content_1_2.dom_element.has_class?('target')).to eq true }
+      it { expect(content_1_1.dom_element.has_class?('mdl-shadow--4dp')).to eq false }
+      it { expect(content_1_2.dom_element.has_class?('mdl-shadow--4dp')).to eq true }
       it { expect(content_1_1.target).to eq false }
       it { expect(contents.current_target).to eq content_1_2.id }
     end

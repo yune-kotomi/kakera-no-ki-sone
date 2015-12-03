@@ -1,19 +1,17 @@
 <% @title = "編集: #{@document.title}" %>
-<div id="save-indicator">
-  <span class="working" style="display:none">保存しています...</span>
-  <span class="saved" style="display:none">保存しました</span>
+
+<div class="mdl-grid" id="document-editor">
+  <div class="mdl-cell mdl-cell--4-col tree-view"></div>
+  <div class="mdl-cell mdl-cell--8-col content-view"></div>
 </div>
 
-<button id="add-button">add</button>
-<input type="checkbox" id="public-checkbox">
-<label for="public-checkbox">公開する</label>
-<%= select_tag :markup,
-  options_for_select([['記法なし', :plaintext], ['はてな記法', :hatena], ['Markdown', :markdown]], @document.markup) %>
+<div id="save-indicator" class="mdl-progress mdl-js-progress"></div>
 
-<div class="row" id="document-editor">
-  <div class="tag-list"></div>
-  <div class="col s12 m4 l5 tree-view"></div>
-  <div class="col s12 m8 l7 content-view"></div>
+<div class="add-button right-bottom-fab">
+  <!-- Colored FAB button with ripple -->
+  <button class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored" id="add-button">
+    <i class="material-icons">add</i>
+  </button>
 </div>
 
 <%= hidden_field_tag :id, @document.id, :id => 'document-id' %>
@@ -23,3 +21,49 @@
 <%= hidden_field_tag :public, @document.public.to_json, :id => 'document-public' %>
 <%= hidden_field_tag :archived, @document.archived.to_json, :id => 'document-archived' %>
 <%= hidden_field_tag :markup, @document.markup.to_json, :id => 'document-markup' %>
+
+<% content_for(:navigation) do %>
+  <hr>
+  <div class="mdl-typography--subhead tag-list-title">タグ</div>
+  <div id="tag-list"></div>
+<% end %>
+
+<% content_for(:bottom) do %>
+  <div id="config-dialog" class="modal-card">
+    <div class="modal-container">
+      <div class="mdl-card mdl-shadow--2dp">
+        <div class="mdl-card__supporting-text">
+          <div>
+            <h4>記法</h4>
+            <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect">
+              <input type="radio" class="mdl-radio__button" name="markup" value="plaintext" id="markup1" <%= 'checked' if @document.markup == 'plaintext' %>>
+              <span class="mdl-radio__label">記法なし</span>
+            </label>
+            <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect">
+              <input type="radio" class="mdl-radio__button" name="markup" value="hatena"id="markup2" <%= 'checked' if @document.markup == 'hatena' %>>
+              <span class="mdl-radio__label">はてな記法</span>
+            </label>
+            <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect">
+              <input type="radio" class="mdl-radio__button" name="markup" value="markdown"id="markup3" <%= 'checked' if @document.markup == 'markdown' %>>
+              <span class="mdl-radio__label">Markdown</span>
+            </label>
+          </div>
+
+          <div>
+            <h4>公開範囲</h4>
+            <label class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect">
+              <input type="checkbox" class="mdl-checkbox__input" id="public-checkbox">
+              <span class="mdl-checkbox__label">一般公開する</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="mdl-card__menu">
+          <button class="mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect close">
+            <i class="material-icons">close</i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+<% end %>

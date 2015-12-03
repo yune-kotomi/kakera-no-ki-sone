@@ -3,49 +3,47 @@ module Editor
     class RootDisplay < Display
       template <<-EOS
         <div class="display">
-          <h2><span class="title">{{:title}}</span></h2>
-          <div class="body-display"></div>
-          <div class="controls">
-            <button class="edit">編集</button>
+          <h3><span class="title">{{:title}}</span></h3>
+          <div class="body-display mdl-typography--body-1"></div>
+
+          <div class="buttons">
+            <button class="mdl-button mdl-js-button mdl-button--icon config">
+              <i class="material-icons">settings</i>
+            </button>
           </div>
         </div>
       EOS
 
-      attribute :target, :default => true
-
-      def initialize(data = {}, parent = nil)
-        super(data, parent)
-
-        observe(:target) do |t|
-          if t
-            dom_element.add_class('target')
-          else
-            dom_element.remove_class('target')
-          end
-        end.call(target)
-      end
+      element :setting_button, :selector => 'button.config'
     end
 
     class Contents < Juso::View::Base
       template <<-EOS
-        <div class="scroll-container">
-          <div class="contents">
-            <div class="root">
-              <div class="display"></div>
-              <div class="editor" style="display:none">
-                <div>
-                  <input type="text" class="title" value="{{attr:title}}">
-                </div>
-                <div>
-                  <textarea class="body">{{:body}}</textarea>
-                </div>
-                <div>
-                  <button class="close">閉じる</button>
+        <div>
+          <div class="scroll-container">
+            <div class="contents">
+              <div class="root content">
+                <div class="display"></div>
+                <div class="editor" style="display:none">
+                  <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                    <input class="mdl-textfield__input title" type="text" value="{{attr:title}}">
+                    <label class="mdl-textfield__label">題名...</label>
+                  </div>
+
+                  <div class="footer">
+                    <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                      <textarea class="mdl-textfield__input body" type="text" rows= "10">{{:body}}</textarea>
+                      <label class="mdl-textfield__label">本文...</label>
+                    </div>
+                    <button class="mdl-button mdl-js-button mdl-button--icon close">
+                      <i class="material-icons">close</i>
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
-            <div>
-              <div class="children"></div>
+              <div>
+                <div class="children"></div>
+              </div>
             </div>
           </div>
         </div>
@@ -57,7 +55,7 @@ module Editor
       element :body, :selector => 'textarea.body'
       element :close_button, :selector => 'button.close'
       element :children, :selector => 'div.children', :type => Content
-      element :container
+      element :container, :selector => 'div.scroll-container'
 
       attribute :id
       attribute :markup
@@ -86,11 +84,12 @@ module Editor
 
         # フォーカス
         observe(:focused) do |v|
-          if v
-            dom_element.find('.contents').add_class('focused')
+          show unless v
+
+          if v && target
+            dom_element.find('.root.content').add_class('mdl-shadow--4dp')
           else
-            dom_element.find('.contents').remove_class('focused')
-            show # フォーカスが外れたら編集終了
+            dom_element.find('.root.content').remove_class('mdl-shadow--4dp')
           end
         end.call(focused)
 
@@ -105,11 +104,15 @@ module Editor
 
         # 自分自身へのターゲット指定
         observe(:target) do |t|
-          display.target = t
           if t
             self.current_target = id
           else
             show # 自分自身がターゲットから外れたら編集終了
+          end
+          if t && focused
+            dom_element.find('.root.content').add_class('mdl-shadow--4dp')
+          else
+            dom_element.find('.root.content').remove_class('mdl-shadow--4dp')
           end
         end.call(target)
 

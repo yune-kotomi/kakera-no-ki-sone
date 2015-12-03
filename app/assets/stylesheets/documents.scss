@@ -1,33 +1,125 @@
 // Place all the styles related to the documents controller here.
 // They will automatically be included in application.css.
 // You can use Sass (SCSS) here: http://sass-lang.com/
-.tree-view {
-  .scroll-container {
-    height: 400px;
-    overflow: auto;
 
-    .selected {
-      background-color: yellow;
-      font-weight: bold;
+#document-editor {
+  padding: 0;
+
+  .content-view {
+    margin-bottom: 4px;
+    &>div{
+      padding: 4px;
+
+      .scroll-container {
+        overflow: auto;
+      }
+
+      .content {
+        margin: 4px;
+        padding: 4px;
+
+        .display {
+          .footer {
+            display: flex;
+
+            button {
+              margin-top: 24px;
+            }
+
+            ul.tags {
+              display: flex;
+              flex: 1;
+
+              li {
+                display: block;
+                padding: 4px 8px;
+              }
+            }
+          }
+        }
+
+        .editor {
+          div.mdl-textfield {
+            width: 100%;
+          }
+
+          div.footer {
+            button {
+              margin: 35px 0 0 5px;
+            }
+            display: flex;
+            div.mdl-textfield {
+              flex: 1;
+            }
+          }
+        }
+
+        &.root {
+          div.buttons {
+            text-align: right;
+          }
+          
+          div.footer button {
+            margin-top: 177px;
+          }
+        }
+      }
+    }
+  }
+
+  .tree-view {
+    margin-bottom: 4px;
+    .scroll-container {
+      overflow: auto;
+    }
+    div.tree {
+      padding: 4px;
+
+      .selected {
+        background-color: yellow;
+        font-weight: bold;
+      }
     }
   }
 }
 
-.content-view {
-  .scroll-container {
-    height: 400px;
-    overflow: auto;
+nav {
+  .tag-list-title {
+    margin: 0 16px;
   }
 
-  .target {
-    border: 1px red solid;
+  .editor-view-tags {
+    ul {
+      li {
+        list-style-type: none;
+        padding: 0 4px;
+      }
+    }
   }
 }
 
-select {
-  display: block;
+#save-indicator {
+  display: none;
+  width: 100%;
 }
 
-.focused {
-  border: 1px blue solid;
+.modal-card {
+  background-color: rgba(0, 0, 0, 0.5);
+  display: none;
+  height: 100%;
+  left: 0px;
+  position: absolute;
+  top: 0px;
+  width: 100%;
+  z-index: 1000;
+
+  .modal-container {
+    display: flex;
+    height: 100%;
+    width: 100%;
+
+    &>.mdl-card {
+      margin: auto;
+    }
+  }
 }

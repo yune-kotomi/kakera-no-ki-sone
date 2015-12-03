@@ -120,16 +120,21 @@ module Editor
       end
 
       # 記法
-      elements[:markup_selector].on(:change) do |e|
-        @document.markup = e.current_target.value
+      elements[:markup_selector].on(:click) do |e|
+        @document.markup = elements[:markup_selector].to_a.find{|e| e.prop('checked') }.value
       end
 
-      # ツリービューにフォーカスを当てる
+      # フォーカスの排他処理
       @tree.observe(:focused) {|f| @contents.focused = !f }
+      @contents.observe(:focused) {|f| @tree.focused = !f }
       @tree.focused = true
 
       # ホットキーを有効に
       @hotkeys = Hotkeys.new(self, @document, @tree, @contents)
+
+      # 設定ダイアログ
+      @contents.display.observe(:setting_button, :click) { elements[:setting_dialog].effect(:fade_in) }
+      elements[:setting_dialog].find('button.close').on(:click) { elements[:setting_dialog].effect(:fade_out) }
     end
 
     # 編集対象の要素の弟ノードを追加する
@@ -184,8 +189,7 @@ module Editor
 
     def save_enable
       @save = true
-      @save_indicator.find('.saved').hide
-      @save_indicator.find('.working').effect(:fade_in)
+      @save_indicator.effect(:fade_in)
       Window.on(:beforeunload) { close_confirm }
     end
 
@@ -202,13 +206,19 @@ module Editor
         'body' => data['children'].to_json,
       ).reject{|k, v| ['id', 'tags', 'children', 'metadatum'].include?(k) }
 
-      unless data == @sent_data # 内容が更新されていなければ保存しない
+      if data == @sent_data
+        # 内容が更新されていなければ保存しない
+        @save_indicator.effect(:fade_out)
+        Window.off(:beforeunload)
+      else
+        @save_indicator.add_class('mdl-progress__indeterminate')
+
         HTTP.patch("/documents/#{@document.id}.json", :payload => {'document' => data}) do |request|
           if request.ok?
             @save = false
             @sent_data = data
-            @save_indicator.find('.working').hide
-            @save_indicator.find('.saved').effect(:fade_in)
+            @save_indicator.remove_class('mdl-progress__indeterminate')
+            @save_indicator.effect(:fade_out)
             Window.off(:beforeunload)
           else
           end
@@ -269,11 +279,18 @@ Document.ready? do
     editor.attach(
       :tree => Element.find('#document-editor>.tree-view'),
       :contents => Element.find('#document-editor>.content-view'),
-      :tags => Element.find('#document-editor>.tag-list'),
+      :tags => Element.find('#tag-list'),
       :save_indicator => Element.find('#save-indicator'),
       :public_checkbox => Element.find('#public-checkbox'),
-      :markup_selector => Element.find('#markup')
+      :markup_selector => Element.find('input[name="markup"]'),
+      :setting_dialog => Element.find('#config-dialog')
     )
+    main = Element.find('main')
+    main.ex_resize do
+      height = main.height - 8*2 - 4*2
+      editor.tree.dom_element(:container).css('height', "#{height}px")
+      editor.contents.dom_element(:container).css('height', "#{height}px")
+    end
 
     Element.find('#add-button').on(:click) do
       editor.add_child

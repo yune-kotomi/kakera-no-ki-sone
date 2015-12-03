@@ -3,10 +3,12 @@ module Editor
     class Leaf < Juso::View::Base
       template <<-EOS
       <li class="dd-item" data-id="{{attr:id}}">
-        <div class="dd-handle">Drag</div>
-        <div class="dd-content">
-          <span class="chapter_number">{{:chapter_number}}</span>
-          <span class="title">{{:title}}</span>
+        <div class="body">
+          <div class="dd-handle">Drag</div>
+          <div class="dd-content">
+            <span class="chapter_number">{{:chapter_number}}</span>
+            <span class="title">{{:title}}</span>
+          </div>
         </div>
         <ol class="dd-list" {{if open}}{{else}}style="display:none"{{/if}}></ol>
       </li>

@@ -13,20 +13,25 @@ module Editor
     class Display < Juso::View::Base
       template <<-EOS
         <div class="display">
-          <h2><span class="chapter_number">{{:chapter_number}}</span><span class="title">{{:title}}</span></h2>
-          <div class="body-display"></div>
-          <div class="controls">
-            <button class="delete">削除</button>
-            <button class="edit">編集</button>
+          <h4>
+            <span class="chapter_number">{{:chapter_number}}</span>
+            <span class="title">{{:title}}</span>
+          </h4>
+          <div class="body-display mdl-typography--body-1"></div>
+
+          <div class="footer">
+            <ul class="tags"></ul>
+            <button class="mdl-button mdl-js-button mdl-button--icon delete">
+              <i class="material-icons">delete</i>
+            </button>
           </div>
-          <ul class="tags"></ul>
         </div>
       EOS
 
-      element :chapter_number, :selector => 'h2>span.chapter_number'
-      element :title, :selector => 'h2>span.title'
+      element :chapter_number, :selector => 'span.chapter_number'
+      element :title, :selector => 'span.title'
       element :body_display, :selector => 'div.body-display'
-      element :edit_button, :selector => 'button.edit'
+      element :edit_button
       element :delete_button, :selector => 'button.delete'
       element :tags, :selector => 'ul.tags', :default => [], :type => Tag
 
@@ -92,17 +97,25 @@ module Editor
     class Editor < Juso::View::Base
       template <<-EOS
         <div class="editor">
-          <div>
-            <input type="text" class="title" value="{{attr:title}}">
+          <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+            <input class="mdl-textfield__input title" type="text" value="{{attr:title}}">
+            <label class="mdl-textfield__label">題名...</label>
           </div>
-          <div>
-            <textarea class="body">{{:body}}</textarea>
+
+          <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+            <textarea class="mdl-textfield__input body" type="text" rows= "10">{{:body}}</textarea>
+            <label class="mdl-textfield__label">本文...</label>
           </div>
-          <div>
-            <input type="text" class="tag-str" value="{{attr:tag_str}}">
-          </div>
-          <div>
-            <button class="close">閉じる</button>
+
+          <div class="footer">
+            <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+              <input class="mdl-textfield__input tag-str" type="text" value="{{attr:title}}">
+              <label class="mdl-textfield__label">タグ...</label>
+            </div>
+
+            <button class="mdl-button mdl-js-button mdl-button--icon close">
+              <i class="material-icons">close</i>
+            </button>
           </div>
         </div>
       EOS
@@ -205,16 +218,28 @@ module Editor
 
         observe(:target) do |v|
           if v
-            dom_element.add_class('target')
             parent.current_target = self.id
           else
-            dom_element.remove_class('target')
             show # 編集を終了する
+          end
+
+          if v && parent.focused
+            dom_element.add_class('mdl-shadow--4dp')
+          else
+            dom_element.remove_class('mdl-shadow--4dp')
           end
         end.call(target)
 
         # 本文領域からフォーカスが外れたら編集終了
-        parent.observe(:focused) {|f| show unless f }
+        parent.observe(:focused) do |f|
+          show unless f
+
+          if f && target
+            dom_element.add_class('mdl-shadow--4dp')
+          else
+            dom_element.remove_class('mdl-shadow--4dp')
+          end
+        end
 
         # キーボード・ショートカット
         @hotkeys = Mousetrap::Pool.instance.get("content-#{id}")
