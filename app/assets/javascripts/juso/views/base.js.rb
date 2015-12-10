@@ -93,7 +93,7 @@ module Juso
         # body以下にappendChild済みでないとupgradeElement出来ないので
         # 不可視divに突っ込んで実行する
         %x{
-          if(componentHandler.upgradeElement){
+          if(typeof(componentHandler) != 'undefined' && componentHandler.upgradeElement){
             var tmp = $('#upgrade-element-tmp-container');
             if(tmp.size() == 0){
               tmp = $('<div id="upgrade-element-tmp-container">');

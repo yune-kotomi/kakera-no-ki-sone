@@ -254,13 +254,13 @@ module Editor
         # キーボード・ショートカット
         @hotkeys = Mousetrap::Pool.instance.get("content-#{id}")
         up = Mousetrap::Handler.new('up') do |handler|
-          handler.condition { parent.focused && self.target }
+          handler.condition { parent.focused && self.target && !self.edit? }
           handler.procedure { previous.target = true unless previous.nil? }
         end
         @hotkeys.bind_handler(up)
 
         down = Mousetrap::Handler.new('down') do |handler|
-          handler.condition { parent.focused && self.target }
+          handler.condition { parent.focused && self.target && !self.edit? }
           handler.procedure { next_content.target = true unless next_content.nil? }
         end
         @hotkeys.bind_handler(down)
@@ -288,6 +288,10 @@ module Editor
         editor.edit(focus_to_last)
         parent.focused = true
         self.target = true
+      end
+
+      def edit?
+        dom_element(:display).css('display') == 'none'
       end
 
       def show

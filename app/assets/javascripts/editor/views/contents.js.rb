@@ -121,7 +121,7 @@ module Editor
 
         @hotkeys = Mousetrap::Pool.instance.get("content-#{id}")
         down = Mousetrap::Handler.new('down') do |handler|
-          handler.condition { self.focused && self.target }
+          handler.condition { self.focused && self.target && !self.edit? }
           handler.procedure { next_content.target = true unless next_content.nil? }
         end
         @hotkeys.bind_handler(down)
@@ -226,6 +226,10 @@ module Editor
         end
         self.focused = true
         self.target = true
+      end
+
+      def edit?
+        dom_element(:editor).css('display') == 'block'
       end
 
       def show

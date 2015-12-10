@@ -110,16 +110,6 @@ describe 'Editor::View::Contents' do
       it { expect(content_1_3.dom_element.next).not_to be_nil }
       it { expect(content_1_3.dom_element.next['data-id']).to eq '1-4' }
 
-      describe 'Viewからの変更伝搬' do
-        let(:content_1_4) { contents.find('1-4') }
-        before do
-          content_1_4.title = 'child1-4 edit'
-          content_1_4.body = 'child1-4 body edit'
-        end
-        it { expect(new_model.title).to eq 'child1-4 edit' }
-        it { expect(new_model.body).to eq 'child1-4 body edit' }
-      end
-
       describe '空の状態で追加' do
         let(:contents2) { Editor::View::Contents.new(source.update(:children => [])) }
         before { contents2.add_child(nil, new_model) }
@@ -158,11 +148,13 @@ describe 'Editor::View::Contents' do
       describe '編集に入ると本文領域にフォーカスが当たる' do
         before { content_1_1.edit }
         it { expect(contents.focused).to eq true }
+        it { expect(content_1_1.edit?).to eq true }
 
         describe '本文領域からフォーカスを外すと編集も終了' do
           before { contents.focused = false }
           it { expect(content_1_1.dom_element.find('.editor-container').css('display')).to eq 'none' }
           it { expect(content_1_1.dom_element(:display).css('display')).to eq 'block' }
+          it { expect(content_1_1.edit?).to eq false }
         end
 
         describe '別のノードを編集開始したら前のノードは編集終了' do
@@ -175,6 +167,8 @@ describe 'Editor::View::Contents' do
 
         describe 'ルートノードを編集開始したら前のノードは編集終了' do
           before { contents.edit }
+
+          it { expect(contents.edit?).to eq true }
           it { expect(content_1_1.dom_element.find('.editor-container').css('display')).to eq 'none' }
           it { expect(content_1_1.dom_element(:display).css('display')).to eq 'block' }
         end
