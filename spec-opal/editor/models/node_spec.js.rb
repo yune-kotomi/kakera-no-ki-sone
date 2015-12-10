@@ -2,7 +2,6 @@ require 'spec_helper'
 require 'jquery'
 require 'jquery_ujs'
 require 'jquery-ui'
-require 'jquery.nestable'
 require 'uuid.core'
 require 'uuid'
 require 'opal-jquery'
@@ -110,7 +109,7 @@ describe 'Editor::Model::Node' do
   describe '削除' do
     describe '末端の葉' do
       before do
-        child1_1_1.observe(nil, :destroy) { @triggered = true }
+        child1_1_1.observe(nil, :event => :destroy) { @triggered = true }
         child1_1.observe(:children) {|n, o| @children = [n, o] }
         @ret = child1_1_1.destroy
       end
@@ -139,7 +138,7 @@ describe 'Editor::Model::Node' do
 
   describe '変更の伝搬' do
     before do
-      root.observe(nil, :document_update) { @changed = true }
+      root.observe(nil, :event => :document_update) { @changed = true }
       child1_1_1.title = 'new'
     end
     it { expect(@changed).to eq true }

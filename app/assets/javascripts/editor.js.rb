@@ -32,7 +32,7 @@ module Editor
 
     def attach(elements)
       # view生成
-      @tree = Editor::View::Tree.new(@document.attributes)
+      @tree = Editor::View::Tree.new(@document)
       elements[:tree].append(@tree.dom_element)
       @contents = Editor::View::Contents.new(@document.attributes)
       elements[:contents].append(@contents.dom_element)
@@ -50,10 +50,8 @@ module Editor
       @document.children.each do |c|
         c.scan do |node|
           leaf = @tree.find(node.id)
-          leaf.attach(node)
-
           content = @contents.find(node.id)
-          content.attach(node)
+          attach_mv(node, leaf, content)
 
           if node.metadatum && node.metadatum[:tags]
             content.tags = node.metadatum[:tags]
@@ -62,14 +60,14 @@ module Editor
       end
 
       # 並び替え
-      @tree.rearrange_observe do |target, from, to, position|
-        @document.rearrange(target, from, to, position)
+      @tree.observe(nil, :event => :rearrange) do |_, target_id, from_id, to_id, position, order|
+        @document.rearrange(target_id, from_id, to_id, position)
+        @contents.rearrange(order)
       end
-      @tree.observe(:order) {|v| @contents.rearrange(v) }
 
       # 文書全体の編集操作
       @document.observe(:tags) {|t| @tags.tags = t }
-      @document.observe(nil, :document_update) { save_enable }
+      @document.observe(nil, :event => :document_update) { save_enable }
       @document.observe { save_enable }
 
       # タグ選択
@@ -79,7 +77,7 @@ module Editor
       @tree.observe(:current_target) {|t| @contents.current_target = t }
       @contents.observe(:current_target) {|t| @tree.current_target = t }
 
-      @tree.observe(:container, :scroll) do
+      @tree.observe(:container, :event => :scroll) do
         # targetが不可視になったら可視範囲にあるノードをtargetにする
         visible_contents = @tree.visible_contents
         unless visible_contents.include?(@tree.current_target)
@@ -93,7 +91,7 @@ module Editor
         end
       end
 
-      @contents.observe(:container, :scroll) do
+      @contents.observe(:container, :event => :scroll) do
         contents = @contents.visible_contents
         tree = @tree.visible_contents
         # contentとtreeの可視範囲がずれたら追従させる
@@ -133,13 +131,34 @@ module Editor
       @hotkeys = Hotkeys.new(self, @document, @tree, @contents)
 
       # 設定ダイアログ
-      @contents.display.observe(:setting_button, :click) { elements[:setting_dialog].effect(:fade_in) }
+      @contents.display.observe(:setting_button, :event => :click) { elements[:setting_dialog].effect(:fade_in) }
       elements[:setting_dialog].find('button.close').on(:click) { elements[:setting_dialog].effect(:fade_out) }
+    end
+
+    def attach_mv(node, leaf, content)
+      node.observe(:title) {|v| leaf.title = v }
+      node.observe(:chapter_number) {|v| leaf.chapter_number = v }
+      node.observe(:chapter_number) {|v| content.chapter_number = v }
+
+      leaf.observe(:open) {|v| node.metadatum = node.metadatum.dup.update(:open => v) }
+      leaf.observe(nil, :event => :destroy) do
+        node.destroy
+        node.scan{|n| @contents.find(n.id).destroy }
+      end
+
+      content.observe(:title) {|v| node.title = v }
+      content.observe(:body) {|v| node.body = v }
+      content.observe(:tags) {|v| node.metadatum = node.metadatum.dup.update(:tags => v) }
+      content.observe(nil, :event => :destroy) do
+        leaf.destroy
+        node.scan{|n| @contents.find(n.id).destroy unless n.id == content.id }
+        node.destroy
+      end
     end
 
     # 編集対象の要素の弟ノードを追加する
     def add_child
-      default_values = {:title => '(無題)'}
+      default_values = {}
       target = @document.find(@tree.current_target)
 
       if target.is_a?(Editor::Model::Root)
@@ -157,6 +176,8 @@ module Editor
         leaf = @tree.find(target.parent.id).add_child(position, node)
         content = @contents.add_child(target.last_child.id, node)
       end
+
+      attach_mv(node, leaf, content)
 
       # 生成した新ノードを選択状態にする
       leaf.target = true

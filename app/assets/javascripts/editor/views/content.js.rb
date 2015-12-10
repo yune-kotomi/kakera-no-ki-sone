@@ -193,6 +193,8 @@ module Editor
 
       attr_accessor :editor
 
+      custom_events :destroy
+
       def initialize(data = {}, parent = nil)
         super(data, parent)
 
@@ -205,6 +207,14 @@ module Editor
         observe(:markup) {|m| display.markup = m }
         observe(:body) {|b| display.body = b }
         observe(:tags) {|t| display.tags = (t||[]).map{|s| {:str => s} } }
+        display.observe(:delete_button, :event => :click) do
+          Dialog::Confirm.new('葉の削除', "#{chapter_number} #{title} を削除してよろしいですか?", 'はい', 'いいえ') do |d|
+            d.ok do
+              destroy
+              trigger(nil, :destroy, self.id)
+            end
+          end.open
+        end
 
         # editorと結合
         self.editor = Editor.new(data, self)
@@ -213,8 +223,8 @@ module Editor
         editor.observe(:body) {|b| self.body = b }
         editor.observe(:tags) {|t| self.tags = t }
 
-        display.observe(:edit_button, :click) { edit }
-        editor.observe(:close_button, :click) { show }
+        display.observe(:edit_button, :event => :click) { edit }
+        editor.observe(:close_button, :event => :click) { show }
 
         observe(:target) do |v|
           if v
@@ -265,6 +275,12 @@ module Editor
         @hotkeys.bind_handler(escape)
       end
 
+      def ==(value)
+        if value.is_a?(self.class)
+          self.id == value.id
+        end
+      end
+
       def edit(focus_to_last = false)
         dom_element(:display).hide
         dom_element.find('.editor-container').show
@@ -299,20 +315,6 @@ module Editor
 
       def offset_bottom
         offset_top + dom_element.outer_height
-      end
-
-      def attach(model)
-        observe(:title) {|v| model.title = v }
-        observe(:body) {|v| model.body = v }
-        observe(:tags) {|t| model.metadatum = model.metadatum.clone.update('tags' => t) }
-        display.observe(:delete_button, :click) do
-          Dialog::Confirm.new('葉の削除', "#{self.chapter_number} #{self.title} を削除してよろしいですか?", 'はい', 'いいえ') do |d|
-            d.ok { model.destroy }
-          end.open
-        end
-        # 表示領域はツリー上の親子関係を持たないのでnodeが持つ子をすべて明示的に消す
-        model.observe(nil, :destroy) { model.scan{|n| parent.find(n.id).destroy } }
-        model.observe(:chapter_number) {|c| self.chapter_number = c }
       end
 
       def previous

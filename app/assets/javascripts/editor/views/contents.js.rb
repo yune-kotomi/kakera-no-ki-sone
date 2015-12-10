@@ -73,8 +73,8 @@ module Editor
         # ルートノードの編集処理
         observe(:title) {|t| display.title = t }
         observe(:body) {|b| display.body = b }
-        display.observe(:edit_button, :click) { edit }
-        observe(:close_button, :click) { show }
+        display.observe(:edit_button, :event => :click) { edit }
+        observe(:close_button, :event => :click) { show }
 
         # 記法変更
         observe(:markup) do |m|
@@ -155,23 +155,12 @@ module Editor
       end
 
       def rearrange(new_order)
-        new_list = flatten_children(new_order).
-          map{|src| children.find{|c| c.id == src['id'] } }
+        new_list = new_order.map{|id| find(id) }
         children.clear
         children.push(new_list)
         children.flatten!
 
-        # DOM要素の並べ直し
-        dom_element(:children).prepend(new_list.first.dom_element)
-
-        (1..new_list.size - 1).each do |i|
-          prev = new_list[i - 1]
-          current = new_list[i]
-
-          unless prev.dom_element['data-id'] == current.dom_element.prev['data-id']
-            prev.dom_element.after(current.dom_element)
-          end
-        end
+        new_list.each{|c| dom_element(:children).append(c.dom_element) }
       end
 
       def add_child(target_id, model)
@@ -191,8 +180,6 @@ module Editor
           children.insert(position + 1, new_content)
           prev_content.dom_element.after(new_content.dom_element)
         end
-
-        new_content.attach(model)
 
         new_content
       end

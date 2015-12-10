@@ -6,14 +6,13 @@ Rails.application.config.assets.version = '1.0'
 # Add additional assets to the asset load path
 # Rails.application.config.assets.paths << Emoji.images_path
 Rails.application.config.assets.paths.concat([
-  'vendor/Nestable',
-  'vendor/jsdiff',
   'vendor/uuidjs/dist',
   'vendor/text-hatena.js',
   'vendor/showdown/dist',
   'vendor/rickdom/src',
   'vendor/mousetrap',
-  'vendor/jquery.ex-resize'
+  'vendor/jquery.ex-resize',
+  'vendor/jquery-ui'
 ])
 
 # Precompile additional assets.

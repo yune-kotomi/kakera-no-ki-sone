@@ -107,10 +107,10 @@ module Juso
           each{|k, v| update_attribute(k, v) }
       end
 
-      def observe(name = nil, event = :change, &block)
+      def observe(name = nil, params = {}, &block)
         raise ObserverBlockMissingError.new if block.nil?
 
-        observer = {:name => name, :event => event, :block => block}
+        observer = ({:name => name, :event => :change, :block => block}).update(params)
 
         if name.nil?
           @wide_observers.push(observer)
@@ -120,6 +120,11 @@ module Juso
         end
 
         block
+      end
+
+      def unobserve(key)
+        @observers.each{|_, o| o.delete_if{|o| o[:key] == key } }
+        @wide_observers.delete_if{|o| o[:key] == key }
       end
 
       def trigger(name, event, *args)

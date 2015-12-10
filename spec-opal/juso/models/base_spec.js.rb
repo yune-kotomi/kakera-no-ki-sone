@@ -104,6 +104,19 @@ describe 'Juso::Model::Base' do
     it { expect(@old_value).to eq 'old' }
   end
 
+  context 'observerの解除' do
+    before do
+      test.attr1 = 'old'
+      test.observe(:attr1, :key => 'observe1') { @observe1 = true }
+      test.observe(:attr1, :key => 'observe2') { @observe2 = true }
+      test.unobserve('observe1')
+      test.attr1 = 'new'
+    end
+
+    it { expect(@observe1).not_to eq true }
+    it { expect(@observe2).to eq true }
+  end
+
   context '全属性observer' do
     before do
       test.attr1 = 'old'

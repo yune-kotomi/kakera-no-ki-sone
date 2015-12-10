@@ -1,3 +1,4 @@
+@import "material";
 // Place all the styles related to the documents controller here.
 // They will automatically be included in application.css.
 // You can use Sass (SCSS) here: http://sass-lang.com/
@@ -58,7 +59,7 @@
           div.buttons {
             text-align: right;
           }
-          
+
           div.footer button {
             margin-top: 177px;
           }
@@ -75,9 +76,78 @@
     div.tree {
       padding: 4px;
 
-      .selected {
-        background-color: yellow;
-        font-weight: bold;
+      .children {
+        padding-left: 28px;
+
+        .leaf {
+          list-style-type: none;
+          margin: 2px 6px;
+          position: relative;
+
+          .body {
+            display: flex;
+
+            .content {
+              cursor: pointer;
+              flex: 1;
+              line-height: 32px;
+              margin-bottom: 2px;
+              padding: 0 6px;
+              white-space: nowrap;
+
+              &.active {
+                background-color: $button-hover-color;
+              }
+
+              &.hover {
+                background-color: $button-active-color;
+              }
+
+              &.selected {
+                font-weight: bold;
+              }
+            }
+
+            .handle {
+              margin-right: 6px;
+            }
+          }
+
+          .brother-droppable {
+            height: 32px;
+            margin: -34px 0 0 -4px;
+            width: 32px;
+
+            &.active {
+              background-color: $button-hover-color;
+            }
+
+            &.hover {
+              background-color: $button-active-color;
+            }
+          }
+
+          .handle {
+            cursor: grab;
+            margin-top: 4px;
+          }
+        }
+      }
+
+      >.root {
+        padding: 2px 6px;
+
+        &.active {
+          background-color: $button-hover-color;
+        }
+
+        &.hover {
+          background-color: $button-active-color;
+        }
+
+        &.selected {
+          font-weight: bold;
+        }
       }
     }
   }

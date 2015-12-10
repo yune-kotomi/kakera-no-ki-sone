@@ -39,6 +39,14 @@ module Juso
         @entire_template
       end
 
+      def self.custom_events(*v)
+        @custom_events = v
+      end
+
+      def self.custom_event_list
+        @custom_events || []
+      end
+
       def initialize(init_data = {}, parent = nil)
         @parent = parent
 
@@ -75,28 +83,54 @@ module Juso
               end
             else
               # 入力 -> 属性
-              observe(name, :input) {|e| send("#{name}=", e.current_target.value) }
+              observe(name, :event => :input) {|e| send("#{name}=", e.current_target.value) }
             end
           end
         end
 
+        # MDL固有処理
+        # cf. http://www.getmdl.io/started/index.html
+        # body以下にappendChild済みでないとupgradeElement出来ないので
+        # 不可視divに突っ込んで実行する
+        %x{
+          if(componentHandler.upgradeElement){
+            var tmp = $('#upgrade-element-tmp-container');
+            if(tmp.size() == 0){
+              tmp = $('<div id="upgrade-element-tmp-container">');
+              tmp.css('display', 'none');
+            }
+            $('body').append(tmp);
+            tmp.append(#{dom_element});
+
+            #{dom_element}.find('[class^=mdl-]').each(function(_, e){
+              componentHandler.upgradeElement(e);
+            });
+          }
+        }
+
         self
       end
 
-      def observe(name, event = :change, &block)
+      def observe(name, params = {}, &block)
+        params = ({:event => :change}).update(params)
+        event = params[:event]
         elem = dom_element(name)
 
-        case event
-        when :change
-          super(name, event) {|*args| block.call(*args) }
+        if self.class.custom_event_list.include?(event)
+          super(name, params) {|*args| block.call(*args) }
         else
-          if elem.nil?
-            # 継承先でマークアップが変更された場合、dom_elementがnilを返す場合がある
-            Proc.new{}
+          case event
+          when :change
+            super(name, params) {|*args| block.call(*args) }
           else
-            # 知らないイベントはDOMイベントとする
-            # 親要素にイベントが伝搬しないようにする
-            elem.on(event) {|*args| block.call(*args); false }
+            if elem.nil?
+              # 継承先でマークアップが変更された場合、dom_elementがnilを返す場合がある
+              Proc.new{}
+            else
+              # 知らないイベントはDOMイベントとする
+              # 親要素にイベントが伝搬しないようにする
+              elem.on(event) {|*args| block.call(*args); false }
+            end
           end
         end
       end

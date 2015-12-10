@@ -15,7 +15,13 @@ module Editor
         observe(:chapter_number) { update_chapter_number }.call
         observe(:children) { update_chapter_number }
         observe { @parent.trigger(nil, :document_update) unless parent.nil? }
-        observe(nil, :document_update) { @parent.trigger(nil, :document_update) unless parent.nil? }
+        observe(nil, :event => :document_update) { @parent.trigger(nil, :document_update) unless parent.nil? }
+      end
+
+      def ==(v)
+        if v.is_a?(self.class)
+          self.id == v.id
+        end
       end
 
       def scan(&block)
@@ -60,6 +66,14 @@ module Editor
           child.chapter_number = [chapter_number, index + 1].reject{|s| s == '' }.join('.')
         end
       end
+
+      def root
+        if self.parent.is_a?(Root)
+          self.parent
+        else
+          self.parent.root
+        end
+      end
     end
 
     class Root < Node
@@ -72,7 +86,7 @@ module Editor
       def initialize(data = {}, parent = nil)
         super
 
-        observe(nil, :document_update) do
+        observe(nil, :event => :document_update) do
           self.tags = children.map {|c| c.scan {|n| n.metadatum['tags'] } }.flatten.uniq.compact.sort
         end.call
       end
@@ -85,13 +99,11 @@ module Editor
 
       def rearrange(target_id, from_id, to_id, position)
         target = find(target_id)
-
         from = find(from_id)
-        children = from.children.clone
-        children.delete(target)
-        from.children = children
-
         to = find(to_id)
+
+        from.children = from.children.reject{|c| c == target }
+
         children = to.children.clone
         children.insert(position, target)
         to.children = children

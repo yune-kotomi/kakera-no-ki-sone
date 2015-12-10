@@ -1,7 +1,5 @@
 # ツリー表示
-# 葉の増減はNestableを再生成
 #
-require 'js_diff'
 require 'editor/views/leaf'
 
 module Editor
@@ -11,29 +9,28 @@ module Editor
         <div class="scroll-container">
           <div class="tree">
             <div class="root" data-id="{{attr:id}}">{{:title}}</div>
-            <div class="dd">
-              <ol class="dd-list"></ol>
-            </div>
+            <ol class="children"></ol>
           </div>
         </div>
       EOS
 
-      element :children, :selector => 'div.dd>ol.dd-list', :type => Leaf
+      element :children, :selector => 'ol.children', :type => Leaf
       element :container
-      element :nestable, :selector => 'div.dd'
       element :title, :selector => 'div.root'
 
       attribute :current_target
       attribute :id
-      attribute :order
       attribute :target
       attribute :focused, :default => false
 
       attr_reader :scroll_direction
+      attr_reader :model
 
-      def initialize(data = {}, parent = nil)
-        super(data, parent)
-        init_nestable
+      custom_events :rearrange
+
+      def initialize(model, parent = nil)
+        super(model.attributes, parent)
+        @model = model
 
         # 開閉状態を反映
         children.each do |leaf|
@@ -44,10 +41,6 @@ module Editor
             end
           end
         end
-
-        @rearrange_change_observers = []
-        observe(:order) {|current, previous| rearranged(previous, current) }
-        rearrange_observe {|t, f, to, pos| rearrange_leaves(t, f, to, pos) }
 
         # current_targetが変わった場合に前のやつを取り下げる
         observe(:current_target) do |c, prev_id|
@@ -66,12 +59,12 @@ module Editor
           end
         end
         # クリックで自分自身を選択状態に
-        observe(:title, :click) do
+        observe(:title, :event => :click) do
           self.target = true
         end.call
 
         # スクロール方向判定
-        observe(:container, :scroll) do
+        observe(:container, :event => :scroll) do
           c = dom_element(:container)
           if @prev_scroll_top.to_i < c.scroll_top
             @scroll_direction = :down
@@ -89,6 +82,16 @@ module Editor
             dom_element.find('.tree').remove_class('focused')
           end
         end.call
+
+        # ドロップ処理
+        %x{
+          #{dom_element(:title)}.droppable({
+            activeClass: 'active',
+            drop: function(event, ui) { #{child_dropped(`ui.draggable.attr('data-id')`)} },
+            hoverClass: "hover",
+            tolerance: 'pointer'
+          });
+        }
 
         # キーボード・ショートカット
         @hotkeys = Mousetrap::Pool.instance.get("tree-#{id}")
@@ -115,36 +118,11 @@ module Editor
 
       def add_child(position, model)
         new_child = Leaf.new(model.attributes, self)
+        children = self.children.dup
         children.insert(position, new_child)
-        if position == 0
-          dom_element(:children).prepend(new_child.dom_element)
-        else
-          dom_element(:children).children.at(position - 1).after(new_child.dom_element)
-        end
-
-        # 変更内容伝搬用
-        new_child.attach(model)
-
-        # current orderを更新しておく
-        update_order_silently
+        self.children = children
 
         new_child
-      end
-
-      # 並び替えイベントのオブザーバ登録
-      # ブロック引数は
-      # - 移動するノードID string
-      # - 移動元親ID string
-      # - 移動先親ID string
-      # - 挿入位置 number
-      def rearrange_observe(&block)
-        @rearrange_change_observers.push(block)
-        block
-      end
-
-      # ノードの追加/削除時にchangeイベントを発生させずに保持しているオーダーを更新する
-      def update_order_silently
-        update_attribute(:order, serialize_nestable, {:trigger => false})
       end
 
       # 可視ノードのIDを返す
@@ -188,90 +166,35 @@ module Editor
         []
       end
 
+      def update_expand_collapse_buttons
+        # dummy
+      end
+
       private
-      def serialize_nestable
-        JSON.parse(`JSON.stringify(#{dom_element(:nestable)}.nestable('serialize'))`)
-      end
-
-      def init_nestable
-        params = {:scroll => true, :maxDepth => 100}
-
-        # Nestable初期化時に開閉ボタンが重複して生成されるのを防止
-        dom_element(:nestable).find('button').remove
-
-        %x{
-          var target = #{dom_element(:nestable)};
-          target.nestable(#{params.to_n});
-          target.on('change', function(){#{rearrange}});
-        }
-        update_attribute(:order, serialize_nestable, {:trigger => false})
-
-        # 開閉状態の反映
-        children.each {|l| l.scan {|leaf| leaf.observe_open_close } }
-      end
-
-      def rearrange
-        self.order = serialize_nestable
-      end
-
-      def rearranged(previous, current)
-        # IDの一覧テキストを生成
-        prev_text = generate_id_text({'id' => '', 'children' => previous}) + "\n"
-        curr_text = generate_id_text({'id' => '', 'children' => current}) + "\n"
-
-        diff = JsDiff.diff(prev_text, curr_text)
-
-        # 子を引きぬかれた親を探す
-        removed = diff.find{|d| d.removed? }
-        tmp = removed.value.split("\n").first.split(":")
-        target = tmp.pop
-        from = tmp.last
-        from = self.id if from == '' # ルートノード
-        # 子の挿入先を探す
-        added = diff.find{|d| d.added? }
-        tmp = added.value.split("\n").first.split(":")
-        tmp.pop
-        to = tmp.last
-        if to == ''
-          to = self.id # ルートノード
-        else
-          find(to).observe_open_close
-        end
-        # 子の挿入位置検出
-        children = curr_text.split("\n").
-          select{|s| s.split(':').size == tmp.size + 1 }.
-          select{|s| s.match(/^#{tmp.join(':')}:/) }
-        position = children.index{|s| s == "#{tmp.join(':')}:#{target}" }
-
-        @rearrange_change_observers.each do |o|
-          o.call(target, from, to, position)
-        end
-      end
-
-      def generate_id_text(src)
-        id = src['id']
-        result = [id]
-        unless src['children'].nil? || src['children'].empty?
-          ret = src['children'].map {|c| generate_id_text(c) }.join("\n")
-          ret = ret.split("\n").map{|s| "#{id}:#{s}" }.join("\n")
-          result.push(ret)
-        end
-
-        result.join("\n")
-      end
-
-      # 内部で保持しているLeafオブジェクト群を並び替える
-      def rearrange_leaves(target_id, from_id, to_id, position)
-        target = find(target_id)
-        from = find(from_id)
-        to = find(to_id)
-        from.children.delete(target)
-        to.children.insert(position, target)
-        target.parent = to
-      end
-
       def flatten_leaf(target)
         [target, target.children.map{|c| flatten_leaf(c) }].flatten
+      end
+
+      def rearrange_notify(target_id, from_id, to_id, position)
+        order = flatten_leaf(self)
+        order.shift
+        trigger(nil, :rearrange, target_id, from_id, to_id, position, order.map(&:id))
+      end
+
+      def child_dropped(id)
+        dropped = find(id)
+        dropped.parent.children.delete_if{|c| c == dropped }
+        children.insert(0, dropped)
+
+        dom_element(:children).prepend(dropped.dom_element)
+
+        dropped.dom_element.css('position', '')
+        dropped.dom_element.css('left', '')
+        dropped.dom_element.css('top', '')
+
+        rearrange_notify(dropped.id, dropped.parent.id, self.id, 0)
+        dropped.parent.update_expand_collapse_buttons
+        dropped.parent = self
       end
     end
   end

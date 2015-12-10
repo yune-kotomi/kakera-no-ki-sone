@@ -2,26 +2,41 @@ module Editor
   module View
     class Leaf < Juso::View::Base
       template <<-EOS
-      <li class="dd-item" data-id="{{attr:id}}">
+      <li class="leaf" data-id="{{attr:id}}">
         <div class="body">
-          <div class="dd-handle">Drag</div>
-          <div class="dd-content">
+          <div class="handle" data-id="{{attr:id}}"><i class="material-icons">drag_handle</i></div>
+
+          <button class="mdl-button mdl-js-button mdl-button--icon expand" {{if open}}style="display:none"{{/if}}>
+            <i class="material-icons more">expand_more</i>
+          </button>
+          <button class="mdl-button mdl-js-button mdl-button--icon collapse" {{if open}}{{else}}style="display:none"{{/if}}>
+            <i class="material-icons less">expand_less</i>
+          </button>
+
+          <div class="content">
             <span class="chapter_number">{{:chapter_number}}</span>
             <span class="title">{{:title}}</span>
           </div>
         </div>
-        <ol class="dd-list" {{if open}}{{else}}style="display:none"{{/if}}></ol>
+
+        <div class="brother-droppable"></div>
+        <ol class="children" {{if open}}{{else}}style="display:none"{{/if}}></ol>
       </li>
       EOS
 
       attribute :id
       attribute :target, :default => false
       attribute :open, :default => true
-      element :chapter_number, :selector => 'div.dd-content>span.chapter_number'
-      element :title, :selector => 'div.dd-content>span.title'
-      element :children, :selector => 'ol.dd-list:first', :type => Leaf
-      element :collapse, :selector => 'button[data-action="collapse"]'
-      element :expand, :selector => 'button[data-action="expand"]'
+      element :chapter_number, :selector => 'span.chapter_number'
+      element :title, :selector => 'span.title'
+      element :content, :selector => 'div.content'
+      element :children, :selector => 'ol.children', :type => Leaf
+      element :collapse, :selector => 'button.collapse'
+      element :expand, :selector => 'button.expand'
+
+      attr_reader :model
+
+      custom_events :destroy
 
       def initialize(data = {}, parent = nil)
         if data[:metadatum] && data[:metadatum].has_key?(:open)
@@ -34,32 +49,35 @@ module Editor
         data = data.update(:open => open)
 
         super(data, parent)
-
-        if self.children.nil? || self.children.empty?
-          # 子がない場合に不要なものを削除
-          dom_element(:children).remove
-        end
-
         # タイトルのクリックでTreeの編集対象にする
-        observe(:title, :click) do
+        observe(:content, :event => :click) do
           self.target = true
         end
 
         observe(:target) do |v|
           if v
-            dom_element(:title).add_class('selected')
+            dom_element(:content).add_class('selected')
             parental_tree.current_target = self.id
           else
-            dom_element(:title).remove_class('selected')
+            dom_element(:content).remove_class('selected')
           end
         end
 
+        # 開閉処理
+        observe(:expand, :event => :click) { self.open = true }
+        observe(:collapse, :event => :click) { self.open = false }
         observe(:open) do |o|
-          unless o
+          if o
+            expand
+          else
+            collapse
             # 閉じた際に子がターゲットだった場合、自分をターゲットにする
             self.target = true if scan{|c| c.target }.include?(true)
           end
         end
+        update_expand_collapse_buttons
+
+        draggable_init
 
         # キーボード・ショートカット
         @hotkeys = Mousetrap::Pool.instance.get("leaf-#{id}")
@@ -94,7 +112,7 @@ module Editor
             if self.children.empty? || self.open == false
               self.parent.target = true
             else
-              collapse
+              self.open = false
             end
           end
         end
@@ -102,7 +120,7 @@ module Editor
 
         right = Mousetrap::Handler.new('right') do |h|
           h.condition { parental_tree.focused && self.target }
-          h.procedure { expand }
+          h.procedure { self.open = true }
         end
         @hotkeys.bind_handler(right)
 
@@ -110,24 +128,8 @@ module Editor
         ctrl_up = Mousetrap::Handler.new('mod+up') do |h|
           h.condition { parental_tree.focused && self.target }
           h.procedure do
-            if brother.first
-              current_position = parent.children.index(self)
-              brother_position = parent.children.index(brother.first)
-
-              new_children = []
-              parent.children.each_with_index do |c, i|
-                case i
-                when current_position
-                  new_children.push(brother.first)
-                when brother_position
-                  new_children.push(self)
-                else
-                  new_children.push(c)
-                end
-              end
-
-              parent.children = new_children
-            end
+            elder = brother.first
+            brother_dropped(elder.id) if elder
           end
         end
         @hotkeys.bind_handler(ctrl_up)
@@ -136,24 +138,8 @@ module Editor
         ctrl_down = Mousetrap::Handler.new('mod+down') do |h|
           h.condition { parental_tree.focused && self.target }
           h.procedure do
-            if brother.last
-              current_position = parent.children.index(self)
-              brother_position = parent.children.index(brother.last)
-
-              new_children = []
-              parent.children.each_with_index do |c, i|
-                case i
-                when current_position
-                  new_children.push(brother.last)
-                when brother_position
-                  new_children.push(self)
-                else
-                  new_children.push(c)
-                end
-              end
-
-              parent.children = new_children
-            end
+            younger = brother.last
+            younger.brother_dropped(id) if younger
           end
         end
         @hotkeys.bind_handler(ctrl_down)
@@ -162,10 +148,7 @@ module Editor
           h.condition { parental_tree.focused && self.target }
           h.procedure do
             if brother.last.nil? && self.parent != parental_tree
-              prev_parent = self.parent
-              prev_parent.dom_element.after(dom_element)
-              parental_tree.rearrange
-              prev_parent.disable_child_list if prev_parent.children.empty?
+              self.parent.brother_dropped(id)
             end
           end
         end
@@ -174,11 +157,13 @@ module Editor
         ctrl_right = Mousetrap::Handler.new('mod+right') do |h|
           h.condition { parental_tree.focused && self.target }
           h.procedure do
-            b = brother.first
-            if b
-              b.enable_child_list if b.children.empty?
-              b.dom_element(:children).append(dom_element)
-              parental_tree.rearrange
+            elder = brother.first
+            if elder
+              if elder.children.empty?
+                elder.child_dropped(id)
+              else
+                elder.children.last.brother_dropped(id)
+              end
             end
           end
         end
@@ -188,7 +173,10 @@ module Editor
           h.condition { parental_tree.focused && self.target }
           h.procedure do
             Dialog::Confirm.new('葉の削除', "#{self.chapter_number} #{self.title} を削除してよろしいですか?", 'はい', 'いいえ') do |d|
-              d.ok { @model.destroy }
+              d.ok do
+                destroy
+                trigger(nil, :destroy, self.id)
+              end
             end.open
           end
         end
@@ -217,42 +205,46 @@ module Editor
 
       def add_child(position, model)
         new_child = Leaf.new(model.attributes, self)
+        children = self.children.dup
         children.insert(position, new_child)
-        if dom_element(:children).nil?
-          element = Element.new('ol')
-          element.add_class('dd-list')
-          dom_element.append(element)
-        end
-
-        if position == 0
-          dom_element(:children).prepend(new_child.dom_element)
-        else
-          dom_element(:children).children.at(position - 1).after(new_child.dom_element)
-        end
-
-        new_child.attach(model)
-
-        # Treeのcurrent orderを更新しておく
-        parental_tree.update_order_silently
+        self.children = children
 
         new_child
       end
 
-      def attach(model)
-        @model = model
+      # 並べ替え処理
+      def brother_dropped(id)
+        dropped = parental_tree.find(id)
+        dropped.parent.children.delete_if{|c| c == dropped }
+        position = @parent.children.index(self)
+        @parent.children.insert(position + 1, dropped)
 
-        # 変更内容伝搬用
-        model.observe(:title) {|v| self.title = v }
-        model.observe(:chapter_number) {|c| self.chapter_number = c }
-        observe(:open) {|o| model.metadatum = model.metadatum.clone.update(:open => o) }
+        dom_element.after(dropped.dom_element)
 
-        # 削除
-        model.observe(nil, :destroy) do
-          self.destroy
-          parent.disable_child_list if parent.children.empty? && !parent.is_a?(Tree)
-        end
+        dropped.dom_element.css('position', '')
+        dropped.dom_element.css('left', '')
+        dropped.dom_element.css('top', '')
 
-        model
+        parental_tree.rearrange_notify(dropped.id, dropped.parent.id, self.parent.id, position + 1)
+        dropped.parent.update_expand_collapse_buttons
+        dropped.parent = @parent
+      end
+
+      def child_dropped(id)
+        dropped = parental_tree.find(id)
+        dropped.parent.children.delete_if{|c| c == dropped }
+        children.insert(0, dropped)
+
+        dom_element(:children).prepend(dropped.dom_element)
+
+        dropped.dom_element.css('position', '')
+        dropped.dom_element.css('left', '')
+        dropped.dom_element.css('top', '')
+
+        parental_tree.rearrange_notify(dropped.id, dropped.parent.id, self.id, 0)
+        dropped.parent.update_expand_collapse_buttons
+        update_expand_collapse_buttons
+        dropped.parent = self
       end
 
       def destroy
@@ -268,7 +260,6 @@ module Editor
 
         parent.children.delete(self)
         self.dom_element.remove
-        parental_tree.update_order_silently
 
         self
       end
@@ -339,55 +330,53 @@ module Editor
         offset_top + dom_element(:title).outer_height
       end
 
-      def observe_open_close
-        dom_element(:collapse).on(:click) { self.open = false; true } if dom_element(:collapse)
-        dom_element(:expand).on(:click) { self.open = true; true } if dom_element(:expand)
-      end
-
       def collapse
-        if dom_element(:children)
-          dom_element(:expand).show
-          dom_element(:collapse).hide
-          dom_element(:children).hide
-          self.open = false
-        end
+        dom_element(:expand).show
+        dom_element(:collapse).hide
+        dom_element(:children).hide
       end
 
       def expand
-        if dom_element(:children)
+        dom_element(:expand).hide
+        dom_element(:collapse).show
+        dom_element(:children).show
+      end
+
+      def update_expand_collapse_buttons
+        if children.empty?
           dom_element(:expand).hide
-          dom_element(:collapse).show
-          dom_element(:children).show
-          self.open = true
+          dom_element(:collapse).hide
+        else
+          if open
+            dom_element(:collapse).show
+          else
+            dom_element(:expand).show
+          end
         end
       end
 
-      # 子がある状態に表示をあわせる
-      def enable_child_list
-        ol = Element.new('ol')
-        ol.add_class('dd-list')
-        dom_element.append(ol)
+      def draggable_init
+        %x{
+          #{dom_element}.draggable({
+            handle: #{".handle[data-id='#{id}']"},
+            scroll: true,
+            revert: "invalid"
+          });
 
-        collapse_button = Element.new('button')
-        collapse_button['type'] = 'button'
-        collapse_button['data-action'] = 'collapse'
-        collapse_button.css('display', 'block')
-        collapse_button.text = 'Collapse'
-        dom_element.find('.dd-handle').before(collapse_button)
+          #{dom_element.children('.brother-droppable')}.droppable({
+            activeClass: 'active',
+            drop: function(event, ui) { #{brother_dropped(`ui.draggable.attr('data-id')`)} },
+            hoverClass: "hover",
+            tolerance: 'pointer'
+          });
 
-        expand_button = Element.new('button')
-        expand_button['type'] = 'button'
-        expand_button['data-action'] = 'expand'
-        expand_button.hide
-        expand_button.text = 'Expand'
-        dom_element.find('.dd-handle').before(expand_button)
-      end
-
-      # 子がない状態に表示をあわせる
-      def disable_child_list
-        dom_element.find('[data-action="collapse"]:first').remove
-        dom_element.find('[data-action="expand"]:first').remove
-        dom_element(:children).remove
+          #{dom_element(:content)}.droppable({
+            activeClass: 'active',
+            drop: function(event, ui) { #{child_dropped(`ui.draggable.attr('data-id')`)} },
+            hoverClass: "hover",
+            tolerance: 'pointer'
+          });
+        }
       end
     end
   end

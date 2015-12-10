@@ -115,7 +115,7 @@ describe 'Juso::View::Base' do
   describe 'DOMイベント' do
     let(:triggered) do
       t = false
-      test.observe(:test1, :click) { t = true }
+      test.observe(:test1, :event => :click) { t = true }
       test.dom_element(:test1).trigger(:click)
       t
     end
