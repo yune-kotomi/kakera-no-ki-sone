@@ -77,30 +77,6 @@ module Editor
       @tree.observe(:current_target) {|t| @contents.current_target = t }
       @contents.observe(:current_target) {|t| @tree.current_target = t }
 
-      @tree.observe(:container, :event => :scroll) do
-        # targetが不可視になったら可視範囲にあるノードをtargetにする
-        visible_contents = @tree.visible_contents
-        unless visible_contents.include?(@tree.current_target)
-          if @tree.scroll_direction == :down
-            target = visible_contents.first
-          else
-            target = visible_contents.last
-          end
-
-          @tree.find(target).target = true
-        end
-      end
-
-      @contents.observe(:container, :event => :scroll) do
-        contents = @contents.visible_contents
-        tree = @tree.visible_contents
-        # contentとtreeの可視範囲がずれたら追従させる
-        if (contents & tree).size == 0
-          @tree.scroll_to(contents.first)
-          @tree.find(contents.first).target = true
-        end
-      end
-
       # 公開/非公開
       if @document.public
         elements[:public_checkbox].prop('checked', true)

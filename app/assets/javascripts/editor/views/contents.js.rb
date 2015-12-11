@@ -117,7 +117,7 @@ module Editor
         end.call(target)
 
         # スクロール
-        observe(:current_target) {|t| scroll_to(t) }
+        observe(:current_target) {|t| scroll_to(t) unless visible_contents.include?(t) }
 
         @hotkeys = Mousetrap::Pool.instance.get("content-#{id}")
         down = Mousetrap::Handler.new('down') do |handler|
@@ -188,11 +188,11 @@ module Editor
       def visible_contents
         # 表示領域
         visible_min = dom_element(:container).offset.top
-        visible_max = visible_min + dom_element(:container).height
+        visible_max = visible_min + dom_element(:container).height.to_i
 
-        ret = children.select {|c| (visible_min < c.offset_bottom && c.offset_bottom <= visible_max) || (visible_min < c.offset_top && c.offset_top <= visible_max) }.map(&:id)
+        ret = children.select {|c| visible_min < c.offset_top && c.offset_bottom <= visible_max }.map(&:id)
 
-        if (visible_min < offset_bottom && offset_bottom <= visible_max) || (visible_min < offset_top && offset_top <= visible_max)
+        if visible_min < offset_top && offset_bottom <= visible_max
           ret.push(self.id)
         end
 

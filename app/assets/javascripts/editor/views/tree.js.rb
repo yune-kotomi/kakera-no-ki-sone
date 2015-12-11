@@ -47,7 +47,7 @@ module Editor
           prev = find(prev_id)
           prev.target = false unless prev.nil?
           find(c).target = true
-          scroll_to(c)
+          scroll_to(c) unless visible_contents.include?(c)
         end
 
         observe(:target) do |v|
@@ -99,10 +99,7 @@ module Editor
           h.condition { focused && target }
           h.procedure do
             target = visible_next
-            unless target.nil?
-              target.target = true
-              scroll_to(target.id)
-            end
+            target.target = true unless target.nil?
           end
         end
         @hotkeys.bind_handler(down)
@@ -129,9 +126,8 @@ module Editor
       def visible_contents
         # 表示領域
         visible_min = dom_element(:container).offset.top
-        visible_max = visible_min + dom_element(:container).height
-
-        flatten_leaf(self).select {|c| (visible_min < c.offset_bottom && c.offset_bottom <= visible_max) || (visible_min < c.offset_top && c.offset_top <= visible_max) }.map(&:id)
+        visible_max = visible_min + dom_element(:container).height.to_i
+        flatten_leaf(self).select {|c| visible_min < c.offset_top && c.offset_bottom < visible_max }.map(&:id)
       end
 
       def offset_top

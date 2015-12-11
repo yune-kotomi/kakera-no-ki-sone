@@ -86,10 +86,7 @@ module Editor
           handler.procedure do |event|
             # 前のノードにフォーカス
             target = self.visible_previous
-            unless target.nil?
-              target.target = true
-              parental_tree.scroll_to(target.id)
-            end
+            target.target = true unless target.nil?
           end
         end
         @hotkeys.bind_handler(up)
@@ -98,10 +95,7 @@ module Editor
           h.condition { parental_tree.focused && self.target }
           h.procedure do
             target = self.visible_next
-            unless target.nil?
-              target.target = true
-              parental_tree.scroll_to(target.id)
-            end
+            target.target = true unless target.nil?
           end
         end
         @hotkeys.bind_handler(down)
@@ -327,7 +321,7 @@ module Editor
       end
 
       def offset_bottom
-        offset_top + dom_element(:title).outer_height
+        offset_top + dom_element(:content).outer_height
       end
 
       def collapse
