@@ -58,6 +58,7 @@ module Editor
           if v
             dom_element(:content).add_class('selected')
             parental_tree.current_target = self.id
+            parents.each{|p| p.open = true unless p.is_a?(Tree) }
           else
             dom_element(:content).remove_class('selected')
           end
@@ -259,11 +260,11 @@ module Editor
       end
 
       def parental_tree
-        if self.parent.is_a?(Tree)
-          self.parent
-        else
-          self.parent.parental_tree
-        end
+        parents.last
+      end
+
+      def parents
+        [parent, parent.parents].flatten
       end
 
       def brother

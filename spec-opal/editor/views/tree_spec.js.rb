@@ -20,9 +20,14 @@ describe 'Editor::View::Tree' do
   let(:leaf1_2) { tree.find('1-2') }
   let(:leaf1_3) { tree.find('1-3') }
 
-  describe '操作' do
+  describe 'トップレベル' do
     let(:parental_tree) { leaf1_1_1.parental_tree }
     it { expect(parental_tree).to eq tree }
+  end
+
+  describe '上位の葉一覧' do
+    let(:parents) { leaf1_1_1.parents }
+    it { expect(parents).to eq [leaf1_1, leaf1, tree] }
   end
 
   describe '編集対象の指定' do
@@ -68,6 +73,17 @@ describe 'Editor::View::Tree' do
         end
         it { expect(leaf1_2.target).to eq true }
         it { expect(leaf1_1.target).not_to eq true }
+      end
+
+      describe '閉じたノードにフォーカスすると開く' do
+        before do
+          leaf1.open = false
+          leaf1_1.open = false
+          leaf1_1_1.target = true
+        end
+
+        it { expect(leaf1.open).to eq true }
+        it { expect(leaf1_1.open).to eq true }
       end
     end
   end

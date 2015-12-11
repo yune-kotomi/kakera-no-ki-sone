@@ -42,11 +42,12 @@ module Editor
           end
         end
 
-        # current_targetが変わった場合に前のやつを取り下げる
         observe(:current_target) do |c, prev_id|
+          # current_targetが変わった場合に前のやつを取り下げる
           prev = find(prev_id)
           prev.target = false unless prev.nil?
           find(c).target = true
+
           scroll_to(c) unless visible_contents.include?(c)
         end
 
@@ -164,6 +165,10 @@ module Editor
 
       def update_expand_collapse_buttons
         # dummy
+      end
+
+      def parents
+        []
       end
 
       private
