@@ -27,7 +27,7 @@ class Document < ActiveRecord::Base
   end
 
   def extract_content(src)
-    (src || []).map do |leaf|
+    (src.deep_dup || []).map do |leaf|
       if leaf['metadatum'].present?
         leaf['metadatum'] = leaf['metadatum'].reject{|k, _| ['open'].include?(k) }
       end
