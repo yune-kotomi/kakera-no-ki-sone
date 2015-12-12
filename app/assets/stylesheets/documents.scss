@@ -3,6 +3,39 @@
 // They will automatically be included in application.css.
 // You can use Sass (SCSS) here: http://sass-lang.com/
 
+body.documents {
+  .documents {
+    padding: 16px;
+
+    table {
+      width: 100%;
+
+      .title {
+        a {
+          display: block;
+          height: 100%;
+          text-decoration: none;
+          width: 100%;
+        }
+      }
+
+      .updated {
+        text-align: center;
+        width: 20em;
+      }
+
+      td.buttons {
+        width: 106px;
+
+        div.buttons {
+          display: flex;
+          margin-top: -6px;
+        }
+      }
+    }
+  }
+}
+
 #document-editor {
   padding: 0;
 

@@ -1,17 +1,16 @@
 class DocumentsController < ApplicationController
   before_action :set_document, only: [:show, :edit, :update, :destroy]
 
-  before_filter :login_required, :except => [:index, :show]
+  before_filter :login_required, :except => [:show]
   before_filter :owner_required, :except => [:index, :show, :create]
 
   # GET /documents
   # GET /documents.json
   def index
-    @documents = Document.
-      where(:public => true).
-      order("updated_at desc").
-      offset(offset).
-      limit(41)
+    @documents = @login_user.documents.
+      where(:archived => params[:archived].present?).
+      order("content_updated_at desc").
+      page(params[:page])
   end
 
   # GET /documents/1

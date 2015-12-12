@@ -1,11 +1,16 @@
-<%
-  if params[:archived]
-    @title = "保存記録"
-  else
-    @title = "文書一覧"
-  end
-  @title = "#{@title}: #{@user.nickname}" unless @login_user == @user
- %>
+<% @title = "文書一覧: #{@user.nickname}" %>
+
+<div class="profile">
+  <div class="mdl-card mdl-shadow--2dp">
+    <div class="mdl-card__title">
+      <h2 class="mdl-card__title-text"><%= @user.nickname %></h2>
+    </div>
+
+    <div class="mdl-card__supporting-text">
+      <%= @user.profile_text.html_safe %>
+    </div>
+  </div>
+</div>
 
 <div class="documents">
   <table class="mdl-data-table mdl-js-data-table">
@@ -13,7 +18,6 @@
       <tr>
         <th class="mdl-data-table__cell--non-numeric title">題名</th>
         <th class="mdl-data-table__cell--non-numeric updated">最終更新</th>
-        <th></th>
       </tr>
     </thead>
 
@@ -27,35 +31,6 @@
           <td class="updated">
             <%= document.content_updated_at %>
           </td>
-
-          <td class="buttons">
-            <div class="buttons">
-              <%= button_to document,
-                :method => :delete,
-                :data => {:confirm => '本当に削除してよろしいですか?'},
-                :class => 'mdl-button mdl-js-button mdl-button--icon' do %>
-                <i class="material-icons">delete</i>
-              <% end %>
-
-              <%= form_for(document) do |f| %>
-                <%= f.button :class => 'mdl-button mdl-js-button mdl-button--icon' do %>
-                  <% if document.archived %>
-                    <i class="material-icons">unarchive</i>
-                  <% else %>
-                    <i class="material-icons">archive</i>
-                  <% end %>
-                <% end %>
-                <% document.archived = !document.archived %>
-                <%= f.hidden_field :archived %>
-              <% end %>
-
-              <%= link_to edit_document_path(document) do %>
-                <button class="mdl-button mdl-js-button mdl-button--icon mdl-button--colored">
-                  <i class="material-icons">edit</i>
-                </button>
-              <% end %>
-            </div>
-          </td>
         </tr>
       <% end %>
     </tbody>
@@ -63,12 +38,3 @@
 </div>
 
 <%= paginate(@documents) %>
-
-<div class="add-button right-bottom-fab">
-  <%= form_for @user.documents.build do %>
-    <!-- Colored FAB button with ripple -->
-    <button class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored">
-      <i class="material-icons">add</i>
-    </button>
-  <% end %>
-</div>

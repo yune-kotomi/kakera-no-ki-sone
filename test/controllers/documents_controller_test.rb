@@ -9,11 +9,28 @@ class DocumentsControllerTest < ActionController::TestCase
     @private = documents(:document3)
   end
 
-  test "indexは公開文書一覧" do
+  test 'indexはゲストに表示不可' do
     get :index
+    assert_response :forbidden
+  end
+
+  test "indexはユーザの文書一覧" do
+    get :index, {}, {:user_id => @user.id}
+
     assert_response :success
-    assert_not_nil assigns(:documents)
-    assert assigns(:documents).map(&:public).include?(true)
+    assert_equal @user.documents.where(:archived => false).count, assigns(:documents).size
+
+    titles = @user.documents.where(:archived => false).map{|d| d.title}.sort
+    assert_equal titles, assigns(:documents).map(&:title).sort
+  end
+
+  test 'index アーカイブ表示' do
+    get :index, {:archived => true}, {:user_id => @user.id}
+
+    assert_equal @user.documents.where(:public => true, :archived => true).count, assigns(:documents).size
+
+    titles = @user.documents.where(:public => true, :archived => true).map{|d| d.title}.sort
+    assert_equal titles, assigns(:documents).map(&:title).sort
   end
 
   test "ゲストは文書を生成できない" do

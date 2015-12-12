@@ -8,17 +8,7 @@ class UsersController < ApplicationController
     ).first
 
     if @user.present?
-      @documents = @user.documents.
-        order("updated_at desc").
-        limit(41).
-        offset(offset)
-
-      @documents = @user.documents.
-        where(:archived => params[:archived].present?).
-        order("updated_at desc").
-        page(params[:page])
-
-      @documents = @documents.where(:public => true) unless @user == @login_user
+      @documents = @user.documents.where(:public => true).page(params[:page])
     else
       missing
     end
@@ -50,7 +40,7 @@ class UsersController < ApplicationController
       end
 
       session[:user_id] = @user.id
-      redirect_to :controller => :users, :action => :show, :domain_name => @user.domain_name, :screen_name => @user.screen_name
+      redirect_to documents_path
 
     rescue Hotarugaike::Profile::InvalidProfileExchangeError
       flash[:notice] = "ログインできませんでした"

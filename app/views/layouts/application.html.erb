@@ -53,8 +53,8 @@
         <nav class="mdl-navigation">
           <% if @login_user.blank? %>
           <% else %>
-            <%= link_to_user '文書', @login_user, {}, :class => 'mdl-navigation__link' %>
-            <%= link_to_user '保存記録', @login_user, {:archived => true}, :class => 'mdl-navigation__link' %>
+            <%= link_to '文書', documents_path, :class => 'mdl-navigation__link' %>
+            <%= link_to '保存記録', documents_path(:archived => true), :class => 'mdl-navigation__link' %>
           <% end %>
 
           <%= yield :navigation %>

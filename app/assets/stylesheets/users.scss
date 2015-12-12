@@ -1,5 +1,4 @@
 body.users {
-
   .documents {
     padding: 16px;
 
@@ -28,6 +27,20 @@ body.users {
           margin-top: -6px;
         }
       }
+    }
+  }
+
+  .profile {
+    box-sizing: border-box;
+    padding: 16px 16px 0;
+    width: 70%;
+
+    @media (max-width: 800px) {
+      width: 100%;
+    }
+
+    &>.mdl-card {
+      width: 100%;
     }
   }
 }
