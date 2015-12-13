@@ -8,9 +8,14 @@ class DocumentsController < ApplicationController
   # GET /documents.json
   def index
     @documents = @login_user.documents.
-      where(:archived => params[:archived].present?).
       order("content_updated_at desc").
       page(params[:page])
+
+    if params[:keywords].present?
+      @documents = @documents.fts(params[:keywords])
+    else
+      @documents = @documents.where(:archived => params[:archived].present?)
+    end
   end
 
   # GET /documents/1

@@ -24,6 +24,13 @@ class DocumentsControllerTest < ActionController::TestCase
     assert_equal titles, assigns(:documents).map(&:title).sort
   end
 
+  test "キーワードを与えると全文検索" do
+    get :index, {:keywords => '日本語 タイトル'}, {:user_id => @owner.id}
+
+    assert_response :success
+    assert_equal [documents(:document1), documents(:document4)].sort{|a, b| a.id <=> b.id }, assigns(:documents).sort{|a, b| a.id <=> b.id }
+  end
+
   test 'index アーカイブ表示' do
     get :index, {:archived => true}, {:user_id => @user.id}
 

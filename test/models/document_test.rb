@@ -93,4 +93,9 @@ class DocumentTest < ActiveSupport::TestCase
     @document2.update_attribute(:body, body)
     assert_equal @orig_timestamp, @document2.content_updated_at
   end
+
+  test '全文検索' do
+    actual = Document.fts('日本語 タイトル').order('id')
+    assert_equal [documents(:document1), documents(:document4)].sort{|a, b| a.id <=> b.id }, actual
+  end
 end
