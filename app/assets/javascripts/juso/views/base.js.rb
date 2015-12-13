@@ -248,9 +248,9 @@ module Juso
 
         else
           # 入力中に属性値反映を行うと正常に入力できない(特に日本語入力時)のでフォーカスをチェックする
-          if ['input', 'textarea'].include?(elem.tag_name) && !elem.is( ":focus" )
+          if ['input', 'textarea'].include?(elem.tag_name)
             # 入力系DOM要素ならvalueに値を投入
-            elem.value = value
+            elem.value = value unless elem.is( ":focus" )
           else
             # 入力系でなければhtmlを更新
             elem.html = value
