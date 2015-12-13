@@ -1,9 +1,6 @@
 [submodule "vendor/uuidjs"]
 	path = vendor/uuidjs
 	url = https://github.com/LiosK/UUID.js.git
-[submodule "vendor/text-hatena.js"]
-	path = vendor/text-hatena.js
-	url = https://github.com/nitoyon/text-hatena.js.git
 [submodule "vendor/showdown"]
 	path = vendor/showdown
 	url = https://github.com/showdownjs/showdown.git
@@ -16,3 +13,6 @@
 [submodule "vendor/jquery.ex-resize"]
 	path = vendor/jquery.ex-resize
 	url = https://github.com/cyokodog/jquery.ex-resize.git
+[submodule "vendor/text-hatena.js"]
+	path = vendor/text-hatena.js
+	url = https://github.com/yune-kotomi/text-hatena.js.git
