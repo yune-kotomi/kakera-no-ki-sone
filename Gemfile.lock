@@ -1,3 +1,9 @@
+GIT
+  remote: git://github.com/iwadon/text-hatena.git
+  revision: 5798e7b4110eae214106b370e1cf3ae5f9e9942e
+  specs:
+    text-hatena (0.12.20080627.0)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -45,18 +51,31 @@ GEM
       debug_inspector (>= 0.0.1)
     builder (3.2.2)
     byebug (8.2.0)
+    charlock_holmes (0.7.3)
     coderay (1.1.0)
     crack (0.4.2)
       safe_yaml (~> 1.0.0)
+    crass (1.0.2)
     debug_inspector (0.0.2)
     did_you_mean (0.10.0)
       interception
     erubis (2.7.0)
+    escape_utils (1.1.0)
     execjs (2.6.0)
+    gemoji (2.1.0)
+    github-linguist (4.7.3)
+      charlock_holmes (~> 0.7.3)
+      escape_utils (~> 1.1.0)
+      mime-types (>= 1.19)
+      rugged (>= 0.23.0b)
     globalid (0.3.6)
       activesupport (>= 4.1.0)
+    greenmat (3.2.2.1)
     hashdiff (0.2.3)
     hike (1.2.3)
+    html-pipeline (2.2.2)
+      activesupport (>= 2, < 5)
+      nokogiri (>= 1.4)
     i18n (0.7.0)
     interception (0.5)
     jquery-rails (4.0.5)
@@ -75,12 +94,15 @@ GEM
     material_design_lite-sass (1.0.6.3)
       autoprefixer-rails (~> 6.0)
       sass (~> 3.3)
+    mem (0.1.5)
     method_source (0.8.2)
     mime-types (2.99)
     mini_portile (0.6.2)
     minitest (5.8.3)
     nokogiri (1.6.6.4)
       mini_portile (~> 0.6.0)
+    nokogumbo (1.4.6)
+      nokogiri
     opal (0.8.1)
       hike (~> 1.2)
       sourcemap (~> 0.1.0)
@@ -100,6 +122,7 @@ GEM
     opal-rspec (0.4.3)
       opal (>= 0.7.0, < 0.9)
     pg (0.18.4)
+    posix-spawn (0.3.11)
     pry (0.10.3)
       coderay (~> 1.1.0)
       method_source (~> 0.8.1)
@@ -107,6 +130,17 @@ GEM
     pry-doc (0.8.0)
       pry (~> 0.9)
       yard (~> 0.8)
+    pygments.rb (0.6.3)
+      posix-spawn (~> 0.3.6)
+      yajl-ruby (~> 1.2.0)
+    qiita-markdown (0.11.2)
+      gemoji
+      github-linguist (~> 4.0)
+      greenmat (>= 3.2.0.2, < 4)
+      html-pipeline (~> 2.0)
+      mem
+      pygments.rb
+      sanitize
     rack (1.6.4)
     rack-test (0.6.3)
       rack (>= 1.0)
@@ -136,7 +170,12 @@ GEM
       thor (>= 0.18.1, < 2.0)
     rake (10.4.2)
     rr (1.1.2)
+    rugged (0.24.0b9)
     safe_yaml (1.0.4)
+    sanitize (4.0.1)
+      crass (~> 1.0.2)
+      nokogiri (>= 1.4.4)
+      nokogumbo (~> 1.4.1)
     sass (3.4.19)
     sass-rails (5.0.4)
       railties (>= 4.0.0, < 5.0)
@@ -171,6 +210,7 @@ GEM
       addressable (>= 2.3.6)
       crack (>= 0.3.2)
       hashdiff
+    yajl-ruby (1.2.1)
     yard (0.8.7.6)
 
 PLATFORMS
@@ -188,9 +228,11 @@ DEPENDENCIES
   pg
   pry
   pry-doc
+  qiita-markdown
   rails (~> 4.2.0)
   rr
   sass-rails (~> 5.0)
+  text-hatena!
   tlsmail
   uglifier (>= 1.3.0)
   uuidtools

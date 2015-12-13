@@ -47,7 +47,6 @@ module Editor
           prev = find(prev_id)
           prev.target = false unless prev.nil?
           find(c).target = true
-
           scroll_to(c) unless visible_contents.include?(c)
         end
 

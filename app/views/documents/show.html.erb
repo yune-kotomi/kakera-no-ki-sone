@@ -1,34 +1,51 @@
-<p id="notice"><%= notice %></p>
+<% @title = @document.title %>
 
-<p>
-  <strong>Title:</strong>
-  <%= @document.title %>
-</p>
+<div class="document">
+  <div class="toc">
+    <div class="mdl-card mdl-shadow--2dp">
+      <div class="mdl-card__title">
+        <h2>
+          <%= link_to @document.title, "#content-#{@document.id}",
+            :id => "toc-#{@document.id}" %>
+        </h2>
+        <div class="author">
+          <%= link_to_user @document.user.nickname, @document.user %>
+        </div>
+      </div>
 
-<p>
-  <strong>Description:</strong>
-  <%= @document.description %>
-</p>
+      <div class="mdl-card__supporting-text">
+        <ol>
+          <%= render :partial => 'documents/show/toc',
+            :collection => @document.body,
+            :locals => {:parent_index => ''} %>
+        </ol>
+      </div>
+    </div>
+  </div>
 
-<p>
-  <strong>Body:</strong>
-  <%= @document.body %>
-</p>
+  <div class="contents">
+    <div class="content">
+      <h3>
+        <%= link_to @document.title, "#toc-#{@document.id}", :id => "content-#{@document.id}" %>
+      </h3>
 
-<p>
-  <strong>Private:</strong>
-  <%= @document.public %>
-</p>
+      <div class="body">
+        <%= @document.description %>
+      </div>
+    </div>
 
-<p>
-  <strong>Password:</strong>
-  <%= @document.password %>
-</p>
+    <%= render :partial => 'documents/show/content',
+      :collection => @document.body,
+      :locals => {:parent_index => ''} %>
+  </div>
+</div>
 
-<p>
-  <strong>Markup:</strong>
-  <%= @document.markup %>
-</p>
-
-<%= link_to 'Edit', edit_document_path(@document) %> |
-<%= link_to 'Back', documents_path %>
+<% if @document.user == @login_user %>
+  <div class="edit-button right-bottom-fab">
+    <!-- Colored FAB button with ripple -->
+    <%= button_to edit_document_path(@document), :method => :get,
+      :class => 'mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored' do %>
+      <i class="material-icons">edit</i>
+    <% end %>
+  </div>
+<% end %>

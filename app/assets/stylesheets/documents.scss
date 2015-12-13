@@ -4,6 +4,52 @@
 // You can use Sass (SCSS) here: http://sass-lang.com/
 
 body.documents {
+  .document {
+    margin: auto;
+    max-width: 800px;
+
+    .contents {
+      box-sizing: border-box;
+      padding: 16px;
+
+      .content {
+        padding: 0 0 16px 0;
+
+        .body {
+          font-family: "游明朝", YuMincho, "ヒラギノ明朝 ProN W3", "Hiragino Mincho ProN", serif;
+        }
+      }
+    }
+    .toc {
+      box-sizing: border-box;
+      padding: 16px;
+      width: 100%;
+
+      &>.mdl-card {
+        width: 100%;
+      }
+
+      .mdl-card__title {
+        padding-bottom: 0;
+
+        h2 {
+          flex: 1;
+          font-size: 24px;
+          margin: 0;
+        }
+      }
+
+      .mdl-card__supporting-text {
+        padding-top: 0;
+
+        ol {
+          list-style-type: none;
+          padding-left: 16px;
+        }
+      }
+    }
+  }
+
   .documents {
     padding: 16px;
 

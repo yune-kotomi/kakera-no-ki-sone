@@ -14,6 +14,9 @@ gem 'opal-rails'
 
 gem 'kaminari'
 
+gem 'text-hatena', :github => 'iwadon/text-hatena'
+gem 'qiita-markdown'
+
 # Use ActiveModel has_secure_password
 # gem 'bcrypt', '~> 3.1.7'
 
