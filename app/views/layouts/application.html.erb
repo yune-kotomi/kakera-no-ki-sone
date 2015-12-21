@@ -19,6 +19,19 @@
           <span class="mdl-layout-title"><%= @title %></span>
           <!-- Add spacer, to align navigation to the right -->
           <div class="mdl-layout-spacer"></div>
+
+          <% if @login_user.present? %>
+            <div class="mdl-textfield mdl-js-textfield mdl-textfield--expandable mdl-textfield--floating-label mdl-textfield--align-right">
+            <label class="mdl-button mdl-js-button mdl-button--icon" for="fixed-header-drawer-exp">
+              <i class="material-icons">search</i>
+            </label>
+            <div class="mdl-textfield__expandable-holder">
+              <%= form_tag documents_path, :method => :get do %>
+                <%= text_field_tag 'keywords', params[:keywords], :id => 'fixed-header-drawer-exp', :class => 'mdl-textfield__input' %>
+              <% end %>
+            </div>
+          </div>
+          <% end %>
         </div>
       </header>
 
