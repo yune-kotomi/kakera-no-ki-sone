@@ -21,7 +21,16 @@ class DocumentsController < ApplicationController
   # GET /documents/1
   # GET /documents/1.json
   def show
-    forbidden if !@document.public && @document.user != @login_user
+    if !@document.public && @document.user != @login_user
+      if @document.password
+        if request.post? && @document.password != params[:password]
+          flash[:notice] = 'パスワードが違います'
+          redirect_to @document
+        end
+      else
+        forbidden
+      end
+    end
   end
 
   # GET /documents/1/edit

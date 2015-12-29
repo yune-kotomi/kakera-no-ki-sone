@@ -79,7 +79,6 @@ module Editor
     class Root < Node
       attribute :public, :default => false
       attribute :archived, :default => false
-      attribute :password
       attribute :markup, :default => 'plaintext'
       attribute :tags, :default => []
 

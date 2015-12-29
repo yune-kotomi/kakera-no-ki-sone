@@ -7,6 +7,7 @@ class DocumentsControllerTest < ActionController::TestCase
 
     @public = documents(:document1)
     @private = documents(:document3)
+    @locked = documents(:document5)
   end
 
   test 'indexはゲストに表示不可' do
@@ -108,6 +109,69 @@ class DocumentsControllerTest < ActionController::TestCase
 
     assert_response :success
     assert_equal @private, assigns(:document)
+  end
+
+  test "ゲストがパスワード付き非公開文書を開くとプロンプトが出る" do
+    get :show,
+      {:id => @locked.id }
+
+    assert_response :success
+    assert_equal @locked, assigns(:document)
+    assert_select 'title', 'パスワードで保護された文書です: カケラの樹'
+  end
+
+  test "ユーザがパスワード付き非公開文書を開くとプロンプトが出る" do
+    get :show,
+      {:id => @locked.id },
+      {:user_id => @user.id}
+
+    assert_response :success
+    assert_equal @locked, assigns(:document)
+    assert_select 'title', 'パスワードで保護された文書です: カケラの樹'
+  end
+
+  test "オーナーがパスワード付き非公開文書を開くとそのまま表示される" do
+    get :show,
+      {:id => @locked.id },
+      {:user_id => @owner.id}
+
+    assert_response :success
+    assert_equal @locked, assigns(:document)
+    assert_select 'title', "#{@locked.title}: カケラの樹"
+  end
+
+  test "ゲストが正しいパスワードを送出するとパスワード付き非公開文書が開く" do
+    post :show,
+      {:id => @locked.id, :password => 'password'}
+
+    assert_response :success
+    assert_equal @locked, assigns(:document)
+    assert_select 'title', "#{@locked.title}: カケラの樹"
+  end
+
+  test "ゲストが不正なパスワードを送出するとプロンプトにリダイレクト" do
+    post :show,
+      {:id => @locked.id, :password => 'wrong password'}
+
+    assert_redirected_to document_path(@locked)
+  end
+
+  test "ユーザが正しいパスワードを送出するとパスワード付き非公開文書が開く" do
+    post :show,
+      {:id => @locked.id, :password => 'password'},
+      {:user_id => @user.id}
+
+    assert_response :success
+    assert_equal @locked, assigns(:document)
+    assert_select 'title', "#{@locked.title}: カケラの樹"
+  end
+
+  test "ユーザが不正なパスワードを送出するとプロンプトにリダイレクト" do
+    post :show,
+      {:id => @locked.id, :password => 'wrong password'},
+      {:user_id => @user.id}
+
+    assert_redirected_to document_path(@locked)
   end
 
   test "ゲストは編集画面を開けない" do

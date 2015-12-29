@@ -6,7 +6,7 @@ class CreateDocuments < ActiveRecord::Migration
       t.jsonb :body
       t.boolean :public, :default => false, :null => false
       t.boolean :archived, :default => false, :null => false
-      t.string :password
+      t.string :bcrypt_password
       t.string :markup, :default => :plaintext, :null => false
 
       t.integer :user_id

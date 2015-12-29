@@ -23,7 +23,7 @@ ActiveRecord::Schema.define(version: 20150211031441) do
     t.jsonb    "body"
     t.boolean  "public",             default: false,       null: false
     t.boolean  "archived",           default: false,       null: false
-    t.string   "password"
+    t.string   "bcrypt_password"
     t.string   "markup",             default: "plaintext", null: false
     t.integer  "user_id"
     t.datetime "content_updated_at",                       null: false

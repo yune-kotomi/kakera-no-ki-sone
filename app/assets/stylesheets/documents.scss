@@ -80,6 +80,14 @@ body.documents {
       }
     }
   }
+
+  .password-prompt {
+    display: block;
+
+    .mdl-card__actions {
+      text-align: right;
+    }
+  }
 }
 
 #document-editor {
@@ -271,5 +279,17 @@ nav {
     &>.mdl-card {
       margin: auto;
     }
+  }
+}
+
+#password-box {
+  display: flex;
+
+  .mdl-textfield {
+    flex: 1;
+  }
+
+  button {
+    margin-top: 16px;
   }
 }

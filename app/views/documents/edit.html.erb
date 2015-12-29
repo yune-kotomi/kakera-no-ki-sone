@@ -55,6 +55,20 @@
               <input type="checkbox" class="mdl-checkbox__input" id="public-checkbox">
               <span class="mdl-checkbox__label">一般公開する</span>
             </label>
+
+            <div id="password-box">
+              <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                <%= password_field_tag 'password', '', :class => 'mdl-textfield__input' %>
+                <label class="mdl-textfield__label">パスワード...</label>
+              </div>
+
+              <button class="mdl-button mdl-js-button mdl-button--icon cancel" <%= 'style="display: none"'.html_safe unless @document.password %>>
+                <i class="material-icons">cancel</i>
+              </button>
+              <button class="mdl-button mdl-js-button mdl-button--icon mdl-button--colored apply">
+                <i class="material-icons">check</i>
+              </button>
+            </div>
           </div>
         </div>
 

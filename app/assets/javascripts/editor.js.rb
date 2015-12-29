@@ -86,11 +86,27 @@ module Editor
       elements[:public_checkbox].on(:click) do |e|
         if e.current_target.prop('checked')
           @document.public = true
+          elements[:password].hide
         else
           @document.public = false
+          elements[:password].show
         end
 
         true
+      end
+
+      password_field = elements[:password].find('[name="password"]')
+      password_apply = elements[:password].find('.apply')
+      password_cancel = elements[:password].find('.cancel')
+
+      password_apply.on(:click) do |e|
+        save_password(password_field.value)
+        password_cancel.show
+      end
+      password_cancel.on(:click) do |e|
+        save_password
+        password_field.value = ''
+        password_cancel.hide
       end
 
       # 記法
@@ -223,6 +239,13 @@ module Editor
       end
     end
 
+    def save_password(password = '')
+      HTTP.patch("/documents/#{@document.id}.json", :payload => {'document' => {'password' => password}}) do |request|
+        if request.ok?
+        end
+      end
+    end
+
     def close_confirm
       'まだ保存されていません。よろしいですか？'
     end
@@ -279,6 +302,7 @@ Document.ready? do
       :tags => Element.find('#tag-list'),
       :save_indicator => Element.find('#save-indicator'),
       :public_checkbox => Element.find('#public-checkbox'),
+      :password => Element.find('#password-box'),
       :markup_selector => Element.find('input[name="markup"]'),
       :setting_dialog => Element.find('#config-dialog')
     )
