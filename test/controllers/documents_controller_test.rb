@@ -59,6 +59,7 @@ class DocumentsControllerTest < ActionController::TestCase
 
     assert_redirected_to edit_document_path(assigns(:document))
     assert_equal @user, assigns(:document).user
+    assert_equal @user.default_markup, assigns(:document).markup
   end
 
   test "ゲストは公開文書を閲覧できる" do

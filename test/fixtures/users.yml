@@ -13,5 +13,5 @@ user2:
   screen_name: user2
   nickname: User2
   profile_text: User2 profile
-  default_markup: plaintext
+  default_markup: hatena
   kitaguchi_profile_id: 2
