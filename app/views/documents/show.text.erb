@@ -1,0 +1,5 @@
+<%= @document.title %>
+<%= @document.description %>
+<%= render :partial => 'documents/show/content',
+  :collection => @document.body,
+  :locals => {:parent_index => ''} %>

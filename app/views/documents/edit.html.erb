@@ -23,6 +23,10 @@
 <%= hidden_field_tag :markup, @document.markup.to_json, :id => 'document-markup' %>
 
 <% content_for(:navigation1) do %>
+  <%= link_to @document, :class => 'mdl-navigation__link' do %>
+    <i class="material-icons">insert_drive_file</i>
+    表示
+  <% end %>
   <%= link_to '#', :class => 'mdl-navigation__link config' do %>
     <i class="material-icons">settings</i>
     設定

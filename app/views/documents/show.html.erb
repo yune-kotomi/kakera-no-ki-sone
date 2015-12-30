@@ -77,3 +77,11 @@
     </div>
   <% end %>
 <% end %>
+
+<% content_for(:navigation1) do %>
+  <%= link_to document_path(@document, :format => :text), :class => 'mdl-navigation__link' do %>
+    <i class="material-icons">insert_drive_file</i>
+    テキスト形式で表示
+  <% end %>
+  <hr>
+<% end %>
