@@ -50,13 +50,26 @@
           <%= yield :navigation1 %>
 
           <% if @login_user.blank? %>
-            <%= link_to 'ユーザ登録/ログイン', users_login_path, :class => 'mdl-navigation__link' %>
+            <%= link_to users_login_path, :class => 'mdl-navigation__link' do %>
+              <i class="material-icons">person</i>
+              ユーザ登録/ログイン
+            <% end %>
           <% else %>
-            <%= link_to '文書', documents_path, :class => 'mdl-navigation__link' %>
-            <%= link_to '保存記録', documents_path(:archived => true), :class => 'mdl-navigation__link' %>
+            <%= link_to documents_path, :class => 'mdl-navigation__link' do %>
+              <i class="material-icons">library_books</i>
+              文書
+            <% end %>
+            <%= link_to documents_path(:archived => true), :class => 'mdl-navigation__link' do %>
+              <i class="material-icons">archive</i>
+              保存記録
+            <% end %>
             <hr>
-            <%= link_to_profile_edit 'プロフィール編集', :class => 'mdl-navigation__link' %>
-            <%= link_to 'ログアウト', users_logout_path, :class => 'mdl-navigation__link' %>
+
+            <%= link_to_profile_edit '<i class="material-icons">settings</i>プロフィール編集'.html_safe, :class => 'mdl-navigation__link' %>
+            <%= link_to users_logout_path, :class => 'mdl-navigation__link' do %>
+              <i class="material-icons">person_outline</i>
+              ログアウト
+            <% end %>
           <% end %>
 
           <%= yield :navigation %>
