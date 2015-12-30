@@ -47,6 +47,8 @@
         </header>
 
         <nav class="mdl-navigation">
+          <%= yield :navigation1 %>
+
           <% if @login_user.blank? %>
             <%= link_to 'ユーザ登録/ログイン', users_login_path, :class => 'mdl-navigation__link' %>
           <% else %>

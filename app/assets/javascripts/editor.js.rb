@@ -121,10 +121,6 @@ module Editor
 
       # ホットキーを有効に
       @hotkeys = Hotkeys.new(self, @document, @tree, @contents)
-
-      # 設定ダイアログ
-      @contents.display.observe(:setting_button, :event => :click) { elements[:setting_dialog].effect(:fade_in) }
-      elements[:setting_dialog].find('button.close').on(:click) { elements[:setting_dialog].effect(:fade_out) }
     end
 
     def attach_mv(node, leaf, content)

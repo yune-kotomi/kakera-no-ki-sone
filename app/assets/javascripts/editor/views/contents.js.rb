@@ -5,16 +5,8 @@ module Editor
         <div class="display">
           <h3><span class="title">{{:title}}</span></h3>
           <div class="body-display mdl-typography--body-1"></div>
-
-          <div class="buttons">
-            <button class="mdl-button mdl-js-button mdl-button--icon config">
-              <i class="material-icons">settings</i>
-            </button>
-          </div>
         </div>
       EOS
-
-      element :setting_button, :selector => 'button.config'
     end
 
     class Contents < Juso::View::Base

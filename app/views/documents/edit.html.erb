@@ -22,10 +22,14 @@
 <%= hidden_field_tag :archived, @document.archived.to_json, :id => 'document-archived' %>
 <%= hidden_field_tag :markup, @document.markup.to_json, :id => 'document-markup' %>
 
-<% content_for(:navigation) do %>
+<% content_for(:navigation1) do %>
+  <%= link_to '#', :class => 'mdl-navigation__link config' do %>
+    設定
+  <% end %>
   <hr>
   <div class="mdl-typography--subhead tag-list-title">タグ</div>
   <div id="tag-list"></div>
+  <hr>
 <% end %>
 
 <% content_for(:bottom) do %>
