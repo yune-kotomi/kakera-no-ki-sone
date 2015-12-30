@@ -72,10 +72,7 @@ class DocumentsController < ApplicationController
   def destroy
     @document.destroy
     respond_to do |format|
-      format.html { redirect_to :controller => :users,
-        :action => :show,
-        :domain_name => @login_user.domain_name,
-        :screen_name => @login_user.screen_name }
+      format.html { redirect_to documents_path }
       format.json { head :no_content }
     end
   end

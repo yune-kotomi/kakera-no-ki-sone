@@ -248,9 +248,7 @@ class DocumentsControllerTest < ActionController::TestCase
         {:user_id => @owner.id}
     end
 
-    assert_redirected_to :controller => :users,
-      :action => :show,
-      :domain_name => @owner.domain_name,
-      :screen_name => @owner.screen_name
+    assert_redirected_to :controller => :documents,
+      :action => :index
   end
 end
