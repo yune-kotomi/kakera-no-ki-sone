@@ -65,3 +65,42 @@
     </button>
   <% end %>
 </div>
+
+<% content_for(:navigation) do %>
+  <hr>
+  <%= link_to '#', :class => 'mdl-navigation__link config' do %>
+    設定
+  <% end %>
+<% end %>
+
+<% content_for(:bottom) do %>
+  <div id="config-dialog" class="modal-card user-config">
+    <div class="modal-container">
+      <div class="mdl-card mdl-shadow--2dp">
+        <div class="mdl-card__supporting-text">
+          <div>
+            <h4>記法</h4>
+            <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect">
+              <input type="radio" class="mdl-radio__button" name="markup" value="plaintext" id="markup1" <%= 'checked' if @login_user.default_markup == 'plaintext' %>>
+              <span class="mdl-radio__label">記法なし</span>
+            </label>
+            <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect">
+              <input type="radio" class="mdl-radio__button" name="markup" value="hatena"id="markup2" <%= 'checked' if @login_user.default_markup == 'hatena' %>>
+              <span class="mdl-radio__label">はてな記法</span>
+            </label>
+            <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect">
+              <input type="radio" class="mdl-radio__button" name="markup" value="markdown"id="markup3" <%= 'checked' if @login_user.default_markup == 'markdown' %>>
+              <span class="mdl-radio__label">Markdown</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="mdl-card__menu">
+          <button class="mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect close">
+            <i class="material-icons">close</i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+<% end %>

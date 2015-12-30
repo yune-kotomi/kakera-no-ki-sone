@@ -40,7 +40,7 @@ class DocumentsController < ApplicationController
   # POST /documents
   # POST /documents.json
   def create
-    @document = @login_user.documents.build
+    @document = @login_user.documents.build(:markup => @login_user.default_markup)
 
     respond_to do |format|
       if @document.save
