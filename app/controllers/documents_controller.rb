@@ -42,6 +42,17 @@ class DocumentsController < ApplicationController
   def create
     @document = @login_user.documents.build(:markup => @login_user.default_markup)
 
+    if params[:template]
+      begin
+        template = @login_user.documents.find(params[:template])
+        @document = template.dup
+        @document.title = "#{@document.title} のコピー"
+      rescue ActiveRecord::RecordNotFound
+        redirect_to documents_path
+        return
+      end
+    end
+
     respond_to do |format|
       if @document.save
         format.html { redirect_to edit_document_path(@document), notice: 'Document was successfully created.' }

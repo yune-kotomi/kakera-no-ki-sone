@@ -62,6 +62,27 @@ class DocumentsControllerTest < ActionController::TestCase
     assert_equal @user.default_markup, assigns(:document).markup
   end
 
+  test "template=IDを指定すると文書をコピーする" do
+    assert_difference('Document.count') do
+      post :create,
+        {:template => @public.id},
+        {:user_id => @owner.id}
+    end
+
+    assert_redirected_to edit_document_path(assigns(:document))
+    assert_equal "#{@public.title} のコピー", assigns(:document).title
+  end
+
+  test '別のユーザの文書はコピーできない' do
+    assert_no_difference('Document.count') do
+      post :create,
+        {:template => @public.id},
+        {:user_id => @user.id}
+    end
+
+    assert_redirected_to documents_path
+  end
+
   test "ゲストは公開文書を閲覧できる" do
     get :show,
       {:id => @public.id}
