@@ -85,8 +85,15 @@ module Editor
       end
       elements[:public_checkbox].on(:click) do |e|
         if e.current_target.prop('checked')
-          @document.public = true
-          elements[:password].hide
+          Dialog::Confirm.new('一般公開', 'この文書を公開してよろしいですか?', 'はい', 'いいえ') do |d|
+            d.ok do
+              @document.public = true
+              elements[:password].hide
+            end
+            d.cancel do
+              elements[:public_checkbox].prop('checked', false)
+            end
+          end.open
         else
           @document.public = false
           elements[:password].show
