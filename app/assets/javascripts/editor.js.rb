@@ -276,7 +276,7 @@ module Editor
 
       private
       def enter(event)
-        ctrl_e(event) if @tree.focused
+        ctrl_e(event)
       end
 
       def ctrl_0(event)
