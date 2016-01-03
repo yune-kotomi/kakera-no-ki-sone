@@ -73,6 +73,29 @@ class DocumentsControllerTest < ActionController::TestCase
     assert_equal "#{@public.title} のコピー", assigns(:document).title
   end
 
+  test '階層付きテキストファイルを送信するとインポートされる' do
+    assert_difference('Document.count') do
+      post :create,
+        {:import => fixture_file_upload("structured_text_1root.txt", 'text/plain')},
+        {:user_id => @user.id}
+    end
+
+    assert_redirected_to edit_document_path(assigns(:document))
+    assert_equal @user, assigns(:document).user
+    assert_equal '.top level', assigns(:document).title
+    assert_equal '2', assigns(:document).body[1]['title']
+  end
+
+  test 'トップノードのない階層付きテキストファイルを送信するとタイトルはファイル名' do
+    assert_difference('Document.count') do
+      post :create,
+        {:import => fixture_file_upload("structured_text_noroot.txt", 'text/plain')},
+        {:user_id => @user.id}
+    end
+
+    assert_equal 'structured_text_noroot.txt', assigns(:document).title
+  end
+
   test '別のユーザの文書はコピーできない' do
     assert_no_difference('Document.count') do
       post :create,
@@ -107,6 +130,18 @@ class DocumentsControllerTest < ActionController::TestCase
 
     assert_response :success
     assert_equal @public, assigns(:document)
+  end
+
+  test 'typeにstructured_textを指定すると階層付きテキストでダウンロードされる' do
+    get :show,
+      {:id => @public.id, :format => :text, :type => 'structured_text'},
+      {:user_id => @owner.id}
+
+    assert_response :success
+    assert_equal @public, assigns(:document)
+    assert_equal 'text/plain', response.content_type
+    assert_equal @public.to_structured_text, response.body
+    assert_equal 'attachment; filename="document 1.txt"', response.header['Content-Disposition']
   end
 
   test "ゲストは非公開文書を閲覧できない" do

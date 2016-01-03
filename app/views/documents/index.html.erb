@@ -73,9 +73,13 @@
   <% end %>
 </div>
 
-<% content_for(:navigation) do %>
+<% content_for(:navigation2) do %>
+  <%= link_to '#', :class => 'mdl-navigation__link modal-trigger', :data => {:modal_selector => '#import-dialog'} do %>
+    <i class="material-icons">file_upload</i>
+    取り込み
+  <% end %>
   <hr>
-  <%= link_to '#', :class => 'mdl-navigation__link config' do %>
+  <%= link_to '#', :class => 'mdl-navigation__link modal-trigger', :data => {:modal_selector => '#config-dialog'} do %>
     <i class="material-icons">settings</i>
     設定
   <% end %>
@@ -100,6 +104,39 @@
               <input type="radio" class="mdl-radio__button" name="markup" value="markdown"id="markup3" <%= 'checked' if @login_user.default_markup == 'markdown' %>>
               <span class="mdl-radio__label">Markdown</span>
             </label>
+          </div>
+        </div>
+
+        <div class="mdl-card__menu">
+          <button class="mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect close">
+            <i class="material-icons">close</i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="import-dialog" class="modal-card import">
+    <div class="modal-container">
+      <div class="mdl-card mdl-shadow--2dp">
+        <div class="mdl-card__supporting-text">
+          <div>
+            <h4>取り込み</h4>
+            <%= form_for @login_user.documents.build, :html => {:multipart => true} do %>
+              <div class="mdl-textfield mdl-js-textfield mdl-textfield--file">
+                <input class="mdl-textfield__input filename-display" placeholder="階層付きテキスト" type="text" readonly/>
+                <div class="mdl-button mdl-button--primary mdl-button--icon mdl-button--file">
+                  <i class="material-icons">attach_file</i><input type="file" name="import">
+                </div>
+              </div>
+
+              <div class="primary-button">
+                <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--accent" type="submit">
+                  <i class="material-icons">file_upload</i>
+                  取り込み
+                </button>
+              </div>
+            <% end %>
           </div>
         </div>
 

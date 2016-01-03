@@ -40,6 +40,95 @@ class Document < ActiveRecord::Base
     end
   end
 
+  def self.load(src)
+    nodes = src.split(/(^\.+)/).reduce([]) do |ret, line|
+      if line.match(/\A\.+\z/)
+        ret.push(:level => line.size - 1)
+      else
+        ret.last.update(:body => line) if ret.last
+      end
+
+      ret
+    end.map{|line| line.update(:body => line[:body].gsub(/^ ./, '.')) }
+
+    nodes.each do |node|
+      title, body = node[:body].match(/\A(.*?)\n(.*?)\z/m).to_a.values_at(1,2)
+      node[:leaf] = new_leaf(title, body)
+    end
+
+    if nodes.select{|n| n[:level] == 0 }.size == 1 && nodes.first[:level] == 0
+      # トップレベルノードが単数かつ先頭のものがそれだった場合、
+      # title, descriptionをそのノードで賄い他のノードを１段上げる
+      title = nodes.first[:leaf]['title']
+      description = nodes.first[:leaf]['body']
+      nodes.shift
+      nodes = nodes.map{|n| n[:level] -= 1; n }
+    else
+      title = ''
+      description = ''
+    end
+
+    document = Document.new(:title => title, :description => description, :body => [])
+
+    # 階層が飛んでいるものを修正
+    prev_level = 0
+    nodes = nodes.map do |node|
+      if prev_level + 1 < node[:level]
+        dummy = ((prev_level + 1)..(node[:level] - 1)).map{|i|
+          {
+            :level => i,
+            :leaf => new_leaf('', '')
+          }
+        }
+        prev_level = node[:level]
+        [dummy, node]
+      else
+        prev_level = node[:level]
+        node
+      end
+    end.flatten
+    if nodes.first && nodes.first[:level] > 0
+      nodes.insert(0, {
+        :level => 0,
+        :leaf => new_leaf('', '')
+      })
+    end
+
+    nodes.each do |node|
+      document.children_of(node[:level]).push(node[:leaf])
+    end
+
+    document
+  end
+
+  def self.new_leaf(title, body)
+    {
+      'id' => UUIDTools::UUID.random_create.to_s,
+      'title' => title,
+      'body' => body,
+      'children' => [],
+      'metadatum' => {}
+    }
+  end
+
+  def children_of(level)
+    children = body
+    level.times do
+      children = children.last['children']
+    end
+    children
+  end
+
+  def to_structured_text
+    root = {
+      'title' => title,
+      'body' => description,
+      'children' => body
+    }
+
+    structured_text_leaf(1, root)
+  end
+
   private
   def valid_node?(target)
     target.keys.sort == ['id', 'title', 'body', 'children', 'metadatum'].sort &&
@@ -69,5 +158,19 @@ class Document < ActiveRecord::Base
   end
 
   def self.body_fts(query)
+  end
+
+  def structured_text_leaf(level, leaf)
+    title = leaf['title'].sub(/\A\./, ' .')
+    body = leaf['body'].gsub(/^\./, ' .')
+    text = ['.' * level + title + "\n#{body}"]
+
+    if leaf['children'].present?
+      leaf['children'].each do |child|
+        text.push(structured_text_leaf(level + 1, child))
+      end
+    end
+
+    text.join("\n")
   end
 end

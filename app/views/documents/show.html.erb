@@ -83,5 +83,9 @@
     <i class="material-icons">insert_drive_file</i>
     テキスト形式で表示
   <% end %>
+  <%= link_to document_path(@document, :format => :text, :type => :structured_text), :class => 'mdl-navigation__link' do %>
+    <i class="material-icons">file_download</i>
+    階層付きテキスト形式で保存
+  <% end %>
   <hr>
 <% end %>

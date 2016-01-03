@@ -63,6 +63,8 @@
               <i class="material-icons">archive</i>
               保存記録
             <% end %>
+
+            <%= yield :navigation2 %>
             <hr>
 
             <%= link_to_profile_edit '<i class="material-icons">settings</i>プロフィール編集'.html_safe, :class => 'mdl-navigation__link' %>

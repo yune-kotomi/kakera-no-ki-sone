@@ -7,14 +7,17 @@ Document.ready? do
   end
 
    # 設定ダイアログ
-   config_dialog = Element.find('#config-dialog')
-   Element.find('nav a.config').on('click') do
-     config_dialog.effect(:fade_in)
-     Element.find('.mdl-layout__drawer,.mdl-layout__obfuscator').remove_class('is-visible')
-     false
-   end
+   Element.find('nav a.modal-trigger').to_a.each do |trigger|
+     modal = Element.find(trigger['data-modal-selector'])
 
-   config_dialog.find('button.close').on(:click) do
-     config_dialog.effect(:fade_out)
+     trigger.on('click') do
+       modal.effect(:fade_in)
+       Element.find('.mdl-layout__drawer,.mdl-layout__obfuscator').remove_class('is-visible')
+       false
+     end
+
+     modal.find('button.close').on(:click) do
+       modal.effect(:fade_out)
+     end
    end
 end

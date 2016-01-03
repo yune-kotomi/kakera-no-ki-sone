@@ -123,4 +123,40 @@ class DocumentTest < ActiveSupport::TestCase
     @document1.password = ''
     assert @document1.password.nil?
   end
+
+  test '階層付きテキストがインポートできる' do
+    src = open("#{Rails.root}/test/fixtures/structured_text_1root.txt").read
+    @document = Document.load(src)
+
+    assert_equal '.top level', @document.title
+    assert_equal "body 1\n.body 1\n", @document.description
+
+    assert_equal '1-1-1', @document.body[0]['children'][0]['children'][0]['title']
+    assert_equal "body 1-1-1\n", @document.body[0]['children'][0]['children'][0]['body']
+    assert_equal '2', @document.body[1]['title']
+    assert_equal '2-1', @document.body[1]['children'][0]['title']
+    assert_equal '3', @document.body[2]['title']
+    assert_equal '3-1', @document.body[2]['children'][0]['title']
+    assert_equal '3-2', @document.body[2]['children'][1]['title']
+  end
+
+  test 'トップレベルノードが複数ある階層付きテキストがインポートできる' do
+    src = open("#{Rails.root}/test/fixtures/structured_text_noroot.txt").read
+    @document = Document.load(src)
+
+    assert_equal '', @document.title
+    assert_equal "", @document.description
+
+    assert_equal 'Aタイトル', @document.body[0]['children'][0]['children'][0]['title']
+
+    assert_equal '.Bタイトル', @document.body[1]['title']
+
+    assert_equal 'Cタイトル', @document.body[1]['children'][0]['children'][0]['children'][0]['title']
+  end
+
+  test '階層付きテキストに変換できる' do
+    actual = @document2.to_structured_text
+    expected = open("#{Rails.root}/test/fixtures/structured_text_document2.txt").read.strip
+    assert_equal expected, actual
+  end
 end

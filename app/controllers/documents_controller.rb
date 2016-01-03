@@ -26,10 +26,16 @@ class DocumentsController < ApplicationController
         if request.post? && @document.password != params[:password]
           flash[:notice] = 'パスワードが違います'
           redirect_to @document
+          return
         end
       else
         forbidden
+        return
       end
+    end
+
+    if params[:type] == 'structured_text'
+      send_data(@document.to_structured_text, :type => 'text/plain', :filename => "#{@document.title}.txt")
     end
   end
 
@@ -51,6 +57,13 @@ class DocumentsController < ApplicationController
         redirect_to documents_path
         return
       end
+    elsif params[:import]
+      src = params[:import].read
+      encode = CharlockHolmes::EncodingDetector.detect(src)[:encoding]
+      @document = Document.load(src.encode('UTF-8', encode))
+      @document.user = @login_user
+      @document.markup = @login_user.default_markup
+      @document.title = params[:import].original_filename if @document.title.blank?
     end
 
     respond_to do |format|

@@ -13,4 +13,13 @@ Document.ready? do
       end
     end
   end
+
+  import_dialog = Element.find('#import-dialog')
+  if import_dialog
+    file_input = import_dialog.find('input[type="file"]')
+    display = import_dialog.find('.filename-display')
+    file_input.on('change') do |e|
+      display.value = `#{e.current_target.get(0)}.files[0].name`
+    end
+  end
 end
