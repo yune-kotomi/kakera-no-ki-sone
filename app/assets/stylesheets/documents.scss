@@ -100,6 +100,7 @@ body.documents {
 
       .scroll-container {
         overflow: auto;
+        outline: none;
       }
 
       .content {
@@ -159,6 +160,7 @@ body.documents {
     margin-bottom: 4px;
     .scroll-container {
       overflow: auto;
+      outline: none;
     }
     div.tree {
       padding: 4px;

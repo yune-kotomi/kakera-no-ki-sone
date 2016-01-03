@@ -12,7 +12,7 @@ module Editor
     class Contents < Juso::View::Base
       template <<-EOS
         <div>
-          <div class="scroll-container">
+          <div class="scroll-container" tabindex="-1">
             <div class="contents">
               <div class="root content">
                 <div class="display"></div>
@@ -182,7 +182,7 @@ module Editor
         visible_min = dom_element(:container).offset.top
         visible_max = visible_min + dom_element(:container).height.to_i
 
-        ret = children.select {|c| visible_min < c.offset_top && c.offset_bottom <= visible_max }.map(&:id)
+        ret = children.select {|c| (visible_min < c.offset_top && c.offset_top <= visible_max) || (visible_min < c.offset_bottom && c.offset_bottom <= visible_max) }.map(&:id)
 
         if visible_min < offset_top && offset_bottom <= visible_max
           ret.push(self.id)

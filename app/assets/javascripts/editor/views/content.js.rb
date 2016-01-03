@@ -254,13 +254,13 @@ module Editor
         # キーボード・ショートカット
         @hotkeys = Mousetrap::Pool.instance.get("content-#{id}")
         up = Mousetrap::Handler.new('up') do |handler|
-          handler.condition { parent.focused && self.target && !self.edit? }
+          handler.condition { parent.focused && self.target && !self.edit? && self.top_visible? }
           handler.procedure { previous.target = true unless previous.nil? }
         end
         @hotkeys.bind_handler(up)
 
         down = Mousetrap::Handler.new('down') do |handler|
-          handler.condition { parent.focused && self.target && !self.edit? }
+          handler.condition { parent.focused && self.target && !self.edit? && self.bottom_visible? }
           handler.procedure { next_content.target = true unless next_content.nil? }
         end
         @hotkeys.bind_handler(down)
@@ -270,7 +270,10 @@ module Editor
         @hotkeys.set_stop_callback { false }
         escape = Mousetrap::Handler.new('escape') do |handler|
           handler.condition { parent.focused && self.target }
-          handler.procedure { show }
+          handler.procedure do
+            show
+            parent.dom_element(:container).focus
+          end
         end
         @hotkeys.bind_handler(escape)
       end
@@ -319,6 +322,18 @@ module Editor
 
       def offset_bottom
         offset_top + dom_element.outer_height
+      end
+
+      def top_visible?
+        container = parent.dom_element(:container)
+
+        container.offset.top < offset_top
+      end
+
+      def bottom_visible?
+        container = parent.dom_element(:container)
+
+        container.offset.top + container.height.to_i > offset_bottom
       end
 
       def previous

@@ -6,7 +6,7 @@ module Editor
   module View
     class Tree < Juso::View::Base
       template <<-EOS
-        <div class="scroll-container">
+        <div class="scroll-container" tabindex="-1">
           <div class="tree">
             <div class="root" data-id="{{attr:id}}">{{:title}}</div>
             <ol class="children"></ol>

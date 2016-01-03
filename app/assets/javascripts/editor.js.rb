@@ -281,6 +281,8 @@ module Editor
 
       def ctrl_0(event)
         @tree.focused = !@tree.focused
+        @tree.dom_element(:container).focus if @tree.focused
+        @contents.dom_element(:container).focus if @contents.focused
       end
 
       def ctrl_n(event)
