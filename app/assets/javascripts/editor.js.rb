@@ -139,6 +139,8 @@ module Editor
 
       # ホットキーを有効に
       @hotkeys = Hotkeys.new(self, @document, @tree, @contents)
+
+      @elements = elements
     end
 
     def attach_mv(node, leaf, content)
@@ -275,6 +277,26 @@ module Editor
       end
     end
 
+    # ラージスクリーン用
+    def adjust_tree_size
+      tree = @elements[:tree]
+      contents = @elements[:contents]
+
+      column_width = `$(window).innerWidth()` / 12
+      columns = (800.0 / column_width).ceil
+      columns = 8 if columns > 8
+
+      [tree, contents].each do |element|
+        element['class'].
+          split(' ').
+          select{|c| c.match(/^mdl-cell--.+-col$/) }.
+          each{|c| element.remove_class(c) }
+      end
+
+      tree.add_class("mdl-cell--#{12 - columns}-col")
+      contents.add_class("mdl-cell--#{columns}-col")
+    end
+
     def switch_to_tree
       @tree.dom_element.show
       @contents.dom_element.hide
@@ -342,6 +364,10 @@ module Editor
     end
   end
 
+  def self.desktop?
+    device == :desktop
+  end
+
   def self.phone?
     device == :phone
   end
@@ -366,6 +392,7 @@ Document.ready? do
       height = main.height - 8*2 - 4*2
       editor.tree.dom_element(:container).css('height', "#{height}px")
       editor.contents.dom_element(:container).css('height', "#{height}px")
+      editor.adjust_tree_size if Editor.desktop?
     end
 
     Element.find('#add-button').on(:click) do
