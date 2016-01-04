@@ -51,6 +51,11 @@ module Editor
         super(data, parent)
         # タイトルのクリックでTreeの編集対象にする
         observe(:content, :event => :click) do
+          if ::Editor.phone?
+            # Editor#switch_to_contents
+            parental_tree.parent.switch_to_contents
+            %x{ history.pushState('contents', null, '#contents') }
+          end
           self.target = true
         end
 

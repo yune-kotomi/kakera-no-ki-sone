@@ -16,3 +16,6 @@
 [submodule "vendor/text-hatena.js"]
 	path = vendor/text-hatena.js
 	url = https://github.com/yune-kotomi/text-hatena.js.git
+[submodule "vendor/jquery-ui-touch-punch"]
+	path = vendor/jquery-ui-touch-punch
+	url = https://github.com/furf/jquery-ui-touch-punch.git

@@ -218,6 +218,10 @@ module Editor
         end
         self.focused = true
         self.target = true
+
+        if ::Editor.phone?
+          %x{ history.pushState('edit', null, '#edit') }
+        end
       end
 
       def edit?

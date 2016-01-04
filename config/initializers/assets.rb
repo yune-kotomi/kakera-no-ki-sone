@@ -12,7 +12,8 @@ Rails.application.config.assets.paths.concat([
   'vendor/rickdom/src',
   'vendor/mousetrap',
   'vendor/jquery.ex-resize',
-  'vendor/jquery-ui'
+  'vendor/jquery-ui',
+  'vendor/jquery-ui-touch-punch'
 ])
 
 # Precompile additional assets.

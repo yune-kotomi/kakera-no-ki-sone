@@ -60,8 +60,14 @@ module Editor
         end
         # クリックで自分自身を選択状態に
         observe(:title, :event => :click) do
+          if ::Editor.phone?
+            # Editor#switch_to_contents
+            parent.switch_to_contents
+            %x{ history.pushState('contents', null, '#contents') }
+          end
           self.target = true
-        end.call
+        end
+        self.target = true
 
         # スクロール方向判定
         observe(:container, :event => :scroll) do

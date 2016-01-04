@@ -291,6 +291,10 @@ module Editor
         editor.edit(focus_to_last)
         parent.focused = true
         self.target = true
+
+        if ::Editor.phone?
+          %x{ history.pushState('edit', null, '#edit') }
+        end
       end
 
       def edit?

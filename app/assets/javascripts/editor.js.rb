@@ -32,13 +32,24 @@ module Editor
 
     def attach(elements)
       # view生成
-      @tree = Editor::View::Tree.new(@document)
+      @tree = Editor::View::Tree.new(@document, self)
       elements[:tree].append(@tree.dom_element)
-      @contents = Editor::View::Contents.new(@document.attributes)
+      @contents = Editor::View::Contents.new(@document.attributes, self)
       elements[:contents].append(@contents.dom_element)
       @tags = Editor::View::Tags.new(:tags => @document.tags)
       elements[:tags].append(@tags.dom_element)
       @save_indicator = elements[:save_indicator]
+
+      # スモールスクリーン対応
+      if ::Editor.phone?
+        switch_to_tree
+        %x{
+          history.pushState('tree', null, '#tree');
+          window.addEventListener('popstate', function (e) {
+            #{pushstate(`history.state`)}
+          })
+        }
+      end
 
       # ルートノードの編集操作
       @contents.observe(:title) {|t| @document.title = t }
@@ -253,6 +264,27 @@ module Editor
       'まだ保存されていません。よろしいですか？'
     end
 
+    # スモールスクリーン用
+    def pushstate(state)
+      case state
+      when 'tree'
+        switch_to_tree
+
+      when 'contents'
+        @contents.find(@contents.current_target).show
+      end
+    end
+
+    def switch_to_tree
+      @tree.dom_element.show
+      @contents.dom_element.hide
+    end
+
+    def switch_to_contents
+      @contents.dom_element.show
+      @tree.dom_element.hide
+    end
+
     class Hotkeys
       def initialize(parent, document, tree, contents)
         @parent = parent
@@ -294,6 +326,24 @@ module Editor
         @contents.find(@contents.current_target).edit
       end
     end
+  end
+
+  def self.device
+    phone_breakpoint = 480
+    tablet_breakpoint = 840
+
+    case `$(window).innerWidth()`
+    when 0..phone_breakpoint
+      :phone
+    when phone_breakpoint..tablet_breakpoint
+      :tablet
+    else
+      :desktop
+    end
+  end
+
+  def self.phone?
+    device == :phone
   end
 end
 
