@@ -161,8 +161,8 @@ class Document < ActiveRecord::Base
   end
 
   def structured_text_leaf(level, leaf)
-    title = leaf['title'].sub(/\A\./, ' .')
-    body = leaf['body'].gsub(/^\./, ' .')
+    title = leaf['title'].to_s.sub(/\A\./, ' .')
+    body = leaf['body'].to_s.gsub(/^\./, ' .')
     text = ['.' * level + title + "\n#{body}"]
 
     if leaf['children'].present?
