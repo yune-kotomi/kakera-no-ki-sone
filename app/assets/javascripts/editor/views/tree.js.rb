@@ -23,7 +23,6 @@ module Editor
       attribute :target
       attribute :focused, :default => false
 
-      attr_reader :scroll_direction
       attr_reader :model
 
       custom_events :rearrange
@@ -68,17 +67,6 @@ module Editor
           self.target = true
         end
         self.target = true
-
-        # スクロール方向判定
-        observe(:container, :event => :scroll) do
-          c = dom_element(:container)
-          if @prev_scroll_top.to_i < c.scroll_top
-            @scroll_direction = :down
-          else
-            @scroll_direction = :up
-          end
-          @prev_scroll_top = c.scroll_top
-        end
 
         # ツリービューへのフォーカス
         observe(:focused) do |v|
