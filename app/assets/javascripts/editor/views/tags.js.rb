@@ -18,8 +18,12 @@ module Editor
     # チェックを入れたタグでノードをハイライト
     class Tags < Juso::View::Base
       template <<-EOS
-        <div class="editor-view-tags">
-          <ul></ul>
+        <div>
+          <div class="mdl-typography--subhead tag-list-title">タグ</div>
+          <div class="editor-view-tags">
+            <ul></ul>
+          </div>
+          <hr>
         </div>
       EOS
 
@@ -29,6 +33,13 @@ module Editor
       def initialize(data = {}, parent = nil)
         super
         self.tags = data[:tags]
+        observe(:tag_list) do |list|
+          if list.size == 0
+            dom_element.hide
+          else
+            dom_element.show
+          end
+        end.call(tag_list)
       end
 
       def tags=(value)
