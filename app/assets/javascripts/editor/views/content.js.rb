@@ -199,9 +199,7 @@ module Editor
         super(data, parent)
 
         # displayと結合
-        self.display = Display.new(
-          data.merge(:tags => (data[:tags]||[]).map{|t| {:str => t} })
-        )
+        self.display = Display.new(data, self)
         observe(:chapter_number) {|n| display.chapter_number = n }
         observe(:title) {|t| display.title = t }
         observe(:markup) {|m| display.markup = m }
@@ -222,6 +220,7 @@ module Editor
         editor.observe(:title) {|t| self.title = t }
         editor.observe(:body) {|b| self.body = b }
         editor.observe(:tags) {|t| self.tags = t }
+        observe(:tags) {|t| editor.tags = t }
 
         display.observe(:edit_button, :event => :click) { edit }
         editor.observe(:close_button, :event => :click) { show }
