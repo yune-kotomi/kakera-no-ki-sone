@@ -330,6 +330,15 @@ module Editor
         offset_top + dom_element(:content).outer_height
       end
 
+      def offset_left
+        dom_element.offset.left
+      end
+
+      def offset_right
+        title = dom_element(:title)
+        offset_left + title.offset.left + title.width.to_i
+      end
+
       def collapse
         dom_element(:expand).show
         dom_element(:collapse).hide

@@ -46,7 +46,7 @@ module Editor
           prev = find(prev_id)
           prev.target = false unless prev.nil?
           find(c).target = true
-          scroll_to(c) unless visible_contents.include?(c)
+          scroll_to(c)
         end
 
         observe(:target) do |v|
@@ -132,12 +132,33 @@ module Editor
         offset_top + dom_element(:title).outer_height
       end
 
+      def offset_left
+        dom_element(:title).offset.left
+      end
+
+      def offset_right
+        offset_left + dom_element(:title).outer_width
+      end
+
       def scroll_to(id)
         target = find(id)
-        offset = target.offset_top +
-          dom_element(:container).scroll_top -
-          dom_element(:container).offset.top
-        dom_element(:container).scroll_top = offset
+        container = dom_element(:container)
+
+        unless visible_contents.include?(id)
+          container.scroll_top = target.offset_top +
+            container.scroll_top - container.offset.top
+        end
+
+        width = target.offset_right - target.offset_left
+        if container.width.to_i > width
+          container.scroll_left = target.offset_left +
+            container.scroll_left - container.offset.left -
+            (container.width - width)/2
+        else
+          # 幅がありすぎるので左端をあわせる
+          container.scroll_left = target.offset_left +
+            container.scroll_left - container.offset.left
+        end
       end
 
       def visible_previous
