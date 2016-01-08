@@ -11,11 +11,20 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150211031441) do
+ActiveRecord::Schema.define(version: 20160108115908) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
   enable_extension "pgroonga"
+
+  create_table "document_histories", force: :cascade do |t|
+    t.integer  "document_id"
+    t.string   "title"
+    t.text     "description"
+    t.jsonb    "body"
+    t.datetime "created_at",  null: false
+    t.datetime "updated_at",  null: false
+  end
 
   create_table "documents", force: :cascade do |t|
     t.string   "title",              default: "新しい文書",     null: false

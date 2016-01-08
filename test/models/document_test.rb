@@ -91,8 +91,21 @@ class DocumentTest < ActiveSupport::TestCase
   test '開閉状態の変更はタイムスタンプに影響しない' do
     body = @document2.body
     body.first['metadatum'] = {'open' => false}
-    @document2.update_attribute(:body, body)
+    assert_no_difference('DocumentHistory.count') do
+      @document2.update_attribute(:body, body)
+    end
     assert_equal @orig_timestamp, @document2.content_updated_at
+  end
+
+  test '変更で一つhistoryを生成' do
+    assert_difference('DocumentHistory.count') do
+      @document2.update_attribute(:title, 'new')
+    end
+
+    history = @document2.document_histories.first
+    assert_equal 'new', history.title
+    assert_equal @document2.description, history.description
+    assert_equal @document2.body, history.body
   end
 
   test '全文検索' do

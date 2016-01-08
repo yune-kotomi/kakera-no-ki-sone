@@ -1,8 +1,13 @@
 class Document < ActiveRecord::Base
   belongs_to :user
+  has_many :document_histories,
+    -> { order 'created_at desc' },
+    :dependent => :destroy
+
   validates :markup, :inclusion => ['plaintext', 'hatena', 'markdown']
   validate :body_validation
   before_save :update_content_timestamp
+  after_save :create_history
   before_create { self.content_updated_at = Time.now }
 
   scope :fts, -> query {
@@ -136,12 +141,37 @@ class Document < ActiveRecord::Base
   end
 
   def update_content_timestamp
-    self.content_updated_at = Time.now if (['title', 'description'] & changed).present?
+    self.content_updated_at = Time.now if content_changed?
+    true
+  end
+
+  def create_history
+    if content_changed?
+      DocumentHistory.transaction do
+        if document_histories.count > 100
+          document_histories.last.destroy
+        end
+
+        document_histories.create(
+          :title => title,
+          :description => description,
+          :body => body
+        )
+      end
+    end
+
+    true
+  end
+
+  def content_changed?
+    return true if (['title', 'description'] & changed).present?
 
     if body_changed?
       node_contents = body_change.map{|b| extract_content(b) }
-      self.content_updated_at = Time.now unless node_contents.first == node_contents.last
+      return true unless node_contents.first == node_contents.last
     end
+
+    false
   end
 
   def extract_content(src)
