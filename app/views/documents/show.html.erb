@@ -27,45 +27,47 @@
 <% else %>
   <% @title = @document.title %>
 
-  <div class="document">
-    <div class="toc">
-      <div class="mdl-card mdl-shadow--2dp">
-        <div class="mdl-card__title">
-          <h2>
-            <%= link_to @document.title, "#content-#{@document.id}",
-              :id => "toc-#{@document.id}" %>
-          </h2>
-          <div class="author">
-            <%= link_to_user @document.user.nickname, @document.user %>
+  <% cache @document do %>
+    <div class="document">
+      <div class="toc">
+        <div class="mdl-card mdl-shadow--2dp">
+          <div class="mdl-card__title">
+            <h2>
+              <%= link_to @document.title, "#content-#{@document.id}",
+                :id => "toc-#{@document.id}" %>
+            </h2>
+            <div class="author">
+              <%= link_to_user @document.user.nickname, @document.user %>
+            </div>
+          </div>
+
+          <div class="mdl-card__supporting-text">
+            <ol>
+              <%= render :partial => 'documents/show/toc',
+                :collection => @document.body,
+                :locals => {:parent_index => ''} %>
+            </ol>
+          </div>
+        </div>
+      </div>
+
+      <div class="contents">
+        <div class="content">
+          <h3>
+            <%= link_to @document.title, "#toc-#{@document.id}", :id => "content-#{@document.id}" %>
+          </h3>
+
+          <div class="body">
+            <%= @document.description %>
           </div>
         </div>
 
-        <div class="mdl-card__supporting-text">
-          <ol>
-            <%= render :partial => 'documents/show/toc',
-              :collection => @document.body,
-              :locals => {:parent_index => ''} %>
-          </ol>
-        </div>
+        <%= render :partial => 'documents/show/content',
+          :collection => @document.body,
+          :locals => {:parent_index => ''} %>
       </div>
     </div>
-
-    <div class="contents">
-      <div class="content">
-        <h3>
-          <%= link_to @document.title, "#toc-#{@document.id}", :id => "content-#{@document.id}" %>
-        </h3>
-
-        <div class="body">
-          <%= @document.description %>
-        </div>
-      </div>
-
-      <%= render :partial => 'documents/show/content',
-        :collection => @document.body,
-        :locals => {:parent_index => ''} %>
-    </div>
-  </div>
+  <% end %>
 
   <% if @document.user == @login_user %>
     <div class="edit-button right-bottom-fab">
