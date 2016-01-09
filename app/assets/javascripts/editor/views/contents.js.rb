@@ -212,9 +212,9 @@ module Editor
         display.dom_element.hide
 
         if focus_to_last
-          dom_element(:body).focus
+          `setTimeout(function(){#{dom_element(:body).focus}}, 10)`
         else
-          dom_element(:title).focus
+          `setTimeout(function(){#{dom_element(:title).focus}}, 10)`
         end
         self.focused = true
         self.target = true

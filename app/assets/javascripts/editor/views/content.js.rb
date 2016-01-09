@@ -165,10 +165,11 @@ module Editor
       end
 
       def edit(focus_to_last = false)
+        # tabで移動してきた際、即時にフォーカスするとtabが効いて次にフォーカスしてしまう
         if focus_to_last
-          dom_element(:tag_str).focus
+          `setTimeout(function(){#{dom_element(:tag_str).focus}}, 10)`
         else
-          dom_element(:title).focus
+          `setTimeout(function(){#{dom_element(:title).focus}}, 10)`
         end
       end
     end
