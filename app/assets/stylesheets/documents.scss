@@ -20,6 +20,22 @@ body.documents {
         }
       }
     }
+
+    .histories {
+      li {
+        display: flex;
+        .from,.to {
+          width: 34px;
+        }
+        label {
+          span.label {
+            opacity: 0;
+            font-size: 1px;
+          }
+        }
+      }
+    }
+
     .toc {
       box-sizing: border-box;
       padding: 16px;

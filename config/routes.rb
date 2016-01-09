@@ -16,6 +16,7 @@ Rails.application.routes.draw do
 
   get 'users/logout'
 
+  get 'documents/:id/histories', :to => 'documents#histories'
   resources :documents
 
   # The priority is based upon order of creation: first created -> highest priority.

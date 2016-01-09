@@ -27,6 +27,11 @@
     <i class="material-icons">insert_drive_file</i>
     表示
   <% end %>
+  <%= link_to({:action => :histories}, :class => 'mdl-navigation__link') do %>
+    <i class="material-icons">history</i>
+    編集履歴
+  <% end %>
+
   <%= link_to '#', :class => 'mdl-navigation__link modal-trigger', :data => {:modal_selector => '#config-dialog'} do %>
     <i class="material-icons">settings</i>
     設定

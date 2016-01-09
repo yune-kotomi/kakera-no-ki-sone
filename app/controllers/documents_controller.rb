@@ -1,5 +1,5 @@
 class DocumentsController < ApplicationController
-  before_action :set_document, only: [:show, :edit, :update, :destroy]
+  before_action :set_document, only: [:show, :histories, :edit, :update, :destroy]
 
   before_filter :login_required, :except => [:show]
   before_filter :owner_required, :except => [:index, :show, :create]
@@ -37,6 +37,10 @@ class DocumentsController < ApplicationController
     if params[:type] == 'structured_text'
       send_data(@document.to_structured_text, :type => 'text/plain', :filename => "#{@document.title}.txt")
     end
+  end
+
+  def histories
+    show
   end
 
   # GET /documents/1/edit

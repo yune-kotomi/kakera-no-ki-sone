@@ -1,0 +1,40 @@
+<% @title = "#{@document.title} の編集履歴" %>
+<div class="document">
+  <% if @document.document_histories.blank? %>
+    履歴がありません
+  <% else %>
+    <%= form_tag({:action => :histories, :id => @document.id}, :method => :get) do %>
+      <ol class="histories">
+        <% @document.document_histories.each do |history| %>
+          <li>
+            <div class="from">
+              <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect">
+                <input type="radio" class="mdl-radio__button" name="diff_from" value="<%= history.id %>">
+                <span class="label">.</span>
+              </label>
+            </div>
+
+            <div class="to">
+              <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect">
+                <input type="radio" class="mdl-radio__button" name="diff_to" value="<%= history.id %>">
+                <span class="label">.</span>
+              </label>
+            </div>
+
+            <div class="timestamp">
+              <%= history.created_at.to_s(:full) %>
+            </div>
+          </li>
+        <% end %>
+      </ol>
+    <% end %>
+  <% end %>
+</div>
+
+<% content_for(:navigation1) do %>
+  <%= link_to edit_document_path(@document), :class => 'mdl-navigation__link' do %>
+    <i class="material-icons">edit</i>
+    編集
+  <% end %>
+  <hr>
+<% end %>
