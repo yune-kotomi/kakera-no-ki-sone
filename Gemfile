@@ -16,6 +16,7 @@ gem 'kaminari'
 
 gem 'text-hatena', :github => 'iwadon/text-hatena'
 gem 'qiita-markdown'
+gem 'diffy'
 
 # Use ActiveModel has_secure_password
 gem 'bcrypt'

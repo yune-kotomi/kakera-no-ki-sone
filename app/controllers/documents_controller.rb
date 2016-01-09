@@ -1,5 +1,5 @@
 class DocumentsController < ApplicationController
-  before_action :set_document, only: [:show, :histories, :edit, :update, :destroy]
+  before_action :set_document, :except => [:index, :create]
 
   before_filter :login_required, :except => [:show]
   before_filter :owner_required, :except => [:index, :show, :create]
@@ -40,7 +40,22 @@ class DocumentsController < ApplicationController
   end
 
   def histories
-    show
+  end
+
+  def diff
+    from = @document.document_histories.find(params[:from])
+    @from = "#{from.title}\n#{from.description}\n" +
+      render_to_string(:partial => 'documents/show/content.text.erb',
+        :collection => from.body,
+        :locals => {:parent_index => ''})
+
+    to = @document.document_histories.find(params[:to])
+    @to = "#{to.title}\n#{to.description}\n" +
+      render_to_string(:partial => 'documents/show/content.text.erb',
+        :collection => to.body,
+        :locals => {:parent_index => ''})
+
+    render :content_type => "text/html"
   end
 
   # GET /documents/1/edit

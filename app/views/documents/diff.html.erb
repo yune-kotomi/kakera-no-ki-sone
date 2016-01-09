@@ -1,0 +1,25 @@
+<% @title = "#{@document.title} 差分" %>
+<div class="document">
+  <%= Diffy::Diff.new(@from, @to).to_s(:html).html_safe %>
+</div>
+
+<% content_for(:head) do %>
+  <style>
+    .diff {
+      margin-top: 1em;
+    }
+    <%= Diffy::CSS %>
+  </style>
+<% end %>
+
+<% content_for(:navigation1) do %>
+  <%= link_to({:action => :histories}, :class => 'mdl-navigation__link') do %>
+    <i class="material-icons">history</i>
+    編集履歴
+  <% end %>
+  <%= link_to edit_document_path(@document), :class => 'mdl-navigation__link' do %>
+    <i class="material-icons">edit</i>
+    編集
+  <% end %>
+  <hr>
+<% end %>

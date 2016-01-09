@@ -57,6 +57,7 @@ GEM
       safe_yaml (~> 1.0.0)
     crass (1.0.2)
     debug_inspector (0.0.2)
+    diffy (3.1.0)
     erubis (2.7.0)
     escape_utils (1.1.0)
     execjs (2.6.0)
@@ -218,6 +219,7 @@ DEPENDENCIES
   autoprefixer-rails
   bcrypt
   byebug
+  diffy
   jquery-rails
   kaminari
   log4r

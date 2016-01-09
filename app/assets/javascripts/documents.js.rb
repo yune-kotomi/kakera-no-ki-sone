@@ -30,8 +30,8 @@ Document.ready? do
   # 履歴のラジオボタン処理
   history_list = Element.find('ol.histories')
   unless history_list.empty?
-    from_buttons = history_list.find('input[name="diff_from"]')
-    to_buttons = history_list.find('input[name="diff_to"]')
+    from_buttons = history_list.find('input[name="from"]')
+    to_buttons = history_list.find('input[name="to"]')
     histories = from_buttons.to_a.map(&:value)
 
     history_list.find('input').on(:click) do |e|
