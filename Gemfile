@@ -46,4 +46,4 @@ end
 
 gem 'log4r'
 gem 'uuidtools'
-gem 'tlsmail'
+gem 'exception_notification'
