@@ -231,6 +231,7 @@ DEPENDENCIES
   qiita-markdown
   rails (~> 4.2.0)
   rr
+  sanitize
   sass-rails (~> 5.0)
   text-hatena!
   tlsmail

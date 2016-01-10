@@ -12,23 +12,25 @@ module DocumentsHelper
   end
 
   def body(node, markup)
-    case markup
+    ret = case markup
     when 'plaintext'
       h(node['body']).gsub("\n", '<br>').html_safe
 
     when 'hatena'
       parser = Text::Hatena.new(:sectionanchor => "■")
       parser.parse(node['body'])
-      parser.html.force_encoding('UTF-8').html_safe
+      parser.html.force_encoding('UTF-8')
 
     when 'markdown'
       processor = Qiita::Markdown::Processor.new
       rendered = processor.call(node['body'])
-      rendered[:output].to_s.html_safe
+      rendered[:output].to_s
     else
       # fallback
       node['body']
     end
+
+    Sanitize.clean(ret, Sanitize::Config::RELAXED).html_safe
   end
 
   def password_prompt?(document, login_user)
