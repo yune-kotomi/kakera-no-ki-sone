@@ -25,7 +25,9 @@ module Editor
       )
 
       #保存ループ起動
-      `setInterval(function(){#{save_loop}}, 5000)`
+      unless Element.find('#document-demo-mode').value == 'true'
+        `setInterval(function(){#{save_loop}}, 5000)`
+      end
 
       @document
     end

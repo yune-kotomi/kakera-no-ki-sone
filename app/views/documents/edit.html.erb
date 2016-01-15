@@ -21,6 +21,7 @@
 <%= hidden_field_tag :public, @document.public.to_json, :id => 'document-public' %>
 <%= hidden_field_tag :archived, @document.archived.to_json, :id => 'document-archived' %>
 <%= hidden_field_tag :markup, @document.markup.to_json, :id => 'document-markup' %>
+<%= hidden_field_tag :demo_mode, params[:action] == 'demo', :id => 'document-demo-mode' %>
 
 <% content_for(:navigation1) do %>
   <%= link_to @document, :class => 'mdl-navigation__link' do %>
@@ -30,7 +31,7 @@
   <%= link_to({:action => :histories}, :class => 'mdl-navigation__link') do %>
     <i class="material-icons">history</i>
     編集履歴
-  <% end %>
+  <% end unless params[:action] == 'demo' %>
 
   <%= link_to '#', :class => 'mdl-navigation__link modal-trigger', :data => {:modal_selector => '#config-dialog'} do %>
     <i class="material-icons">settings</i>

@@ -1,8 +1,8 @@
 class DocumentsController < ApplicationController
-  before_action :set_document, :except => [:index, :create]
+  before_action :set_document, :except => [:index, :create, :demo]
 
-  before_filter :login_required, :except => [:show]
-  before_filter :owner_required, :except => [:index, :show, :create]
+  before_filter :login_required, :except => [:show, :demo]
+  before_filter :owner_required, :except => [:index, :show, :create, :demo]
 
   # GET /documents
   # GET /documents.json
@@ -60,6 +60,11 @@ class DocumentsController < ApplicationController
 
   # GET /documents/1/edit
   def edit
+  end
+
+  def demo
+    @document = Document.find(Sone::Application.config.demo_document_id)
+    render :edit
   end
 
   # POST /documents

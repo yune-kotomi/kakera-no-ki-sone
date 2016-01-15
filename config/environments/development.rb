@@ -43,4 +43,6 @@ Rails.application.configure do
   config.opal.enable_specs        = true
 
   config.opal.spec_location = 'spec-opal'
+
+  config.demo_document_id = 1
 end

@@ -255,6 +255,14 @@ class DocumentsControllerTest < ActionController::TestCase
     assert_equal @public, assigns(:document)
   end
 
+  test "デモモードはデモ用文書を読み込む" do
+    Sone::Application.config.stub(:demo_document_id, @private.id) do
+      get :demo
+      assert_response :success
+      assert_equal @private, assigns(:document)
+    end
+  end
+
   test "ゲストは更新できない" do
     patch :update,
       {:id => @public.id, :document => @public.attributes, :format => :json}
