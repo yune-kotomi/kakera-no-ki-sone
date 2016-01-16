@@ -37,6 +37,11 @@
     <i class="material-icons">settings</i>
     設定
   <% end %>
+
+  <%= link_to '#', :class => 'mdl-navigation__link modal-trigger', :data => {:modal_selector => '#help-dialog'} do %>
+    <i class="material-icons">help</i>
+    ヘルプ
+  <% end %>
   <hr>
   <div id="tag-list"></div>
 <% end %>
@@ -81,6 +86,99 @@
               <button class="mdl-button mdl-js-button mdl-button--icon mdl-button--colored apply">
                 <i class="material-icons">check</i>
               </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="mdl-card__menu">
+          <button class="mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect close">
+            <i class="material-icons">close</i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="help-dialog" class="modal-card">
+    <div class="modal-container">
+      <div class="mdl-card mdl-shadow--2dp" style="width: 90%">
+        <div class="mdl-card__supporting-text">
+          <h4>キーボード・ショートカット</h4>
+          <div class="mdl-grid">
+            <div class="mdl-cell mdl-cell--6-col">
+              <h5>ツリー領域にフォーカスがある場合</h5>
+              <table>
+                <tr>
+                  <th>前の葉に移動</th>
+                  <td>↑</td>
+                </tr>
+                <tr>
+                  <th>次の葉に移動</th>
+                  <td>↓</td>
+                </tr>
+                <tr>
+                  <th>葉を編集</th>
+                  <td>Enter</td>
+                </tr>
+                <tr>
+                  <th>葉を開く</th>
+                  <td>→</td>
+                </tr>
+                <tr>
+                  <th>葉を閉じる</th>
+                  <td>←</td>
+                </tr>
+                <tr>
+                  <th>上の葉と入れ替える</th>
+                  <td>CTRL+↑</td>
+                </tr>
+                <tr>
+                  <th>下の葉と入れ替える</th>
+                  <td>CTRL+↓</td>
+                </tr>
+                <tr>
+                  <th>一段下げる</th>
+                  <td>CTRL+→</td>
+                </tr>
+                <tr>
+                  <th>一段上げる</th>
+                  <td>CTRL+←</td>
+                </tr>
+                <tr>
+                  <th>葉を削除</th>
+                  <td>CTRL+DEL</td>
+                </tr>
+                <tr>
+                  <th>本文領域へ移動</th>
+                  <td>CTRL+0</td>
+                </tr>
+              </table>
+            </div>
+
+            <div class="mdl-cell mdl-cell--6-col">
+              <h5>本文領域にフォーカスがある場合</h5>
+              <table>
+                <tr>
+                  <th>前の葉に移動</th>
+                  <td>↑</td>
+                </tr>
+                <tr>
+                  <th>次の葉に移動</th>
+                  <td>↓</td>
+                </tr>
+                <tr>
+                  <th>編集</th>
+                  <td>Enter</td>
+                </tr>
+                <tr>
+                  <th>編集終了</th>
+                  <td>ESC</td>
+                </tr>
+                <tr>
+                  <th>ツリー領域に移動</th>
+                  <td>CTRL+0</td>
+                </tr>
+              </table>
             </div>
           </div>
         </div>
