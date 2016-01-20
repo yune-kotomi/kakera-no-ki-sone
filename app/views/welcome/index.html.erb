@@ -1,2 +1,78 @@
-<h1>Welcome#index</h1>
-<p>Find me in app/views/welcome/index.html.erb</p>
+<% @title = '創り出すためのアウトライン・プロセッサ 『カケラの樹』' %>
+<div class="key-visual">
+  <picture>
+    <source
+      media="(min-width: 480px) and (max-width: 1200px)"
+      srcset="<%= srcset 'key_visual_winter.medium.png', (1..2) %>">
+    <%= image_tag 'key_visual_winter.small.png',
+      :alt => '誰も知らなかった言葉を、紡ぎ続けるんだ。',
+      :srcset => srcset('key_visual_winter.small.png', (1..3)) %>
+  </picture>
+</div>
+
+<div class="login">
+  <div class="logo">
+    <%= image_tag 'logo.png',
+      :alt => '創り出すためのアウトライン・プロセッサ',
+      :srcset => srcset('logo.png', (1..3)) %>
+  </div>
+
+  <div class="buttons">
+    <%= button_to({:controller => :documents, :action => :demo},
+      :method => :get,
+      :class => 'mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect') do %>
+      編集画面を試す
+    <% end if @login_user.blank? %>
+
+    <%= button_to({:controller => :users, :action => :login},
+      :method => :get,
+      :class => 'mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent') do %>
+      使いはじめる
+    <% end if @login_user.blank? %>
+
+    <%= button_to(documents_path,
+      :method => :get,
+      :class => 'mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent') do %>
+      <i class="material-icons">library_books</i>
+      文書一覧
+    <% end if @login_user.present? %>
+  </div>
+</div>
+
+<div class="introduction">
+  <ol>
+    <li>
+      <h4>アウトラインエディタで、思索の断片をカタチに。</h4>
+      <div>
+        章、段落など、小さなかたまりをいくつもつなぎ合わせ、まとまった文書を書くことができるツールが「アウトライン・プロセッサ」です。
+      </div>
+      <div>
+        かたまり(「葉」と称します)を、並び替えや取捨選択しながら自由に文章の構造を操作できるため、考えをまとめたり、長い文章を筋道立てて書き上げることがやりやすくなります。
+      </div>
+    </li>
+    <li>
+      <h4>インストール不要、いつでもどこでも。</h4>
+      <div>
+        ブラウザ上で全ての機能が使用できます。
+      </div>
+      <div>
+        文書はサーバ上に保存されるため、パソコン、スマートフォン、タブレットなど様々な端末から常に同じ文書を編集できます。
+      </div>
+    </li>
+    <li>
+      <h4>ブログ感覚で、書けます。</h4>
+      <div>
+        文字装飾をせずに書く以外に、簡単な記述で豊かな表現ができるはてな記法や、プログラマに人気のMarkdown記法も使えます。
+      </div>
+    </li>
+    <li>
+      <h4>パスワードも不要、気軽に使えます。</h4>
+      <div>
+        面倒なユーザID、パスワードの管理は必要ありません。
+      </div>
+      <div>
+        いつものGoogleアカウントやMixi ID、はてなIDなどを使って、簡単に使い始められます。
+      </div>
+    </li>
+  </ol>
+</div>

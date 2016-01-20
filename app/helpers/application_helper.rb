@@ -12,4 +12,16 @@ module ApplicationHelper
   def link_to_profile_edit(label = 'プロフィール編集', html_options = {})
     link_to label, Sone::Application.config.authentication.edit, html_options
   end
+
+  def srcset(asset, range)
+    ext = File.extname(asset)
+    base = File.basename(asset, ext)
+
+    range.
+      reject{|i| i == 1 }.
+      map{|i| ["#{base}@#{i}x#{ext}", "#{i}x"] }.to_h.
+      tap{|t| t[asset] = '1x' }.
+      map{|k, v| "#{asset_path(k)} #{v}" }.
+      join(', ')
+  end
 end
