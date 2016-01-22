@@ -33,6 +33,8 @@ module Editor
     end
 
     def attach(elements)
+      @elements = elements
+
       # view生成
       @tree = Editor::View::Tree.new(@document, self)
       elements[:tree].append(@tree.dom_element)
@@ -141,8 +143,6 @@ module Editor
 
       # ホットキーを有効に
       @hotkeys = Hotkeys.new(self, @document, @tree, @contents)
-
-      @elements = elements
     end
 
     def attach_mv(node, leaf, content)
@@ -300,13 +300,13 @@ module Editor
     end
 
     def switch_to_tree
-      @tree.dom_element.show
-      @contents.dom_element.hide
+      @elements[:tree].show
+      @elements[:contents].hide
     end
 
     def switch_to_contents
-      @contents.dom_element.show
-      @tree.dom_element.hide
+      @elements[:contents].show
+      @elements[:tree].hide
     end
 
     class Hotkeys
@@ -377,6 +377,9 @@ end
 
 Document.ready? do
   unless Element.find('#document-editor').empty?
+    Element.find('footer').remove
+    Element.find('.right-bottom-fab').css('bottom', '32px')
+
     editor = Editor::Editor.new
     editor.load_from_dom
     editor.attach(
@@ -395,7 +398,7 @@ Document.ready? do
       editor.tree.dom_element(:container).css('height', "#{height}px")
       editor.contents.dom_element(:container).css('height', "#{height}px")
       editor.adjust_tree_size if Editor.desktop?
-    end
+    end.call
 
     Element.find('#add-button').on(:click) do
       editor.add_child
