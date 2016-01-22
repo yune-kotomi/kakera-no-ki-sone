@@ -42,3 +42,11 @@
   right: 32px;
   z-index: 1000;
 }
+
+footer {
+  .mdl-logo {
+    img {
+      margin-top: 5px;
+    }
+  }
+}
