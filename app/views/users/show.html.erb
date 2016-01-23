@@ -1,4 +1,9 @@
 <% @title = "文書一覧: #{@user.nickname}" %>
+<% content_for(:head) do %>
+  <link rel="alternate" type="application/rss+xml"
+      title="文書一覧フィード"
+      href="<%= url_for(:format => :rss, :only_path => false) %>" />
+<% end %>
 
 <div class="profile">
   <div class="mdl-card mdl-shadow--2dp">
