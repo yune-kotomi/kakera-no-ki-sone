@@ -1,5 +1,6 @@
 <%
-rss = RSS::Maker.make('1.0'){|maker|
+require 'rss/maker'
+rss = RSS::Maker.make('1.0') do |maker|
 	maker.channel.about = url_for(
 		:action => 'show',
 		:domain_name => @user.domain_name,
@@ -22,16 +23,29 @@ rss = RSS::Maker.make('1.0'){|maker|
 
 	maker.items.do_sort = true
 
-	@documents.each{|document|
-		item = maker.items.new_item
-		item.link = url_for(
-			:controller => 'documents',
-			:action=>'show',
-			:id=>document.id,
-			:only_path => false)
-		item.title = document.title
-		item.date = Time.at(document.updated_at.to_i)
-		item.description = h(document.description)
-	}
-}
+	if @documents.blank?
+		maker.items.new_item.tap do |item|
+			item.link = url_for(
+				:controller => 'welcome',
+				:action=>'index',
+				:only_path => false)
+			item.title = '(公開された文書がありません)'
+			item.date = Time.at(0)
+			item.description = ''
+		end
+	else
+		@documents.each do |document|
+			maker.items.new_item.tap do |item|
+				item.link = url_for(
+					:controller => 'documents',
+					:action=>'show',
+					:id=>document.id,
+					:only_path => false)
+				item.title = document.title
+				item.date = Time.at(document.updated_at.to_i)
+				item.description = h(document.description)
+			end
+		end
+	end
+end
 %><%= rss.to_s.html_safe %>
