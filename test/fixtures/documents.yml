@@ -31,7 +31,7 @@ document3:
   bcrypt_password:
   markup: plaintext
   user: user1
-  body: '[{"id": "id","title":"","body":"日本語の本文"}]'
+  body: '[{"id": "id","title":"","body":"日本語の本文","children":[],"metadatum":{}}]'
   content_updated_at: 2015-11-24 12:43:52
 document4:
   title: document 4 日本語のタイトル
@@ -41,7 +41,7 @@ document4:
   bcrypt_password:
   markup: plaintext
   user: user1
-  body: '[{"id": "id","title":"","body":"英語の本文"}]'
+  body: '[{"id": "id","title":"","body":"英語の本文","children":[],"metadatum":{}}]'
   content_updated_at: 2015-11-24 12:43:52
 document5:
   title: document 5

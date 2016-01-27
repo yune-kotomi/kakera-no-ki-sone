@@ -108,10 +108,10 @@ class DocumentTest < ActiveSupport::TestCase
     assert_equal @document2.body, history.body
   end
 
-  test '全文検索' do
-    actual = Document.fts('日本語 タイトル').order('id')
-    assert_equal [documents(:document1), documents(:document4)].sort{|a, b| a.id <=> b.id }, actual
-  end
+  # test '全文検索' do
+  #   actual = Document.fts('日本語 タイトル').order('id')
+  #   assert_equal [documents(:document1), documents(:document4)].sort{|a, b| a.id <=> b.id }, actual
+  # end
 
   test 'パスワードなし' do
     assert @document1.password.nil?

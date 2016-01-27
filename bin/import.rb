@@ -73,7 +73,7 @@ Dir.chdir(ARGV[0]) do
         binding.pry
       end
 
-      document.update_columns(
+      data = {
         :title => src['name'].to_s,
         :description => src['excerpt'],
         :body => leaves(body).tap{|l| l.push(license_leaf(src['license'], User.find(src['user_id']).nickname)) if src['license'].present? },
@@ -83,7 +83,10 @@ Dir.chdir(ARGV[0]) do
         :content_updated_at => Time.parse(src['updated_at']),
         :updated_at => Time.parse(src['updated_at']),
         :created_at => Time.parse(src['created_at'])
-      )
+      }
+      tmp = Document.new(data)
+      tmp.send(:update_fulltext)
+      document.update_columns(data.update(:fulltext => tmp.fulltext))
     else
       document.destroy
     end

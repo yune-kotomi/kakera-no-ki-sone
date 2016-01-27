@@ -7,21 +7,11 @@ class Document < ActiveRecord::Base
   validates :markup, :inclusion => ['plaintext', 'hatena', 'markdown']
   validate :body_validation
   before_save :update_content_timestamp
+  before_save :update_fulltext
   after_save :create_history
   before_create { self.content_updated_at = Time.now }
 
-  scope :fts, -> query {
-    sql = ActiveRecord::Base.send(
-      :sanitize_sql_array,
-      [
-        '/*+ IndexScan(documents) */ select id from documents where body @@ ?',
-        "query(\"paths\", \"title OR body\") && query(\"string\", \"#{query}\")"
-      ]
-    )
-    ids = ActiveRecord::Base.connection.select_all(sql).map{|r| r['id'] }
-
-    where('title @@ ? OR description @@ ? OR id in (?)', query, query, ids)
-  }
+  scope :fts, -> query { where('fulltext @@ ?', query) }
 
   def body_validation
     if body.present? && (body.map{|node| valid_node?(node) }.uniq - [true]).present?
@@ -145,6 +135,14 @@ class Document < ActiveRecord::Base
     true
   end
 
+  def update_fulltext
+    self.fulltext = [title, description, (body||[]).map{|l| leaf_to_fulltext(l) }].join("\n")
+  end
+
+  def leaf_to_fulltext(leaf)
+    [leaf['title'], leaf['body'], leaf['children'].map{|c| leaf_to_fulltext(c) }].join("\n")
+  end
+
   def create_history
     if content_changed?
       DocumentHistory.transaction do
@@ -185,9 +183,6 @@ class Document < ActiveRecord::Base
 
       leaf
     end
-  end
-
-  def self.body_fts(query)
   end
 
   def structured_text_leaf(level, leaf)

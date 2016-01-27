@@ -30,6 +30,7 @@ ActiveRecord::Schema.define(version: 20160108115908) do
     t.string   "title",              default: "新しい文書",     null: false
     t.text     "description"
     t.jsonb    "body"
+    t.text     "fulltext"
     t.boolean  "public",             default: false,       null: false
     t.boolean  "archived",           default: false,       null: false
     t.string   "bcrypt_password"
@@ -40,9 +41,7 @@ ActiveRecord::Schema.define(version: 20160108115908) do
     t.datetime "updated_at",                               null: false
   end
 
-  add_index "documents", ["body"], name: "index_documents_on_body", using: :pgroonga
-  add_index "documents", ["description"], name: "index_documents_on_description", using: :pgroonga
-  add_index "documents", ["title"], name: "index_documents_on_title", using: :pgroonga
+  add_index "documents", ["fulltext"], name: "index_documents_on_fulltext", using: :pgroonga
 
   create_table "users", force: :cascade do |t|
     t.string   "domain_name"

@@ -8,13 +8,6 @@ before_script:
   - cp config/initializers/kitaguchi.rb.example config/initializers/kitaguchi.rb
 before_install:
   - curl --silent --location https://github.com/pgroonga/pgroonga/raw/master/data/travis/setup.sh | sh
-  - curl -O "http://iij.dl.osdn.jp/pghintplan/62456/pg_hint_plan94-1.1.3.tar.gz"
-  - tar xvzf pg_hint_plan94-1.1.3.tar.gz
-  - cd pg_hint_plan94-1.1.3
-  - make
-  - sudo make install
-  - psql -c 'create extension pg_hint_plan;' -U postgres
-  - cd ../
 cache: bundler
 addons:
   postgresql: "9.4"
