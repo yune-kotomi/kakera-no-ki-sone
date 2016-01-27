@@ -74,7 +74,7 @@
               <span class="mdl-checkbox__label">一般公開する</span>
             </label>
 
-            <div id="password-box">
+            <div id="password-box" <%= 'style="display: none"'.html_safe if @document.public %>>
               <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
                 <%= password_field_tag 'password', '', :class => 'mdl-textfield__input' %>
                 <label class="mdl-textfield__label">パスワード...</label>
