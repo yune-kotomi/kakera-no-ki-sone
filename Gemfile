@@ -14,7 +14,7 @@ gem 'opal-rails'
 
 gem 'kaminari'
 
-gem 'text-hatena', :github => 'iwadon/text-hatena'
+gem 'text-hatena', :github => 'yune-kotomi/text-hatena'
 gem 'qiita-markdown'
 gem 'diffy'
 gem 'sanitize'
