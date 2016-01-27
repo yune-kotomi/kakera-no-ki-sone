@@ -58,7 +58,7 @@
           </h3>
 
           <div class="body">
-            <%= body(@document.description, @document.markup) %>
+            <%= body({'body' => @document.description}, @document.markup) %>
           </div>
         </div>
 
