@@ -17,9 +17,14 @@ module DocumentsHelper
       h(node['body']).gsub("\n", '<br>').html_safe
 
     when 'hatena'
-      parser = Text::Hatena.new(:sectionanchor => "■")
-      parser.parse(node['body'])
-      parser.html.force_encoding('UTF-8')
+      begin
+        parser = Text::Hatena.new(:sectionanchor => "■")
+        parser.parse(node['body'])
+        parser.html.force_encoding('UTF-8')
+      rescue => e
+        ExceptionNotifier.notify_exception(e)
+        node['body']
+      end
 
     when 'markdown'
       processor = Qiita::Markdown::Processor.new
