@@ -13,8 +13,10 @@ ActionMailer::Base.smtp_settings = {
 }
 
 Rails.application.config.middleware.use(
-    ExceptionNotifier,
-    :email_prefix => "[アプリの名前]",
-    :sender_address => %{"No Reply" <sender address>},
-    :exception_recipients => ['destination mail address']
+    ExceptionNotification::Rack,
+    :email => {
+      :email_prefix => "[カケラの樹]",
+      :sender_address => %{"No Reply" <sender address>},
+      :exception_recipients => ['destination mail address']
+    }
 )
