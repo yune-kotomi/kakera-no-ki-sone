@@ -8,7 +8,7 @@ body.welcome {
       width: 100%;
 
       @media (min-width: 1200px) {
-        background-image: url(/assets/key_visual_winter.large.png);
+        background-image: image-url("key_visual_winter.large.png");
         background-position: center;
         background-size: auto;
         background-repeat: no-repeat;
@@ -21,7 +21,7 @@ body.welcome {
        (min-width: 1200px) and (min-device-pixel-ratio: 2),
        (min-width: 1200px) and (min-resolution: 192dpi),
        (min-width: 1200px) and (min-resolution: 2dppx) {
-        background-image: url(/assets/key_visual_winter.large@2x.png);
+        background-image: image-url("key_visual_winter.large@2x.png");
         background-size: auto 850px;
       }
 
