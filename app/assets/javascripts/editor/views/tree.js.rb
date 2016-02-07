@@ -31,16 +31,6 @@ module Editor
         super(model.attributes, parent)
         @model = model
 
-        # 開閉状態を反映
-        children.each do |leaf|
-          leaf.scan do |l|
-            unless l.open
-              l.dom_element(:collapse).hide if l.dom_element(:collapse)
-              l.dom_element(:expand).show if l.dom_element(:expand)
-            end
-          end
-        end
-
         observe(:current_target) do |c, prev_id|
           # current_targetが変わった場合に前のやつを取り下げる
           prev = find(prev_id)

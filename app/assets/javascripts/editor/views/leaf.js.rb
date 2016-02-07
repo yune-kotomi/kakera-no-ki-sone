@@ -80,7 +80,7 @@ module Editor
             # 閉じた際に子がターゲットだった場合、自分をターゲットにする
             self.target = true if scan{|c| c.target }.include?(true)
           end
-        end
+        end.call(open)
         update_expand_collapse_buttons
 
         draggable_init
@@ -260,6 +260,7 @@ module Editor
 
         parent.children.delete(self)
         self.dom_element.remove
+        parent.update_expand_collapse_buttons
 
         self
       end
