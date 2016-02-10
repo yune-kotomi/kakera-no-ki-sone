@@ -81,6 +81,9 @@ module Editor
             self.target = true if scan{|c| c.target }.include?(true)
           end
         end.call(open)
+
+        # タイトルを書き換えると長さが変わる
+        observe(:title) { parental_tree.trigger(nil, :width_changed) }
         update_expand_collapse_buttons
 
         draggable_init
@@ -208,6 +211,7 @@ module Editor
         children = self.children.dup
         children.insert(position, new_child)
         self.children = children
+        parental_tree.trigger(nil, :width_changed)
 
         new_child
       end
@@ -227,6 +231,7 @@ module Editor
 
         parental_tree.rearrange_notify(dropped.id, dropped.parent.id, self.parent.id, position + 1)
         dropped.parent.update_expand_collapse_buttons
+        parental_tree.trigger(nil, :width_changed)
         dropped.parent = @parent
       end
 
@@ -244,6 +249,7 @@ module Editor
         parental_tree.rearrange_notify(dropped.id, dropped.parent.id, self.id, 0)
         dropped.parent.update_expand_collapse_buttons
         update_expand_collapse_buttons
+        parental_tree.trigger(nil, :width_changed)
         dropped.parent = self
       end
 
@@ -261,6 +267,7 @@ module Editor
         parent.children.delete(self)
         self.dom_element.remove
         parent.update_expand_collapse_buttons
+        parental_tree.trigger(nil, :width_changed)
 
         self
       end
@@ -336,8 +343,9 @@ module Editor
       end
 
       def offset_right
+        chapter_number = dom_element(:chapter_number)
         title = dom_element(:title)
-        offset_left + title.offset.left + title.width.to_i
+        chapter_number.offset.left + chapter_number.width.to_i + title.width.to_i
       end
 
       def collapse

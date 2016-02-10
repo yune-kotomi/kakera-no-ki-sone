@@ -25,7 +25,7 @@ module Editor
 
       attr_reader :model
 
-      custom_events :rearrange
+      custom_events :rearrange, :width_changed
 
       def initialize(model, parent = nil)
         super(model.attributes, parent)
@@ -67,6 +67,9 @@ module Editor
           end
         end.call
 
+        observe(nil, :event => :width_changed) { set_vertical_position }
+        `setTimeout(function(){#{set_vertical_position}}, 10)`
+
         # ドロップ処理
         %x{
           #{dom_element(:title)}.droppable({
@@ -102,6 +105,7 @@ module Editor
         children = self.children.dup
         children.insert(position, new_child)
         self.children = children
+        trigger(nil, :width_changed)
 
         new_child
       end
@@ -198,8 +202,20 @@ module Editor
         dropped.dom_element.css('top', '')
 
         rearrange_notify(dropped.id, dropped.parent.id, self.id, 0)
+        trigger(nil, :width_changed)
         dropped.parent.update_expand_collapse_buttons
         dropped.parent = self
+      end
+
+      def set_vertical_position
+        # 中身の幅
+        container = dom_element(:container)
+        width = children.flat_map{|c| c.scan(&:offset_right) }.max + container.scroll_left - container.css('margin-left').to_s.sub('px', '').to_i + 10
+        if dom_element.parent.width > width
+          container.css('margin-left', "#{dom_element.parent.width - width}px")
+        else
+          container.css('margin-left', '')
+        end
       end
     end
   end
