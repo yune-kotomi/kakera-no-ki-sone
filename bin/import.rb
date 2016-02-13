@@ -16,10 +16,10 @@ end
 def license_leaf(license, nickname)
   t = <<EOS
 <div id="license">
-  <a rel="license" href="http://creativecommons.org/licenses/#{license}/3.0/deed.ja">
-    <img alt="Creative Commons License" style="border-width:0" src="http://i.creativecommons.org/l/#{license}/3.0/88x31.png" />
+  <a rel="license" href="https://creativecommons.org/licenses/#{license}/3.0/deed.ja">
+    <img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/#{license}/3.0/88x31.png" />
   </a>
-  この<span xmlns:dc="http://purl.org/dc/elements/1.1/" href="http://purl.org/dc/dcmitype/Text" rel="dc:type">文書</span>は、#{nickname}より<a rel="license" href="http://creativecommons.org/licenses/#{license}/3.0/deed.ja">クリエイティブ・コモンズ・ライセンス</a>の下でライセンスされています。
+  この<span xmlns:dc="http://purl.org/dc/elements/1.1/" href="http://purl.org/dc/dcmitype/Text" rel="dc:type">文書</span>は、#{nickname}より<a rel="license" href="https://creativecommons.org/licenses/#{license}/3.0/deed.ja">クリエイティブ・コモンズ・ライセンス</a>の下でライセンスされています。
 </div>
 EOS
 
