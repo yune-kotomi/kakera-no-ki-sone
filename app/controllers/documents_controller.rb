@@ -105,8 +105,17 @@ class DocumentsController < ApplicationController
   # PATCH/PUT /documents/1.json
   def update
     respond_to do |format|
-      if @document.update(document_params.update(:body => JSON.parse(document_params[:body] || '[]')))
-        format.html { redirect_to @document, notice: 'Document was successfully updated.' }
+      if @document.update(document_params)
+        format.html do
+          case document_params[:archived].to_s
+          when 'true'
+            redirect_to documents_path
+          when 'false'
+            redirect_to documents_path(:archived => true)
+          else
+            redirect_to @document, notice: 'Document was successfully updated.'
+          end
+        end
         format.json { render :json => true }
       else
         format.html { render :edit }

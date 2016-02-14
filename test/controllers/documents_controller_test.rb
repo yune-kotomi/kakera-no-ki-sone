@@ -315,4 +315,24 @@ class DocumentsControllerTest < ActionController::TestCase
     assert_redirected_to :controller => :documents,
       :action => :index
   end
+
+  test 'アーカイブへ移動' do
+    patch :update,
+      {:id => @public.id, :document => {:archived => true}},
+      {:user_id => @owner.id}
+
+    assert_redirected_to :controller => :documents,
+      :action => :index
+    assert assigns(:document).archived
+    assert_not assigns(:document).body.blank?
+  end
+
+  test 'アーカイブ解除' do
+    patch :update,
+      {:id => @public.id, :document => {:archived => false}},
+      {:user_id => @owner.id}
+
+    assert_redirected_to :controller => :documents,
+      :action => :index, :archived => true
+  end
 end
