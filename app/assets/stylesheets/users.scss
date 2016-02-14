@@ -12,11 +12,17 @@ body.users {
           text-decoration: none;
           width: 100%;
         }
+
+        white-space: normal;
       }
 
       .updated {
         text-align: center;
         width: 20em;
+
+        @media (max-width: $grid-tablet-breakpoint) {
+          display: none;
+        }
       }
 
       td.buttons {
