@@ -67,8 +67,10 @@ module Editor
           end
         end.call
 
-        observe(nil, :event => :width_changed) { set_vertical_position }
-        `setTimeout(function(){#{set_vertical_position}}, 10)`
+        unless ::Editor.phone?
+          observe(nil, :event => :width_changed) { set_vertical_position }
+          `setTimeout(function(){#{set_vertical_position}}, 10)`
+        end
 
         # ドロップ処理
         %x{

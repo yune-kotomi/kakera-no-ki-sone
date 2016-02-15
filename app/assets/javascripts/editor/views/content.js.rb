@@ -292,7 +292,7 @@ module Editor
         parent.focused = true
         self.target = true
 
-        if ::Editor.phone?
+        if ::Editor.phone? && `history.state` != 'edit'
           %x{ history.pushState('edit', null, '#edit') }
         end
       end
