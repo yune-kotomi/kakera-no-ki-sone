@@ -291,6 +291,7 @@ module Editor
         editor.edit(focus_to_last)
         parent.focused = true
         self.target = true
+        parent.scroll_to(self.id)
 
         if ::Editor.phone? && `history.state` != 'edit'
           %x{ history.pushState('edit', null, '#edit') }
