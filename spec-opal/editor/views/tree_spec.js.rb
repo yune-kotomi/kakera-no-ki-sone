@@ -14,7 +14,13 @@ require 'editor/fixtures'
 describe 'Editor::View::Tree' do
   document_source
 
-  let(:tree) { Editor::View::Tree.new(Editor::Model::Root.new(source)) }
+  let(:tree) do
+    r = Element.new('div')
+    r.css('width', '600px')
+    t = Editor::View::Tree.new(Editor::Model::Root.new(source))
+    r.append(t.dom_element)
+    t
+  end
   let(:leaf1) { tree.find('c1') }
   let(:leaf1_1) { tree.find('1-1') }
   let(:leaf1_1_1) { tree.find('1-1-1') }
