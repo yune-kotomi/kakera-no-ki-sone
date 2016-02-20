@@ -20,7 +20,12 @@
       <% @documents.each do |document| %>
         <tr>
           <td class="mdl-data-table__cell--non-numeric title">
-            <%= link_to document.title, edit_document_path(document) %>
+            <%= link_to edit_document_path(document) do %>
+              <%= document.title %>
+              <% if document.public %>
+                <i class="material-icons">public</i>
+              <% end %>
+            <% end %>
           </td>
 
           <td class="updated">
