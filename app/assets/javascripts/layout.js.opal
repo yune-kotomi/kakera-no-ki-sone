@@ -15,27 +15,27 @@ def init_footer_and_fab
   if height > 667
     moving_footer.remove
     fixed_footer.ex_resize do
-      bottom = fixed_footer.outer_height + 32
+      bottom = fixed_footer.outer_height + 16
       fab.css('bottom', "#{bottom}px")
     end.call
   else
     if page_content.outer_height > height - Element.find('header').outer_height
       fixed_footer.remove
       moving_footer.show
-      fab.css('bottom', "32px")
+      fab.css('bottom', "16px")
       main.on(:scroll) do |e|
         bottom = main.scroll_top + main.outer_height - page_content.outer_height
         if bottom >= 0
           # FAB移動
-          fab.css('bottom', "#{bottom + 32}px")
+          fab.css('bottom', "#{bottom + 16}px")
         else
-          fab.css('bottom', '32px')
+          fab.css('bottom', '16px')
         end
       end
     else
       moving_footer.remove
       fixed_footer.ex_resize do
-        bottom = fixed_footer.outer_height + 32
+        bottom = fixed_footer.outer_height + 16
         fab.css('bottom', "#{bottom}px")
       end.call
     end

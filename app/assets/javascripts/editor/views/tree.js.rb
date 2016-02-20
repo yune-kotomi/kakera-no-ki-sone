@@ -10,6 +10,7 @@ module Editor
           <div class="tree">
             <div class="root" data-id="{{attr:id}}">{{:title}}</div>
             <ol class="children"></ol>
+            <div class="right-bottom-fab-spacer"></div>
           </div>
         </div>
       EOS

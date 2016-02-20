@@ -36,6 +36,7 @@ module Editor
               <div>
                 <div class="children"></div>
               </div>
+              <div class="right-bottom-fab-spacer"></div>
             </div>
           </div>
         </div>

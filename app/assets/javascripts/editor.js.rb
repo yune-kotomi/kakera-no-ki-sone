@@ -378,7 +378,7 @@ end
 Document.ready? do
   unless Element.find('#document-editor').empty?
     Element.find('footer').remove
-    Element.find('.right-bottom-fab').css('bottom', '32px')
+    Element.find('.right-bottom-fab').css('bottom', '16px')
 
     editor = Editor::Editor.new
     editor.load_from_dom
