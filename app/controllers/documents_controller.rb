@@ -47,12 +47,14 @@ class DocumentsController < ApplicationController
     @from = "#{from.title}\n#{from.description}\n" +
       render_to_string(:partial => 'documents/show/content.text.erb',
         :collection => from.body,
+        :formats => [:text],
         :locals => {:parent_index => ''})
 
     to = @document.document_histories.find(params[:to])
     @to = "#{to.title}\n#{to.description}\n" +
       render_to_string(:partial => 'documents/show/content.text.erb',
         :collection => to.body,
+        :formats => [:text],
         :locals => {:parent_index => ''})
 
     render :content_type => "text/html"
