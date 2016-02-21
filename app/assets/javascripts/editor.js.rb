@@ -307,6 +307,9 @@ module Editor
     def switch_to_contents
       @elements[:contents].show
       @elements[:tree].hide
+
+      # 表示しないとscroll_toが使えないのでここでやる
+      contents.scroll_to(contents.current_target)
     end
 
     class Hotkeys
