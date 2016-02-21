@@ -92,7 +92,6 @@ GEM
       actionpack (>= 3.0.0)
       activesupport (>= 3.0.0)
     libv8 (3.16.14.13)
-    log4r (1.1.10)
     loofah (2.0.3)
       nokogiri (>= 1.5.9)
     mail (2.6.3)
@@ -248,7 +247,6 @@ DEPENDENCIES
   exception_notification
   jquery-rails
   kaminari
-  log4r
   material_design_lite-sass
   opal-rails
   pg

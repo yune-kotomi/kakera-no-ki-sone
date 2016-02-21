@@ -46,6 +46,5 @@ group :development, :test do
   gem 'pry-doc'
 end
 
-gem 'log4r'
 gem 'uuidtools'
 gem 'exception_notification'
