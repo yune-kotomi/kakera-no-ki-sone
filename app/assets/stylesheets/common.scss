@@ -54,3 +54,41 @@ footer {
     }
   }
 }
+
+/*
+Android Chrome用hack
+https://github.com/google/material-design-lite/issues/1072#issuecomment-123445135
+*/
+.mdl-layout {
+    overflow: visible;
+}
+.mdl-layout__drawer {
+    position: fixed;
+}
+.mdl-layout__content {
+    display: block;
+    overflow: visible;
+    margin-top: 64px;
+}
+.is-small-screen .mdl-layout__content {
+    margin-top: 56px;
+}
+.mdl-layout__header {
+    position: fixed;
+}
+.mdl-layout__obfuscator {
+    position: fixed;
+}
+
+/*
+Android Chrome用hack
+https://github.com/google/material-design-lite/issues/1072#issuecomment-187259322
+*/
+html, body {
+  overflow-y: auto;
+  min-height: 100%;
+}
+
+mdl-layout {
+  min-height: 100%;
+}
