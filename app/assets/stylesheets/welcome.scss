@@ -3,11 +3,13 @@ body.welcome {
   Android Chrome用hack
   common.scssも参照すること
   */
-  .mdl-layout__content {
-      margin-top: 0;
-  }
-  .is-small-screen .mdl-layout__content {
-      margin-top: 0;
+  @media (max-width: $grid-tablet-breakpoint) {
+    .mdl-layout__content {
+        margin-top: 0;
+    }
+    .is-small-screen .mdl-layout__content {
+        margin-top: 0;
+    }
   }
 
   .page-content {
