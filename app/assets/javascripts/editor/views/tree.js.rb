@@ -23,6 +23,7 @@ module Editor
       attribute :id
       attribute :target
       attribute :focused, :default => false
+      attribute :visible, :default => true
 
       attr_reader :model
 
@@ -37,7 +38,7 @@ module Editor
           prev = find(prev_id)
           prev.target = false unless prev.nil?
           find(c).target = true
-          scroll_to(c)
+          scroll_to(c) unless ::Editor.phone?
         end
 
         observe(:target) do |v|
@@ -72,6 +73,33 @@ module Editor
           observe(nil, :event => :width_changed) { set_vertical_position }
           `setTimeout(function(){#{set_vertical_position}}, 10)`
         end
+
+        @scroll_top = 0
+        @scroll_left = 0
+        %x{
+          $(window).scroll(
+            function(){
+              #{@scroll_top = `$(window).scrollTop()` if visible};
+              #{@scroll_left = `$(window).scrollLeft()` if visible};
+            }
+          );
+        }
+        observe(:visible) do |v|
+          if v
+            dom_element.show
+
+            top = @scroll_top
+            left = @scroll_left
+            %x{
+              setTimeout(function(){
+                $(window).scrollTop(#{top});
+                $(window).scrollLeft(#{left});
+              }, 10)
+            }
+          else
+            dom_element.hide
+          end
+        end.call(visible)
 
         # ドロップ処理
         %x{

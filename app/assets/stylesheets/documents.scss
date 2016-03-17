@@ -133,9 +133,11 @@ body.documents {
     &>div{
       padding: 4px;
 
-      .scroll-container {
-        overflow: auto;
-        outline: none;
+      @media (min-width: $grid-tablet-breakpoint) {
+        .scroll-container {
+          overflow: auto;
+          outline: none;
+        }
       }
 
       .content {
@@ -193,10 +195,13 @@ body.documents {
 
   .tree-view {
     margin-bottom: 4px;
-    .scroll-container {
-      overflow: auto;
-      outline: none;
+    @media (min-width: $grid-tablet-breakpoint) {
+      .scroll-container {
+        overflow: auto;
+        outline: none;
+      }
     }
+
     div.tree {
       padding: 4px;
 

@@ -300,16 +300,13 @@ module Editor
     end
 
     def switch_to_tree
-      @elements[:tree].show
-      @elements[:contents].hide
+      @contents.visible = false
+      @tree.visible = true
     end
 
     def switch_to_contents
-      @elements[:contents].show
-      @elements[:tree].hide
-
-      # 表示しないとscroll_toが使えないのでここでやる
-      contents.scroll_to(contents.current_target)
+      @tree.visible = false
+      @contents.visible = true
     end
 
     class Hotkeys
@@ -397,10 +394,12 @@ Document.ready? do
     )
     main = Element.find('main')
     main.ex_resize do
-      height = main.height - 8*2 - 4*2
-      editor.tree.dom_element(:container).css('height', "#{height}px")
-      editor.contents.dom_element(:container).css('height', "#{height}px")
-      editor.adjust_tree_size if Editor.desktop?
+      if Editor.desktop?
+        height = main.height - 8*2 - 4*2
+        editor.tree.dom_element(:container).css('height', "#{height}px")
+        editor.contents.dom_element(:container).css('height', "#{height}px")
+        editor.adjust_tree_size
+      end
     end.call
 
     Element.find('#add-button').on(:click) do

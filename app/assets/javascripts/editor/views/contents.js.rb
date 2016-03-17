@@ -54,6 +54,7 @@ module Editor
       attribute :markup
       attribute :focused, :default => false
       attribute :target, :default => true
+      attribute :visible, :default => true
       attribute :current_target
 
       def initialize(data = {}, parent = nil)
@@ -110,7 +111,16 @@ module Editor
         end.call(target)
 
         # スクロール
-        observe(:current_target) {|t| scroll_to(t) unless visible_contents.include?(t) }
+        observe(:current_target) {|t| scroll_to(t) unless visible_contents.include?(t) } unless ::Editor.phone?
+
+        observe(:visible) do |v|
+          if v
+            dom_element.show
+            scroll_to(current_target)
+          else
+            dom_element.hide
+          end
+        end.call(visible)
 
         @hotkeys = Mousetrap::Pool.instance.get("content-#{id}")
         down = Mousetrap::Handler.new('down') do |handler|
@@ -202,10 +212,16 @@ module Editor
 
       def scroll_to(id)
         target = find(id)
-        offset = target.offset_top +
-          dom_element(:container).scroll_top -
-          dom_element(:container).offset.top
-        dom_element(:container).scroll_top = offset
+        if ::Editor.phone?
+          # MDLヘッダ+アドレスバーの分下げる
+          offset = target.offset_top - Element.find('header').outer_height*2
+          `$(window).scrollTop(#{offset})`
+        else
+          offset = target.offset_top +
+            dom_element(:container).scroll_top -
+            dom_element(:container).offset.top
+          dom_element(:container).scroll_top = offset
+        end
       end
 
       def edit(focus_to_last = false)
