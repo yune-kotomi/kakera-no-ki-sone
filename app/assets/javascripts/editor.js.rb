@@ -300,11 +300,13 @@ module Editor
     end
 
     def switch_to_tree
+      Element.find('header').show
       @contents.visible = false
       @tree.visible = true
     end
 
     def switch_to_contents
+      Element.find('header').hide
       @tree.visible = false
       @contents.visible = true
     end
