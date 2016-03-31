@@ -396,7 +396,7 @@ Document.ready? do
     )
     main = Element.find('main')
     main.ex_resize do
-      if Editor.desktop?
+      unless Editor.phone?
         height = main.height - 8*2 - 4*2
         editor.tree.dom_element(:container).css('height', "#{height}px")
         editor.contents.dom_element(:container).css('height', "#{height}px")
