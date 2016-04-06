@@ -26,7 +26,7 @@ def init_footer_and_fab
       moving_footer.show
       fab.css('bottom', "16px")
       Window.on(:scroll) do |e|
-        bottom = `$(window).scrollTop()` + height - moving_footer.offset.top
+        bottom = `$(window).scrollTop() + $(window).innerHeight()` - moving_footer.offset.top
         if bottom >= 0
           # FAB移動
           fab.css('bottom', "#{bottom + 16}px")
