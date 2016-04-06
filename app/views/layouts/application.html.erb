@@ -82,10 +82,10 @@
 
       <main class="mdl-layout__content">
         <div class="page-content"><%= yield %></div>
-        <%= render :partial => 'layouts/footer' %>
+        <%= render :partial => 'layouts/footer', :locals => {:size => 'mini'} %>
       </main>
 
-      <%= render :partial => 'layouts/footer' %>
+      <%= render :partial => 'layouts/footer', :locals => {:size => 'mega'} %>
 
       <%= yield :bottom %>
     </div>
