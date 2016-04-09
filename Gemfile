@@ -28,6 +28,7 @@ gem 'bcrypt'
 
 # Use Capistrano for deployment
 # gem 'capistrano-rails', group: :development
+gem 'jwt'
 
 group :test do
   gem 'webmock'
