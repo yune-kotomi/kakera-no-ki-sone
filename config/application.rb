@@ -27,4 +27,4 @@ module Sone
   end
 end
 
-require 'hotarugaike_client'
+require_relative '../lib/hotarugaike_client'
