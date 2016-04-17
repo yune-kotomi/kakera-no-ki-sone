@@ -58,6 +58,14 @@ body.documents {
             text-decoration: none;
           }
         }
+
+        .author {
+          img.avater {
+            margin-right: 4px;
+            max-height: 32px;
+            max-width: 32px;
+          }
+        }
       }
 
       .mdl-card__supporting-text {

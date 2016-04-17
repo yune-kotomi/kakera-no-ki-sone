@@ -108,6 +108,7 @@ class UsersControllerTest < ActionController::TestCase
       'profile_id' => @user.kitaguchi_profile_id,
       'nickname' => 'new nickname',
       'profile_text' => 'new profile text',
+      'profile_image' => 'http://www.hatena.ne.jp/users/ha/hatena/profile.gif',
       'exp' => 5.minutes.from_now.to_i
     }
 
@@ -116,6 +117,7 @@ class UsersControllerTest < ActionController::TestCase
     assert_response :success
     assert_not_nil assigns(:user)
     assert_equal 'new nickname', assigns(:user).nickname
+    assert_equal payload['profile_image'], assigns(:user).profile_image
   end
 
   test "updateは署名が不正なら蹴る(Kitugachi認証サービスからのPOST)" do

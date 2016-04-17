@@ -8,7 +8,10 @@
 <div class="profile">
   <div class="mdl-card mdl-shadow--2dp">
     <div class="mdl-card__title">
-      <h2 class="mdl-card__title-text"><%= @user.nickname %></h2>
+      <h2>
+        <%= image_tag @user.profile_image, :class => 'avater' if @user.profile_image.present? %>
+        <%= @user.nickname %>
+      </h2>
     </div>
 
     <div class="mdl-card__supporting-text">
