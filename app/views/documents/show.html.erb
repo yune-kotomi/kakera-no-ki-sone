@@ -37,6 +37,7 @@
                 :id => "toc-#{@document.id}" %>
             </h2>
             <div class="author">
+              <%= image_tag @document.user.profile_image, :class => 'avater' if @document.user.profile_image.present? %>
               <%= link_to_user @document.user.nickname, @document.user %>
             </div>
           </div>
