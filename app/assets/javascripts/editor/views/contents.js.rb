@@ -173,7 +173,7 @@ module Editor
           tags = []
         end
 
-        new_content = Content.new(model.attributes.update(:tags => tags), self)
+        new_content = Content.new(model.attributes.update(:tags => tags, :markup => markup), self)
 
         if target_id.nil?
           self.children = [new_content]
