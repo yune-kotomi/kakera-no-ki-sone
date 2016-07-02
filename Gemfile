@@ -36,7 +36,7 @@ group :test do
 end
 
 group :development do
-  gem 'web-console', '~> 3.0'
+  gem 'web-console', '~> 3.3'
   gem 'rails_real_favicon'
 end
 
