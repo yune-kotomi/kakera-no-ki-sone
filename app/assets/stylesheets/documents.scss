@@ -9,6 +9,7 @@ body.documents {
 
       .content {
         padding: 0 0 16px 0;
+        word-wrap: break-word;
 
         .body {
           font-family: "游明朝", YuMincho, "ヒラギノ明朝 ProN W3", "Hiragino Mincho ProN", serif;
@@ -151,6 +152,7 @@ body.documents {
       .content {
         margin: 4px;
         padding: 4px;
+        word-wrap: break-word;
 
         .display {
           .footer {
