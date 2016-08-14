@@ -225,9 +225,7 @@ module Editor
 
         dom_element.after(dropped.dom_element)
 
-        dropped.dom_element.css('position', '')
-        dropped.dom_element.css('left', '')
-        dropped.dom_element.css('top', '')
+        ['position', 'left', 'top', 'width', 'height'].each{|s| dropped.dom_element.css(s, '') }
 
         parental_tree.rearrange_notify(dropped.id, dropped.parent.id, self.parent.id, position + 1)
         dropped.parent.update_expand_collapse_buttons
@@ -242,9 +240,7 @@ module Editor
 
         dom_element(:children).prepend(dropped.dom_element)
 
-        dropped.dom_element.css('position', '')
-        dropped.dom_element.css('left', '')
-        dropped.dom_element.css('top', '')
+        ['position', 'left', 'top', 'width', 'height'].each{|s| dropped.dom_element.css(s, '') }
 
         parental_tree.rearrange_notify(dropped.id, dropped.parent.id, self.id, 0)
         dropped.parent.update_expand_collapse_buttons
