@@ -130,8 +130,15 @@ class DocumentsController < ApplicationController
   # DELETE /documents/1.json
   def destroy
     @document.destroy
+    back_to =
+      if @document.archived
+        documents_path(:archived => true)
+      else
+        documents_path
+      end
+
     respond_to do |format|
-      format.html { redirect_to documents_path }
+      format.html { redirect_to back_to }
       format.json { head :no_content }
     end
   end

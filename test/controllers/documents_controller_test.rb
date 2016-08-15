@@ -316,6 +316,19 @@ class DocumentsControllerTest < ActionController::TestCase
       :action => :index
   end
 
+  test '保存記録から削除した場合保存記録に戻す' do
+    @public.update_attribute(:archived, true)
+
+    assert_difference('Document.count', -1) do
+      delete :destroy,
+        {:id => @public.id},
+        {:user_id => @owner.id}
+    end
+
+    assert_redirected_to :controller => :documents,
+      :action => :index, :archived => true
+  end
+
   test 'アーカイブへ移動' do
     patch :update,
       {:id => @public.id, :document => {:archived => true}},
