@@ -1,6 +1,6 @@
 GIT
   remote: git://github.com/yune-kotomi/text-hatena.git
-  revision: d5c9f79f783e92f820aca84003b07007e8095b1d
+  revision: 5d59573f6d8f454b5397ce0e81023f6cc230fda7
   specs:
     text-hatena (0.12.20080627.0)
 
