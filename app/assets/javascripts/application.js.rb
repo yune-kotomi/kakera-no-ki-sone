@@ -1,6 +1,7 @@
 require 'jquery'
 require 'jquery_ujs'
 require 'material'
+require 'dialog-polyfill'
 require 'jquery-ui'
 require 'jquery.ui.touch-punch'
 require 'uuid.core'
