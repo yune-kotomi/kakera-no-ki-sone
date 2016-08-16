@@ -114,7 +114,7 @@ module Editor
         # キーボード・ショートカット
         @hotkeys = Mousetrap::Pool.instance.get("tree-#{id}")
         down = Mousetrap::Handler.new('down') do |h|
-          h.condition { focused && target }
+          h.condition { target }
           h.procedure do
             target = visible_next
             target.target = true unless target.nil?
