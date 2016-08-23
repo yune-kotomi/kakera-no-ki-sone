@@ -112,7 +112,7 @@ GEM
       pkg-config (~> 1.1.7)
     nokogumbo (1.4.9)
       nokogiri
-    opal (0.10.1)
+    opal (0.9.4)
       hike (~> 1.2)
       sourcemap (~> 0.1.0)
       sprockets (~> 3.1)
@@ -249,6 +249,7 @@ DEPENDENCIES
   jwt
   kaminari
   material_design_lite-sass
+  opal (~> 0.9.4)
   opal-rails
   pg
   pry
