@@ -11,6 +11,7 @@ gem 'autoprefixer-rails'
 gem 'uglifier', '>= 1.3.0'
 
 gem 'jquery-rails'
+gem 'opal', '~> 0.9.4'
 gem 'opal-rails'
 
 gem 'kaminari'
