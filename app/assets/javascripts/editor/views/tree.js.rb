@@ -114,7 +114,7 @@ module Editor
         # キーボード・ショートカット
         @hotkeys = Mousetrap::Pool.instance.get("tree-#{id}")
         down = Mousetrap::Handler.new('down') do |h|
-          h.condition { focused && target }
+          h.condition { target }
           h.procedure do
             target = visible_next
             target.target = true unless target.nil?
@@ -228,9 +228,7 @@ module Editor
 
         dom_element(:children).prepend(dropped.dom_element)
 
-        dropped.dom_element.css('position', '')
-        dropped.dom_element.css('left', '')
-        dropped.dom_element.css('top', '')
+        ['position', 'left', 'top', 'width', 'height'].each{|s| dropped.dom_element.css(s, '') }
 
         rearrange_notify(dropped.id, dropped.parent.id, self.id, 0)
         trigger(nil, :width_changed)

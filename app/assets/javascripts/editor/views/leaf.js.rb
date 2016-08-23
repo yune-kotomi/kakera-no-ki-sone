@@ -129,7 +129,7 @@ module Editor
 
         # 兄と入れ替える
         ctrl_up = Mousetrap::Handler.new('mod+up') do |h|
-          h.condition { parental_tree.focused && self.target }
+          h.condition { self.target }
           h.procedure do
             elder = brother.first
             brother_dropped(elder.id) if elder
@@ -139,7 +139,7 @@ module Editor
 
         # 弟と入れ替える
         ctrl_down = Mousetrap::Handler.new('mod+down') do |h|
-          h.condition { parental_tree.focused && self.target }
+          h.condition { self.target }
           h.procedure do
             younger = brother.last
             younger.brother_dropped(id) if younger
@@ -148,7 +148,7 @@ module Editor
         @hotkeys.bind_handler(ctrl_down)
 
         ctrl_left = Mousetrap::Handler.new('mod+left') do |h|
-          h.condition { parental_tree.focused && self.target }
+          h.condition { self.target }
           h.procedure do
             if brother.last.nil? && self.parent != parental_tree
               self.parent.brother_dropped(id)
@@ -158,7 +158,7 @@ module Editor
         @hotkeys.bind_handler(ctrl_left)
 
         ctrl_right = Mousetrap::Handler.new('mod+right') do |h|
-          h.condition { parental_tree.focused && self.target }
+          h.condition { self.target }
           h.procedure do
             elder = brother.first
             if elder
@@ -173,7 +173,7 @@ module Editor
         @hotkeys.bind_handler(ctrl_right)
 
         ctrl_del = Mousetrap::Handler.new('mod+del') do |h|
-          h.condition { parental_tree.focused && self.target }
+          h.condition { self.target }
           h.procedure do
             Dialog::Confirm.new('葉の削除', "#{self.chapter_number} #{self.title} を削除してよろしいですか?", 'はい', 'いいえ') do |d|
               d.ok do
@@ -225,9 +225,7 @@ module Editor
 
         dom_element.after(dropped.dom_element)
 
-        dropped.dom_element.css('position', '')
-        dropped.dom_element.css('left', '')
-        dropped.dom_element.css('top', '')
+        ['position', 'left', 'top', 'width', 'height'].each{|s| dropped.dom_element.css(s, '') }
 
         parental_tree.rearrange_notify(dropped.id, dropped.parent.id, self.parent.id, position + 1)
         dropped.parent.update_expand_collapse_buttons
@@ -242,9 +240,7 @@ module Editor
 
         dom_element(:children).prepend(dropped.dom_element)
 
-        dropped.dom_element.css('position', '')
-        dropped.dom_element.css('left', '')
-        dropped.dom_element.css('top', '')
+        ['position', 'left', 'top', 'width', 'height'].each{|s| dropped.dom_element.css(s, '') }
 
         parental_tree.rearrange_notify(dropped.id, dropped.parent.id, self.id, 0)
         dropped.parent.update_expand_collapse_buttons

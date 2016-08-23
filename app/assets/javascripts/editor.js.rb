@@ -107,6 +107,7 @@ module Editor
             end
             d.cancel do
               elements[:public_checkbox].prop('checked', false)
+              elements[:public_checkbox].parent.remove_class('is-checked')
             end
           end.open
         else
