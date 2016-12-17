@@ -220,7 +220,7 @@ module Juso
             children.each{|c| elem.append(c.dom_element) }
 
             # 使われなくなったDOM要素を始末
-            (self.send(name) - children).each{|c| c.dom_element.remove }
+            (self.send(name) - children).each{|c| c.dom_element.remove } unless self.send(name).nil?
 
             update_attribute(name, children)
           else

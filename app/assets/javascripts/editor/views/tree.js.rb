@@ -239,7 +239,12 @@ module Editor
       def set_vertical_position
         # 中身の幅
         container = dom_element(:container)
-        width = children.flat_map{|c| c.scan(&:offset_right) }.max + container.scroll_left - container.css('margin-left').to_s.sub('px', '').to_i + 10
+
+        width = children.flat_map{|c| c.scan(&:offset_right) }.max +
+          container.scroll_left -
+          container.css('margin-left').to_s.sub('px', '').to_i +
+          20
+
         if dom_element.parent.width > width
           container.css('margin-left', "#{dom_element.parent.width - width}px")
         else
