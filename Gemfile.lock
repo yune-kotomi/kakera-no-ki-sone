@@ -1,5 +1,5 @@
 GIT
-  remote: git://github.com/yune-kotomi/text-hatena.git
+  remote: https://github.com/yune-kotomi/text-hatena.git
   revision: 5d59573f6d8f454b5397ce0e81023f6cc230fda7
   specs:
     text-hatena (0.12.20080627.0)
@@ -42,13 +42,14 @@ GEM
       minitest (~> 5.1)
       thread_safe (~> 0.3, >= 0.3.4)
       tzinfo (~> 1.1)
-    addressable (2.4.0)
+    addressable (2.5.0)
+      public_suffix (~> 2.0, >= 2.0.2)
     arel (6.0.3)
-    autoprefixer-rails (6.4.0.3)
+    autoprefixer-rails (6.5.4)
       execjs
     bcrypt (3.1.11)
     builder (3.2.2)
-    byebug (9.0.5)
+    byebug (9.0.6)
     charlock_holmes (0.7.3)
     coderay (1.1.1)
     concurrent-ruby (1.0.2)
@@ -57,7 +58,7 @@ GEM
     crass (1.0.2)
     debug_inspector (0.0.2)
     diffy (3.1.0)
-    domain_name (0.5.20160615)
+    domain_name (0.5.20161129)
       unf (>= 0.0.5, < 1.0.0)
     erubis (2.7.0)
     escape_utils (1.1.1)
@@ -66,7 +67,7 @@ GEM
       activesupport (>= 4.0, < 6)
     execjs (2.7.0)
     gemoji (2.1.0)
-    github-linguist (4.8.8)
+    github-linguist (4.8.18)
       charlock_holmes (~> 0.7.3)
       escape_utils (~> 1.1.0)
       mime-types (>= 1.19)
@@ -74,12 +75,12 @@ GEM
     globalid (0.3.7)
       activesupport (>= 4.1.0)
     greenmat (3.2.2.1)
-    hashdiff (0.3.0)
+    hashdiff (0.3.1)
     hike (1.2.3)
     html-pipeline (2.4.2)
       activesupport (>= 2)
       nokogiri (>= 1.4)
-    http-cookie (1.0.2)
+    http-cookie (1.0.3)
       domain_name (~> 0.5)
     i18n (0.7.0)
     jquery-rails (4.2.1)
@@ -87,16 +88,16 @@ GEM
       railties (>= 4.2.0)
       thor (>= 0.14, < 2.0)
     json (1.8.3)
-    jwt (1.5.4)
+    jwt (1.5.6)
     kaminari (0.17.0)
       actionpack (>= 3.0.0)
       activesupport (>= 3.0.0)
-    libv8 (3.16.14.15)
+    libv8 (3.16.14.17)
     loofah (2.0.3)
       nokogiri (>= 1.5.9)
     mail (2.6.4)
       mime-types (>= 1.16, < 4)
-    material_design_lite-sass (1.2.0)
+    material_design_lite-sass (1.2.1)
       autoprefixer-rails (~> 6.0)
       sass (~> 3.3)
     mem (0.1.5)
@@ -105,12 +106,11 @@ GEM
       mime-types-data (~> 3.2015)
     mime-types-data (3.2016.0521)
     mini_portile2 (2.1.0)
-    minitest (5.9.0)
+    minitest (5.10.1)
     netrc (0.11.0)
-    nokogiri (1.6.8)
+    nokogiri (1.6.8.1)
       mini_portile2 (~> 2.1.0)
-      pkg-config (~> 1.1.7)
-    nokogumbo (1.4.9)
+    nokogumbo (1.4.10)
       nokogiri
     opal (0.9.4)
       hike (~> 1.2)
@@ -128,9 +128,8 @@ GEM
       opal-jquery (~> 0.4.0)
       rails (>= 4.0, < 6.0)
       sprockets-rails (< 3.0)
-    pg (0.18.4)
-    pkg-config (1.1.7)
-    posix-spawn (0.3.11)
+    pg (0.19.0)
+    posix-spawn (0.3.12)
     pry (0.10.4)
       coderay (~> 1.1.0)
       method_source (~> 0.8.1)
@@ -138,10 +137,12 @@ GEM
     pry-doc (0.9.0)
       pry (~> 0.9)
       yard (~> 0.8)
-    pygments.rb (0.6.3)
+    public_suffix (2.0.4)
+    pygments.rb (1.0.0)
       posix-spawn (~> 0.3.6)
-      yajl-ruby (~> 1.2.0)
-    qiita-markdown (0.14.0)
+      yajl-ruby (~> 1.2)
+    qiita-markdown (0.16.2)
+      addressable
       gemoji
       github-linguist (~> 4.0)
       greenmat (>= 3.2.0.2, < 4)
@@ -149,7 +150,7 @@ GEM
       mem
       pygments.rb
       sanitize
-    rack (1.6.4)
+    rack (1.6.5)
     rack-test (0.6.3)
       rack (>= 1.0)
     rails (4.2.7.1)
@@ -171,8 +172,8 @@ GEM
       rails-deprecated_sanitizer (>= 1.0.1)
     rails-html-sanitizer (1.0.3)
       loofah (~> 2.0)
-    rails_real_favicon (0.0.5)
-      json (~> 1.7)
+    rails_real_favicon (0.0.6)
+      json (>= 1.7, < 3)
       rails (>= 3.1)
       rest-client (~> 2.0)
       rubyzip (~> 1)
@@ -181,7 +182,7 @@ GEM
       activesupport (= 4.2.7.1)
       rake (>= 0.8.7)
       thor (>= 0.18.1, < 2.0)
-    rake (11.2.2)
+    rake (12.0.0)
     ref (2.0.0)
     rest-client (2.0.0)
       http-cookie (>= 1.0.2, < 2.0)
@@ -189,9 +190,9 @@ GEM
       netrc (~> 0.8)
     rr (1.2.0)
     rubyzip (1.2.0)
-    rugged (0.25.0b6)
+    rugged (0.25.0b10)
     safe_yaml (1.0.4)
-    sanitize (4.2.0)
+    sanitize (4.4.0)
       crass (~> 1.0.2)
       nokogiri (>= 1.4.4)
       nokogumbo (~> 1.4.1)
@@ -214,12 +215,12 @@ GEM
     therubyracer (0.12.2)
       libv8 (~> 3.16.14.0)
       ref
-    thor (0.19.1)
+    thor (0.19.4)
     thread_safe (0.3.5)
     tilt (2.0.5)
     tzinfo (1.2.2)
       thread_safe (~> 0.1)
-    uglifier (3.0.2)
+    uglifier (3.0.4)
       execjs (>= 0.3.0, < 3)
     unf (0.1.4)
       unf_ext
@@ -229,11 +230,11 @@ GEM
       activemodel (>= 4.2)
       debug_inspector
       railties (>= 4.2)
-    webmock (2.1.0)
+    webmock (2.3.1)
       addressable (>= 2.3.6)
       crack (>= 0.3.2)
       hashdiff
-    yajl-ruby (1.2.1)
+    yajl-ruby (1.3.0)
     yard (0.9.5)
 
 PLATFORMS
@@ -268,4 +269,4 @@ DEPENDENCIES
   webmock
 
 BUNDLED WITH
-   1.12.5
+   1.13.6
