@@ -151,7 +151,7 @@ module Editor
       node.observe(:chapter_number) {|v| leaf.chapter_number = v }
       node.observe(:chapter_number) {|v| content.chapter_number = v }
 
-      leaf.observe(:open) {|v| node.metadatum = node.metadatum.dup.update(:open => v) }
+      leaf.observe(:expanded) {|v| node.metadatum = node.metadatum.dup.update(:expanded => v) }
       leaf.observe(nil, :event => :destroy) do
         node.destroy
         node.scan{|n| @contents.find(n.id).destroy }

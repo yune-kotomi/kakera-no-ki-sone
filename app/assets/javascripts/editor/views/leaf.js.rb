@@ -6,10 +6,10 @@ module Editor
         <div class="body">
           <div class="handle" data-id="{{attr:id}}"><i class="material-icons">drag_handle</i></div>
 
-          <button class="mdl-button mdl-js-button mdl-button--icon expand" {{if open}}style="display:none"{{/if}}>
+          <button class="mdl-button mdl-js-button mdl-button--icon expand" {{if expanded}}style="display:none"{{/if}}>
             <i class="material-icons more">expand_more</i>
           </button>
-          <button class="mdl-button mdl-js-button mdl-button--icon collapse" {{if open}}{{else}}style="display:none"{{/if}}>
+          <button class="mdl-button mdl-js-button mdl-button--icon collapse" {{if expanded}}{{else}}style="display:none"{{/if}}>
             <i class="material-icons less">expand_less</i>
           </button>
 
@@ -20,13 +20,13 @@ module Editor
         </div>
 
         <div class="brother-droppable"></div>
-        <ol class="children" {{if open}}{{else}}style="display:none"{{/if}}></ol>
+        <ol class="children" {{if expanded}}{{else}}style="display:none"{{/if}}></ol>
       </li>
       EOS
 
       attribute :id
       attribute :target, :default => false
-      attribute :open, :default => true
+      attribute :expanded, :default => true
       element :chapter_number, :selector => 'span.chapter_number'
       element :title, :selector => 'span.title'
       element :content, :selector => 'div.content'
@@ -39,14 +39,14 @@ module Editor
       custom_events :destroy
 
       def initialize(data = {}, parent = nil)
-        if data[:metadatum] && data[:metadatum].has_key?(:open)
-          open = data[:metadatum][:open]
-        elsif data.has_key?(:open)
-          open = data[:open]
+        if data[:metadatum] && data[:metadatum].has_key?(:expanded)
+          expanded = data[:metadatum][:expanded]
+        elsif data.has_key?(:expanded)
+          expanded = data[:expanded]
         else
-          open = true
+          expanded = true
         end
-        data = data.update(:open => open)
+        data = data.update(:expanded => expanded)
 
         super(data, parent)
         # タイトルのクリックでTreeの編集対象にする
@@ -63,16 +63,16 @@ module Editor
           if v
             dom_element(:content).add_class('selected')
             parental_tree.current_target = self.id
-            parents.each{|p| p.open = true unless p.is_a?(Tree) }
+            parents.each{|p| p.expanded = true unless p.is_a?(Tree) }
           else
             dom_element(:content).remove_class('selected')
           end
         end
 
         # 開閉処理
-        observe(:expand, :event => :click) { self.open = true }
-        observe(:collapse, :event => :click) { self.open = false }
-        observe(:open) do |o|
+        observe(:expand, :event => :click) { self.expanded = true }
+        observe(:collapse, :event => :click) { self.expanded = false }
+        observe(:expanded) do |o|
           if o
             expand
           else
@@ -80,7 +80,7 @@ module Editor
             # 閉じた際に子がターゲットだった場合、自分をターゲットにする
             self.target = true if scan{|c| c.target }.include?(true)
           end
-        end.call(open)
+        end.call(expanded)
 
         # タイトルを書き換えると長さが変わる
         observe(:title) { parental_tree.trigger(nil, :width_changed) }
@@ -112,10 +112,10 @@ module Editor
         left = Mousetrap::Handler.new('left') do |h|
           h.condition { parental_tree.focused && self.target }
           h.procedure do
-            if self.children.empty? || self.open == false
+            if self.children.empty? || self.expanded == false
               self.parent.target = true
             else
-              self.open = false
+              self.expanded = false
             end
           end
         end
@@ -123,7 +123,7 @@ module Editor
 
         right = Mousetrap::Handler.new('right') do |h|
           h.condition { parental_tree.focused && self.target }
-          h.procedure { self.open = true }
+          h.procedure { self.expanded = true }
         end
         @hotkeys.bind_handler(right)
 
@@ -180,7 +180,7 @@ module Editor
                 destroy
                 trigger(nil, :destroy, self.id)
               end
-            end.open
+            end.expanded
           end
         end
         @hotkeys.bind_handler(ctrl_del)
@@ -297,7 +297,7 @@ module Editor
       end
 
       def last_child(visible = false)
-        if children.empty? || (self.open == false && visible)
+        if children.empty? || (self.expanded == false && visible)
           self
         else
           children.last.last_child(visible)
@@ -305,7 +305,7 @@ module Editor
       end
 
       def visible_next(force_close = false)
-        if self.open && force_close == false && !children.empty?
+        if self.expanded && force_close == false && !children.empty?
           children.first
         else
           if brother.last
@@ -361,7 +361,7 @@ module Editor
           dom_element(:expand).hide
           dom_element(:collapse).hide
         else
-          if open
+          if expanded
             dom_element(:collapse).show
           else
             dom_element(:expand).show
