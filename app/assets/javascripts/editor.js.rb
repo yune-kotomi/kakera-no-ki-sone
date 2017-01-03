@@ -282,6 +282,8 @@ module Editor
 
     # ラージスクリーン用
     def adjust_tree_size
+      return if ::Editor.phone?
+
       tree = @elements[:tree]
       contents = @elements[:contents]
 

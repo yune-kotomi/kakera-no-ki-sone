@@ -80,6 +80,9 @@ module Editor
             # 閉じた際に子がターゲットだった場合、自分をターゲットにする
             self.target = true if scan{|c| c.target }.include?(true)
           end
+
+          # 幅変化に合わせてツリーの幅を変更
+          parental_tree.trigger(nil, :width_changed)
         end.call(expanded)
 
         # タイトルを書き換えると長さが変わる
