@@ -204,7 +204,6 @@ module Editor
         observe(:chapter_number) {|n| display.chapter_number = n }
         observe(:title) {|t| display.title = t }
         observe(:markup) {|m| display.markup = m }
-        observe(:body) {|b| display.body = b }
         observe(:tags) {|t| display.tags = (t||[]).map{|s| {:str => s} } }
         display.observe(:delete_button, :event => :click) do
           Dialog::Confirm.new('葉の削除', "#{chapter_number} #{title} を削除してよろしいですか?", 'はい', 'いいえ') do |d|
@@ -304,6 +303,7 @@ module Editor
 
       def show
         dom_element.find('.editor-container').hide
+        display.body = self.body
         dom_element(:display).show
       end
 
