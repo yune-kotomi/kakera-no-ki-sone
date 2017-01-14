@@ -11,12 +11,11 @@ gem 'autoprefixer-rails'
 gem 'uglifier', '>= 1.3.0'
 
 gem 'jquery-rails'
-gem 'opal', '~> 0.9.4'
 gem 'opal-rails'
 
 gem 'kaminari'
 
-gem 'text-hatena', :github => 'yune-kotomi/text-hatena'
+gem 'text-hatena', :git => 'https://github.com/yune-kotomi/text-hatena.git'
 gem 'qiita-markdown'
 gem 'diffy'
 gem 'sanitize'
