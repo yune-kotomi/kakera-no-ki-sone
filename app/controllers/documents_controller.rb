@@ -1,8 +1,8 @@
 class DocumentsController < ApplicationController
   before_action :set_document, :except => [:index, :create, :demo]
 
-  before_filter :login_required, :except => [:show, :demo]
-  before_filter :owner_required, :except => [:index, :show, :create, :demo]
+  before_action :login_required, :except => [:show, :demo]
+  before_action :owner_required, :except => [:index, :show, :create, :demo]
 
   # GET /documents
   # GET /documents.json
