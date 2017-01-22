@@ -16,7 +16,7 @@ class DocumentsControllerTest < ActionController::TestCase
   end
 
   test "indexはユーザの文書一覧" do
-    get :index, {}, {:user_id => @user.id}
+    get :index, :session => {:user_id => @user.id}
 
     assert_response :success
     assert_equal @user.documents.where(:archived => false).count, assigns(:documents).size
@@ -33,7 +33,9 @@ class DocumentsControllerTest < ActionController::TestCase
   # end
 
   test 'index アーカイブ表示' do
-    get :index, {:archived => true}, {:user_id => @user.id}
+    get :index,
+      :params => {:archived => true},
+      :session => {:user_id => @user.id}
 
     assert_equal @user.documents.where(:public => true, :archived => true).count, assigns(:documents).size
 
@@ -44,7 +46,7 @@ class DocumentsControllerTest < ActionController::TestCase
   test "ゲストは文書を生成できない" do
     assert_no_difference('Document.count') do
       post :create,
-        {:document => @public.attributes}
+        :params => {:document => @public.attributes}
     end
 
     assert_response :forbidden
@@ -53,8 +55,7 @@ class DocumentsControllerTest < ActionController::TestCase
   test "ユーザは文書を作成できる" do
     assert_difference('Document.count') do
       post :create,
-        {},
-        {:user_id => @user.id}
+        :session => {:user_id => @user.id}
     end
 
     assert_redirected_to edit_document_path(assigns(:document))
@@ -65,8 +66,8 @@ class DocumentsControllerTest < ActionController::TestCase
   test "template=IDを指定すると文書をコピーする" do
     assert_difference('Document.count') do
       post :create,
-        {:template => @public.id},
-        {:user_id => @owner.id}
+        :params => {:template => @public.id},
+        :session => {:user_id => @owner.id}
     end
 
     assert_redirected_to edit_document_path(assigns(:document))
@@ -76,8 +77,8 @@ class DocumentsControllerTest < ActionController::TestCase
   test '階層付きテキストファイルを送信するとインポートされる' do
     assert_difference('Document.count') do
       post :create,
-        {:import => fixture_file_upload("structured_text_1root.txt", 'text/plain')},
-        {:user_id => @user.id}
+        :params => {:import => fixture_file_upload("structured_text_1root.txt", 'text/plain')},
+        :session => {:user_id => @user.id}
     end
 
     assert_redirected_to edit_document_path(assigns(:document))
@@ -89,8 +90,8 @@ class DocumentsControllerTest < ActionController::TestCase
   test 'トップノードのない階層付きテキストファイルを送信するとタイトルはファイル名' do
     assert_difference('Document.count') do
       post :create,
-        {:import => fixture_file_upload("structured_text_noroot.txt", 'text/plain')},
-        {:user_id => @user.id}
+        :params => {:import => fixture_file_upload("structured_text_noroot.txt", 'text/plain')},
+        :session => {:user_id => @user.id}
     end
 
     assert_equal 'structured_text_noroot.txt', assigns(:document).title
@@ -99,8 +100,8 @@ class DocumentsControllerTest < ActionController::TestCase
   test '別のユーザの文書はコピーできない' do
     assert_no_difference('Document.count') do
       post :create,
-        {:template => @public.id},
-        {:user_id => @user.id}
+        :params => {:template => @public.id},
+        :session => {:user_id => @user.id}
     end
 
     assert_redirected_to documents_path
@@ -108,7 +109,7 @@ class DocumentsControllerTest < ActionController::TestCase
 
   test "ゲストは公開文書を閲覧できる" do
     get :show,
-      {:id => @public.id}
+      :params => {:id => @public.id}
 
     assert_response :success
     assert_equal @public, assigns(:document)
@@ -116,8 +117,8 @@ class DocumentsControllerTest < ActionController::TestCase
 
   test "ユーザは公開文書を閲覧できる" do
     get :show,
-      {:id => @public.id},
-      {:user_id => @user.id}
+      :params => {:id => @public.id},
+      :session => {:user_id => @user.id}
 
     assert_response :success
     assert_equal @public, assigns(:document)
@@ -125,8 +126,8 @@ class DocumentsControllerTest < ActionController::TestCase
 
   test "オーナーは公開文書を閲覧できる" do
     get :show,
-      {:id => @public.id},
-      {:user_id => @owner.id}
+      :params => {:id => @public.id},
+      :session => {:user_id => @owner.id}
 
     assert_response :success
     assert_equal @public, assigns(:document)
@@ -134,8 +135,8 @@ class DocumentsControllerTest < ActionController::TestCase
 
   test 'typeにstructured_textを指定すると階層付きテキストでダウンロードされる' do
     get :show,
-      {:id => @public.id, :format => :text, :type => 'structured_text'},
-      {:user_id => @owner.id}
+      :params => {:id => @public.id, :format => :text, :type => 'structured_text'},
+      :session => {:user_id => @owner.id}
 
     assert_response :success
     assert_equal @public, assigns(:document)
@@ -146,23 +147,23 @@ class DocumentsControllerTest < ActionController::TestCase
 
   test "ゲストは非公開文書を閲覧できない" do
     get :show,
-      {:id => @private.id}
+      :params => {:id => @private.id}
 
     assert_response :forbidden
   end
 
   test "ユーザは非公開文書を閲覧できない" do
     get :show,
-      {:id => @private.id},
-      {:user_id => @user.id}
+      :params => {:id => @private.id},
+      :session => {:user_id => @user.id}
 
     assert_response :forbidden
   end
 
   test "オーナーは非公開文書を閲覧できる" do
     get :show,
-      {:id => @private.id},
-      {:user_id => @owner.id}
+      :params => {:id => @private.id},
+      :session => {:user_id => @owner.id}
 
     assert_response :success
     assert_equal @private, assigns(:document)
@@ -170,7 +171,7 @@ class DocumentsControllerTest < ActionController::TestCase
 
   test "ゲストがパスワード付き非公開文書を開くとプロンプトが出る" do
     get :show,
-      {:id => @locked.id }
+      :params => {:id => @locked.id }
 
     assert_response :success
     assert_equal @locked, assigns(:document)
@@ -179,8 +180,8 @@ class DocumentsControllerTest < ActionController::TestCase
 
   test "ユーザがパスワード付き非公開文書を開くとプロンプトが出る" do
     get :show,
-      {:id => @locked.id },
-      {:user_id => @user.id}
+      :params => {:id => @locked.id },
+      :session => {:user_id => @user.id}
 
     assert_response :success
     assert_equal @locked, assigns(:document)
@@ -189,8 +190,8 @@ class DocumentsControllerTest < ActionController::TestCase
 
   test "オーナーがパスワード付き非公開文書を開くとそのまま表示される" do
     get :show,
-      {:id => @locked.id },
-      {:user_id => @owner.id}
+      :params => {:id => @locked.id },
+      :session => {:user_id => @owner.id}
 
     assert_response :success
     assert_equal @locked, assigns(:document)
@@ -199,7 +200,7 @@ class DocumentsControllerTest < ActionController::TestCase
 
   test "ゲストが正しいパスワードを送出するとパスワード付き非公開文書が開く" do
     post :show,
-      {:id => @locked.id, :password => 'password'}
+      :params => {:id => @locked.id, :password => 'password'}
 
     assert_response :success
     assert_equal @locked, assigns(:document)
@@ -208,15 +209,15 @@ class DocumentsControllerTest < ActionController::TestCase
 
   test "ゲストが不正なパスワードを送出するとプロンプトにリダイレクト" do
     post :show,
-      {:id => @locked.id, :password => 'wrong password'}
+      :params => {:id => @locked.id, :password => 'wrong password'}
 
     assert_redirected_to document_path(@locked)
   end
 
   test "ユーザが正しいパスワードを送出するとパスワード付き非公開文書が開く" do
     post :show,
-      {:id => @locked.id, :password => 'password'},
-      {:user_id => @user.id}
+      :params => {:id => @locked.id, :password => 'password'},
+      :session => {:user_id => @user.id}
 
     assert_response :success
     assert_equal @locked, assigns(:document)
@@ -225,31 +226,31 @@ class DocumentsControllerTest < ActionController::TestCase
 
   test "ユーザが不正なパスワードを送出するとプロンプトにリダイレクト" do
     post :show,
-      {:id => @locked.id, :password => 'wrong password'},
-      {:user_id => @user.id}
+      :params => {:id => @locked.id, :password => 'wrong password'},
+      :session => {:user_id => @user.id}
 
     assert_redirected_to document_path(@locked)
   end
 
   test "ゲストは編集画面を開けない" do
     get :edit,
-      {:id => @public.id}
+      :params => {:id => @public.id}
 
     assert_response :forbidden
   end
 
   test "ユーザは編集画面を開けない" do
     get :edit,
-      {:id => @public.id},
-      {:user_id => @user.id}
+      :params => {:id => @public.id},
+      :session => {:user_id => @user.id}
 
     assert_response :forbidden
   end
 
   test "オーナーは編集画面を開ける" do
     get :edit,
-      {:id => @public.id},
-      {:user_id => @owner.id}
+      :params => {:id => @public.id},
+      :session => {:user_id => @owner.id}
 
     assert_response :success
     assert_equal @public, assigns(:document)
@@ -265,23 +266,23 @@ class DocumentsControllerTest < ActionController::TestCase
 
   test "ゲストは更新できない" do
     patch :update,
-      {:id => @public.id, :document => @public.attributes, :format => :json}
+      :params => {:id => @public.id, :document => @public.attributes, :format => :json}
 
     assert_response :forbidden
   end
 
   test "ユーザは更新できない" do
     patch :update,
-      {:id => @public.id, :document => @public.attributes, :format => :json},
-      {:user_id => @user.id}
+      :params => {:id => @public.id, :document => @public.attributes, :format => :json},
+      :session => {:user_id => @user.id}
 
     assert_response :forbidden
   end
 
   test "オーナーは更新できる" do
     patch :update,
-      {:id => @public.id, :document => @public.attributes, :format => :json},
-      {:user_id => @owner.id}
+      :params => {:id => @public.id, :document => @public.attributes, :format => :json},
+      :session => {:user_id => @owner.id}
 
     assert_response :success
   end
@@ -289,7 +290,7 @@ class DocumentsControllerTest < ActionController::TestCase
   test "ゲストは削除できない" do
     assert_no_difference('Document.count') do
       delete :destroy,
-        {:id => @public.id}
+        :params => {:id => @public.id}
     end
 
     assert_response :forbidden
@@ -298,8 +299,8 @@ class DocumentsControllerTest < ActionController::TestCase
   test "ユーザは削除できない" do
     assert_no_difference('Document.count') do
       delete :destroy,
-        {:id => @public.id},
-        {:user_id => @user.id}
+        :params => {:id => @public.id},
+        :session => {:user_id => @user.id}
     end
 
     assert_response :forbidden
@@ -308,8 +309,8 @@ class DocumentsControllerTest < ActionController::TestCase
   test "オーナーは削除できる" do
     assert_difference('Document.count', -1) do
       delete :destroy,
-        {:id => @public.id},
-        {:user_id => @owner.id}
+        :params => {:id => @public.id},
+        :session => {:user_id => @owner.id}
     end
 
     assert_redirected_to :controller => :documents,
@@ -321,8 +322,8 @@ class DocumentsControllerTest < ActionController::TestCase
 
     assert_difference('Document.count', -1) do
       delete :destroy,
-        {:id => @public.id},
-        {:user_id => @owner.id}
+        :params => {:id => @public.id},
+        :session => {:user_id => @owner.id}
     end
 
     assert_redirected_to :controller => :documents,
@@ -331,8 +332,8 @@ class DocumentsControllerTest < ActionController::TestCase
 
   test 'アーカイブへ移動' do
     patch :update,
-      {:id => @public.id, :document => {:archived => true}},
-      {:user_id => @owner.id}
+      :params => {:id => @public.id, :document => {:archived => true}},
+      :session => {:user_id => @owner.id}
 
     assert_redirected_to :controller => :documents,
       :action => :index
@@ -342,8 +343,8 @@ class DocumentsControllerTest < ActionController::TestCase
 
   test 'アーカイブ解除' do
     patch :update,
-      {:id => @public.id, :document => {:archived => false}},
-      {:user_id => @owner.id}
+      :params => {:id => @public.id, :document => {:archived => false}},
+      :session => {:user_id => @owner.id}
 
     assert_redirected_to :controller => :documents,
       :action => :index, :archived => true

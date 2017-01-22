@@ -59,7 +59,7 @@ class UsersController < ApplicationController
   def update
     if @login_user.present? && verify_authenticity_token.nil?
       @login_user.update(params[:user].permit(:default_markup))
-      render :text => ({:status => 'ok'}).to_json
+      render :plain => ({:status => 'ok'}).to_json
     else
       data = Sone::Application.config.authentication.updated_profile(params[:token])
       @user = User.where(:kitaguchi_profile_id => data['profile_id']).first
@@ -70,7 +70,7 @@ class UsersController < ApplicationController
           :profile_image => data['profile_image']
          )
       end
-      render :text => "success"
+      render :plain => "success"
     end
   rescue Hotarugaike::Profile::Client::InvalidProfileExchangeError
     forbidden

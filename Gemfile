@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-gem 'rails', '~> 4.2.0'
+gem 'rails', '~> 5.0'
 gem 'therubyracer'
 
 gem 'pg'
@@ -33,6 +33,7 @@ gem 'jwt'
 group :test do
   gem 'webmock'
   gem 'rr', :require => false
+  gem 'rails-controller-testing'
 end
 
 group :development do

@@ -39,8 +39,10 @@ class UsersControllerTest < ActionController::TestCase
     token = JWT.encode(payload, Sone::Application.config.authentication.key)
     assert_difference 'User.count' do
       get :login_complete,
-        :id => Sone::Application.config.authentication.service_id,
-        :token => token
+        :params => {
+          :id => Sone::Application.config.authentication.service_id,
+          :token => token
+        }
     end
     assert_redirected_to :controller => :documents, :action => :index
     assert_not_nil assigns(:user)
@@ -66,8 +68,10 @@ class UsersControllerTest < ActionController::TestCase
     token = JWT.encode(payload, Sone::Application.config.authentication.key)
     assert_no_difference  'User.count' do
       get :login_complete,
-        :id => Sone::Application.config.authentication.service_id,
-        :token => token
+        :params => {
+          :id => Sone::Application.config.authentication.service_id,
+          :token => token
+        }
     end
     assert_redirected_to :controller => :documents, :action => :index
     assert_not_nil assigns(:user)
@@ -75,7 +79,8 @@ class UsersControllerTest < ActionController::TestCase
   end
 
   test "login_completeに不正な署名が来たら蹴る" do
-    get :login_complete, :id => Sone::Application.config.authentication.service_id
+    get :login_complete,
+      :params => {:id => Sone::Application.config.authentication.service_id}
     assert_response :forbidden
   end
 
@@ -88,8 +93,10 @@ class UsersControllerTest < ActionController::TestCase
     token = JWT.encode(payload, Sone::Application.config.authentication.key)
     assert_no_difference  'User.count' do
       get :login_complete,
-        :id => Sone::Application.config.authentication.service_id,
-        :token => token
+        :params => {
+          :id => Sone::Application.config.authentication.service_id,
+          :token => token
+        }
     end
     assert_response :forbidden
 
@@ -97,7 +104,8 @@ class UsersControllerTest < ActionController::TestCase
   end
 
   test "logoutはセッションのログイン情報を消し、認証サービスからもログアウトさせる" do
-    get :logout, {}, {:user_id => @user.id}
+    get :logout,
+      :session => {:user_id => @user.id}
     assert_response :redirect
     assert @response.header['Location'] =~ /logout/
   end
@@ -112,7 +120,8 @@ class UsersControllerTest < ActionController::TestCase
       'exp' => 5.minutes.from_now.to_i
     }
 
-    post :update, :token => JWT.encode(payload, Sone::Application.config.authentication.key)
+    post :update,
+      :params => {:token => JWT.encode(payload, Sone::Application.config.authentication.key)}
 
     assert_response :success
     assert_not_nil assigns(:user)
@@ -129,25 +138,32 @@ class UsersControllerTest < ActionController::TestCase
       'exp' => 5.minutes.from_now.to_i
     }
 
-    post :update, :token => JWT.encode(payload, 'wrong key')
+    post :update,
+      :params => {:token => JWT.encode(payload, 'wrong key')}
 
     assert_response :forbidden
   end
 
   test "セッションが有効なら署名チェックせずに更新する(設定画面からのPOST)" do
     params = {:user => {:default_markup => 'hatena'}, :format => :json}
-    patch :update, params, {:user_id => @user.id}
+    patch :update,
+      :params => params,
+      :session => {:user_id => @user.id}
     assert_response :success
     assert 'hatena', assigns(:login_user).default_markup
   end
 
   test "show(format=rss)は公開文書のみを含むvalidなRSSを返す" do
     get :show,
-      {:domain_name => @user.domain_name, :screen_name => @user.screen_name, :format => :rss}
+      :params => {
+        :domain_name => @user.domain_name,
+        :screen_name => @user.screen_name,
+        :format => :rss
+      }
 
     assert_response :success
 
-    assert_nothing_raised RSS::NotWellFormedError do
+    assert_nothing_raised do
       rss = RSS::Parser.parse(@response.body)
       assert_not_nil rss
 
@@ -159,13 +175,17 @@ class UsersControllerTest < ActionController::TestCase
   end
 
   test "存在しないユーザを叩いたら404" do
-    get :show, :domain_name => 'non-exists', :screen_name => 'non-exists'
+    get :show,
+      :params => {:domain_name => 'non-exists', :screen_name => 'non-exists'}
     assert_response :missing
   end
 
   test "showはゲストに公開文書のみを表示" do
     get :show,
-      {:domain_name => @user.domain_name, :screen_name => @user.screen_name}
+      :params => {
+        :domain_name => @user.domain_name,
+        :screen_name => @user.screen_name
+      }
 
     assert_equal @user.documents.where(:public => true).count, assigns(:documents).size
 
@@ -175,8 +195,11 @@ class UsersControllerTest < ActionController::TestCase
 
   test "showは他のユーザに公開文書のみを表示" do
     get :show,
-      {:domain_name => @user.domain_name, :screen_name => @user.screen_name},
-      {:user_id => @user2.id}
+      :params => {
+        :domain_name => @user.domain_name,
+        :screen_name => @user.screen_name
+      },
+      :session => {:user_id => @user2.id}
 
       assert_equal @user.documents.where(:public => true).count, assigns(:documents).size
 
@@ -186,8 +209,11 @@ class UsersControllerTest < ActionController::TestCase
 
   test "showはオーナーにも公開文書のみを表示" do
     get :show,
-      {:domain_name => @user.domain_name, :screen_name => @user.screen_name},
-      {:user_id => @user.id}
+      :params => {
+        :domain_name => @user.domain_name,
+        :screen_name => @user.screen_name
+      },
+      :session => {:user_id => @user.id}
 
       assert_equal @user.documents.where(:public => true).count, assigns(:documents).size
 
