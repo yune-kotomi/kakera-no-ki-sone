@@ -8,7 +8,7 @@ module Editor
       template <<-EOS
         <div class="scroll-container" tabindex="-1">
           <div class="tree">
-            <div class="root" data-id="{{attr:id}}">{{:title}}</div>
+            <div class="root" data-id="{{attr:id}}"><span>{{:title}}</span></div>
             <ol class="children"></ol>
             <div class="right-bottom-fab-spacer"></div>
           </div>
@@ -17,7 +17,7 @@ module Editor
 
       element :children, :selector => 'ol.children', :type => Leaf
       element :container
-      element :title, :selector => 'div.root'
+      element :title, :selector => 'div.root>span'
 
       attribute :current_target
       attribute :id
@@ -162,7 +162,7 @@ module Editor
       end
 
       def offset_right
-        offset_left + dom_element(:title).outer_width
+        offset_left + dom_element(:title).outer_width + 14
       end
 
       def scroll_to(id)
@@ -240,7 +240,11 @@ module Editor
         # 中身の幅
         container = dom_element(:container)
 
-        width = children.flat_map{|c| c.scan(&:offset_right) }.max +
+        width =
+          [
+            self.offset_right,
+            children.map{|c| c.scan(&:offset_right) }
+          ].flatten.max +
           container.scroll_left -
           container.css('margin-left').to_s.sub('px', '').to_i +
           20
