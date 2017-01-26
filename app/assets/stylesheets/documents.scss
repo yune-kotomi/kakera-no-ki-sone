@@ -286,7 +286,7 @@ body.documents {
           background-color: $button-active-color;
         }
 
-        &.selected {
+        span.selected {
           font-weight: bold;
         }
       }

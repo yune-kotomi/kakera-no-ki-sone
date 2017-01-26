@@ -14,6 +14,7 @@ class Document < ActiveRecord::Base
   scope :fts, -> query { where('fulltext @@ ?', query) }
 
   def body_validation
+    self.body = JSON.parse(body) if body.is_a?(String)
     if body.present? && (body.map{|node| valid_node?(node) }.uniq - [true]).present?
       errors.add(:body, 'invalid node(s)')
     end
