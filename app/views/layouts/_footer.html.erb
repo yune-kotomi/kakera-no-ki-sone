@@ -2,9 +2,14 @@
   <div class="mdl-mega-footer__left-section">
     <div class="mdl-logo">
       <%= link_to root_path do %>
-        <%= image_tag 'banner.png',
-          :alt => '創り出すためのアウトライン・プロセッサ',
-          :srcset => srcset('banner.png', (1..3)) %>
+        <picture>
+          <source
+            type="image/webp"
+            srcset="<%= srcset 'banner.webp', (1..2) %>">
+          <%= image_tag 'banner.png',
+            :alt => '創り出すためのアウトライン・プロセッサ',
+            :srcset => srcset('banner.png', (1..3)) %>
+        </picture>
       <% end %>
 
       <a href="//ame.yumenosora.net/"><img src="//ame.yumenosora.net/images/presented_by/banner234x60.png" srcset="//ame.yumenosora.net/images/presented_by/banner234x60@2x.png 2x, //ame.yumenosora.net/images/presented_by/banner234x60@3x.png 3x" alt="presented by 雨上がりの青空を探して">

@@ -4,7 +4,14 @@
     <picture>
       <source
         media="(min-width: 480px) and (max-width: 1200px)"
+        type="image/webp"
+        srcset="<%= srcset 'key_visual_winter.medium.webp', (1..2) %>">
+      <source
+        media="(min-width: 480px) and (max-width: 1200px)"
         srcset="<%= srcset 'key_visual_winter.medium.png', (1..2) %>">
+      <source
+        type="image/webp"
+        srcset="<%= srcset 'key_visual_winter.small.webp', (1..2) %>">
       <%= image_tag 'key_visual_winter.small.png',
         :alt => '誰も知らなかった言葉を、紡ぎ続けるんだ。',
         :srcset => srcset('key_visual_winter.small.png', (1..3)) %>
@@ -15,9 +22,14 @@
 
 <div class="login">
   <div class="logo">
-    <%= image_tag 'logo.png',
-      :alt => '創り出すためのアウトライン・プロセッサ',
-      :srcset => srcset('logo.png', (1..3)) %>
+    <picture>
+      <source
+        type="image/webp"
+        srcset="<%= srcset 'logo.webp', (1..2) %>">
+      <%= image_tag 'logo.png',
+        :alt => '創り出すためのアウトライン・プロセッサ',
+        :srcset => srcset('logo.png', (1..3)) %>
+    </picture>
   </div>
 
   <div class="buttons">
