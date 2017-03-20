@@ -212,16 +212,10 @@ module Editor
 
       def scroll_to(id)
         target = find(id)
-        if ::Editor.phone?
-          # MDLヘッダ+アドレスバーの分下げる
-          offset = target.offset_top - Element.find('header').outer_height*2
-          `$(window).scrollTop(#{offset})`
-        else
-          offset = target.offset_top +
-            dom_element(:container).scroll_top -
-            dom_element(:container).offset.top
-          dom_element(:container).scroll_top = offset
-        end
+        offset = target.offset_top +
+        dom_element(:container).scroll_top -
+        dom_element(:container).offset.top
+        dom_element(:container).scroll_top = offset
       end
 
       def edit(focus_to_last = false)

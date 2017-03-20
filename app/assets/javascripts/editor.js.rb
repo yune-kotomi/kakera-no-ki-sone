@@ -303,13 +303,11 @@ module Editor
     end
 
     def switch_to_tree
-      Element.find('header').show
       @contents.visible = false
       @tree.visible = true
     end
 
     def switch_to_contents
-      Element.find('header').hide
       @tree.visible = false
       @contents.visible = true
     end
@@ -398,13 +396,21 @@ Document.ready? do
       :setting_dialog => Element.find('#config-dialog')
     )
     main = Element.find('main')
-    main.ex_resize do
-      unless Editor.phone?
-        height = main.height - 8*2 - 4*2
-        editor.tree.dom_element(:container).css('height', "#{height}px")
-        editor.contents.dom_element(:container).css('height', "#{height}px")
-        editor.adjust_tree_size
+
+    # モバイルではmainのheightはコンテンツ長となるが
+    # PCと同様、画面高さに固定する
+    if Editor.phone?
+      Element.find('body').ex_resize do
+        main_height = `$(window).innerHeight()` - Element.find('header').outer_height
+        main.css('height', "#{main_height}px")
       end
+    end
+
+    main.ex_resize do
+      height = main.height - 8*2 - 4*2
+      editor.tree.dom_element(:container).css('height', "#{height}px")
+      editor.contents.dom_element(:container).css('height', "#{height}px")
+      editor.adjust_tree_size
     end.call
 
     Element.find('#add-button').on(:click) do

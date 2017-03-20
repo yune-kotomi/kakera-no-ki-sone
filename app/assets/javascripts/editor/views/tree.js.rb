@@ -51,7 +51,7 @@ module Editor
         end
         # クリックで自分自身を選択状態に
         observe(:title, :event => :click) do
-          if ::Editor.phone?
+          if ::Editor.phone? && self.target
             # Editor#switch_to_contents
             parent.switch_to_contents
             %x{ history.pushState('contents', null, '#contents') }
