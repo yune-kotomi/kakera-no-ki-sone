@@ -379,7 +379,7 @@ module Editor
 end
 
 Document.ready? do
-  unless Element.find('#document-editor').empty?
+  unless Element.find('#_document-editor').empty?
     Element.find('footer').remove
     Element.find('.right-bottom-fab').css('bottom', '16px')
 

@@ -153,20 +153,10 @@ body.documents {
 
         .display {
           .footer {
-            display: flex;
+            text-align: right;
 
             button {
               margin-top: 24px;
-            }
-
-            ul.tags {
-              display: flex;
-              flex: 1;
-
-              li {
-                display: block;
-                padding: 4px 8px;
-              }
             }
           }
         }
@@ -178,7 +168,7 @@ body.documents {
 
           div.footer {
             button {
-              margin: 35px 0 0 5px;
+              margin: 177px 0 0 5px;
             }
             display: flex;
             div.mdl-textfield {
@@ -236,14 +226,11 @@ body.documents {
               &.hover {
                 background-color: $button-active-color;
               }
-
-              &.selected {
-                font-weight: bold;
-              }
             }
 
             .handle {
-              margin-right: 6px;
+              cursor: grab;
+              margin: 4px 6px 0 0;
             }
           }
 
@@ -261,27 +248,55 @@ body.documents {
             }
           }
 
-          .handle {
-            cursor: grab;
-            margin-top: 4px;
+          .buttons {
+            display: none;
+          }
+
+          &.selected {
+            &>.buttons {
+              display: block;
+              margin-left: -4px;
+            }
+
+            &>.body {
+              &>.content {
+                font-weight: bold;
+              }
+            }
           }
         }
+      }
+
+      >.buttons {
+        display: none;
+        margin-left: 4px;
       }
 
       >.root {
         cursor: pointer;
         padding: 2px 6px;
 
-        &.active {
+        span {
+          display: block;
+          padding: 2px 6px;
+        }
+
+        span.active {
           background-color: $button-hover-color;
         }
 
-        &.hover {
+        span.hover {
           background-color: $button-active-color;
         }
+      }
 
-        span.selected {
+      &.selected {
+        &>.root {
           font-weight: bold;
+        }
+
+        &>.buttons {
+          display: block;
         }
       }
     }
