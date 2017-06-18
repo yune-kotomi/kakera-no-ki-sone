@@ -133,8 +133,8 @@ module Editor2
           if target
             target.update_attributes(action.payload)
           else
-            @markup = action.payload[:markup] if action.payload[:markup]
-            @published = action.payload[:published] if action.payload[:published]
+            @markup = action.payload[:markup] if action.payload.keys.include?(:markup)
+            @published = action.payload[:published] if action.payload.keys.include?(:published)
           end
         when :remove
           if target.parent

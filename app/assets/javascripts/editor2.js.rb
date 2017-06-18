@@ -84,7 +84,7 @@ module Editor2
       Shortcut.add('Ctrl+Right') { mod_right_key } # 1段下げる
 
       # スモールスクリーン対応
-      if ::Editor.phone?
+      if ::Editor2::Editor.phone?
         %x{
           history.pushState('tree', null, '#tree');
           window.addEventListener('popstate', function (e) {
@@ -182,7 +182,7 @@ module Editor2
         :title => data[:title],
         :description => data[:body],
         :body => data[:children].to_json,
-        :public => data[:published],
+        :public => (data[:published] == true),
         :markup => data[:markup]
       }
 
@@ -376,7 +376,7 @@ Document.ready? do
     main = Element.find('main')
     # モバイルではmainのheightはコンテンツ長となるが
     # PCと同様、画面高さに固定する
-    if Editor.phone?
+    if Editor2::Editor.phone?
       Element.find('body').ex_resize do
         main_height = `$(window).innerHeight()` - Element.find('header').outer_height
         main.css('height', "#{main_height}px")
