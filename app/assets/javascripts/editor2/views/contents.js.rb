@@ -1,0 +1,227 @@
+require 'rickdom'
+
+module Editor2
+  class Contents < AbstractView
+    template <<-EOS
+      <div>
+        <div class="scroll-container" tabindex="-1">
+          <div class="contents">
+            <div class="root content">
+              <div class="display">
+                <div class="display">
+                  <h3><span class="title">{{:title}}</span></h3>
+                  <div class="body-display mdl-typography--body-1"></div>
+                </div>
+              </div>
+              <div class="editor" style="display:none">
+                <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                  <input class="mdl-textfield__input title leaf edit" type="text" value="{{attr:title}}">
+                  <label class="mdl-textfield__label">題名...</label>
+                </div>
+
+                <div class="footer">
+                  <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                    <textarea class="mdl-textfield__input body leaf edit" type="text" rows= "10">{{:body}}</textarea>
+                    <label class="mdl-textfield__label">本文...</label>
+                  </div>
+                  <button class="mdl-button mdl-js-button mdl-button--icon close">
+                    <i class="material-icons">close</i>
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div>
+              <div class="children"></div>
+            </div>
+            <div class="right-bottom-fab-spacer"></div>
+          </div>
+        </div>
+      </div>
+    EOS
+
+    element :display, :selector => 'div.display'
+    element :title_display, :selector => 'div.display span.title'
+    element :body_display, :selector => 'div.display>.body-display'
+
+    element :editor, :selector => 'div.editor'
+    element :title, :selector => 'input.title'
+    element :body, :selector => 'textarea.body'
+    element :close_button, :selector => 'button.close'
+
+    element :children, :selector => 'div.children', :type => Content
+    element :container, :selector => 'div.scroll-container'
+
+    def initialize(attr = {:children => []}, parent)
+      super(attr, parent)
+
+      # 入力監視
+      observe do |name, value|
+        emit(Action.new(
+        :operation => :change,
+        :target => @id,
+        :payload => {name.to_sym => value}
+        ))
+      end
+
+      dom_element(:display).on(:click){|e| edit }
+      dom_element(:close_button).on(:click){|e| show }
+    end
+
+    def apply(attr)
+      @markup = attr[:markup]
+      [:title, :body].map{|n| dom_element(n) }.each{|e| e['data-id'] = @id }
+
+      # 文書をフラットに
+      attr[:children] = flatten_children(attr[:children])
+
+      apply_body(attr[:body]) unless attributes[:body] == attr[:body]
+
+      super(attr.update(:title_display => attr[:title]))
+
+      # 選択操作
+      dom_element.find('.root.content').remove_class('mdl-shadow--4dp')
+      selected =
+        if attr[:selected] == @id
+          self
+        else
+          attribute_instances[:children].
+            find{|c| c.id == attr[:selected] }
+        end
+
+      selected.select
+
+      unless selected.visible?
+        container = dom_element(:container)
+        target =
+          if selected == self
+            selected.dom_element.find('.root.content')
+          else
+            selected.dom_element
+          end
+        offset = target.offset.top +
+          container.scroll_top - container.offset.top
+        container.scroll_top = offset
+      end
+    end
+
+    def show
+      dom_element(:display).show
+      dom_element(:editor).hide
+      apply_body(attributes[:body])
+    end
+
+    def edit(focus = :title)
+      dom_element(:display).hide
+      dom_element(:editor).show
+      emit(Action.new(
+        :operation => :select,
+        :target => @id
+      ))
+
+      if focus == :title
+        dom_element(:title).focus
+      else
+        dom_element(:body).focus
+      end
+
+      %x{ history.pushState('edit', null, '#edit') } if ::Editor2::Editor.phone?
+    end
+
+    def render(text)
+      # 記法展開して表示
+      html =
+        case @markup
+        when 'plaintext'
+          render_plaintext(text)
+        when 'hatena'
+          render_hatena(text)
+        when 'markdown'
+          render_markdown(text)
+        else
+          raise 'unknown markup'
+        end
+
+      # 危険なタグを除去
+      RickDOM.new.build(html)
+    end
+
+    def visible?
+      false
+    end
+
+    def select
+      dom_element.find('.root.content').add_class('mdl-shadow--4dp')
+    end
+
+    # 全ての本文を強制更新
+    def refresh!
+      apply_body(attributes[:body])
+      attribute_instances[:children].each{|c| c.apply_body(c.attributes[:body]) }
+    end
+
+    private
+    def render_plaintext(src)
+      text = src.to_s
+      ({
+        '&' => '&amp;',
+        '>' => '&gt;',
+        '<' => '&lt;',
+        '"' => '&quot;',
+        "'" => '&#39;',
+        ' ' => '&nbsp;',
+        "\n" => '<br>'
+      }).each do |k, v|
+        text = text.gsub(k, v)
+      end
+      text
+    end
+
+    def render_hatena(src)
+      parser = Text::Hatena.new(:sectionanchor => "■")
+      parser.parse(src)
+      parser.to_html
+    end
+
+    def render_markdown(src)
+      parser = Markdown::Parser.new
+      parser.parse(src)
+      parser.to_html
+    end
+
+    def apply_body(body)
+      unless dom_element(:display).css(:display) == 'none'
+        html = render(body)
+        dom_element(:body_display).html = html
+      end
+    end
+
+    def flatten_children(src)
+      case src
+      when Array
+        src.map{|e| flatten_children(e) }
+      when Hash
+        if src[:children].nil?
+          [src]
+        else
+          [src, flatten_children(src[:children])]
+        end
+      end.flatten
+    end
+
+    def find(id)
+      if id == @id
+        self
+      else
+        attribute_instances[:children].find{|c| c.id == id }
+      end
+    end
+
+    def next
+      attribute_instances[:children].first
+    end
+
+    def previous
+      nil
+    end
+  end
+end

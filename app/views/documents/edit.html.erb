@@ -7,13 +7,6 @@
 
 <div id="save-indicator" class="mdl-progress mdl-js-progress"></div>
 
-<div class="add-button right-bottom-fab">
-  <!-- Colored FAB button with ripple -->
-  <button class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored" id="add-button">
-    <i class="material-icons">add</i>
-  </button>
-</div>
-
 <%= hidden_field_tag :id, @document.id, :id => 'document-id' %>
 <%= hidden_field_tag :title, @document.title, :id => 'document-title' %>
 <%= hidden_field_tag :description, @document.description, :id => 'document-description' %>
@@ -70,23 +63,9 @@
           <div>
             <h4>公開範囲</h4>
             <label class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect">
-              <input type="checkbox" class="mdl-checkbox__input" id="public-checkbox">
+              <input type="checkbox" class="mdl-checkbox__input" id="public-checkbox" <%= 'checked="checked"' if @document.public %>>
               <span class="mdl-checkbox__label">一般公開する</span>
             </label>
-
-            <div id="password-box" <%= 'style="display: none"'.html_safe if @document.public %>>
-              <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-                <%= password_field_tag 'password', '', :class => 'mdl-textfield__input' %>
-                <label class="mdl-textfield__label">パスワード...</label>
-              </div>
-
-              <button class="mdl-button mdl-js-button mdl-button--icon cancel" <%= 'style="display: none"'.html_safe unless @document.password %>>
-                <i class="material-icons">cancel</i>
-              </button>
-              <button class="mdl-button mdl-js-button mdl-button--icon mdl-button--colored apply">
-                <i class="material-icons">check</i>
-              </button>
-            </div>
           </div>
         </div>
 
@@ -105,9 +84,7 @@
         <div class="mdl-card__supporting-text">
           <h4>キーボード・ショートカット</h4>
           <div class="mdl-grid">
-            <div class="mdl-cell mdl-cell--6-col">
-              <h5>ツリー領域にフォーカスがある場合</h5>
-              <table>
+            <table>
                 <tr>
                   <th>前の葉に移動</th>
                   <td>↑</td>
@@ -117,8 +94,15 @@
                   <td>↓</td>
                 </tr>
                 <tr>
+                  <th>葉を追加</th>
+                  <td>CTRL+ALT+N</td>
+                <tr>
                   <th>葉を編集</th>
-                  <td>Enter</td>
+                  <td>ENTER</td>
+                </tr>
+                <tr>
+                  <th>編集終了</th>
+                  <td>ESC</td>
                 </tr>
                 <tr>
                   <th>葉を開く</th>
@@ -148,38 +132,7 @@
                   <th>葉を削除</th>
                   <td>CTRL+DEL</td>
                 </tr>
-                <tr>
-                  <th>本文領域へ移動</th>
-                  <td>CTRL+0</td>
-                </tr>
               </table>
-            </div>
-
-            <div class="mdl-cell mdl-cell--6-col">
-              <h5>本文領域にフォーカスがある場合</h5>
-              <table>
-                <tr>
-                  <th>前の葉に移動</th>
-                  <td>↑</td>
-                </tr>
-                <tr>
-                  <th>次の葉に移動</th>
-                  <td>↓</td>
-                </tr>
-                <tr>
-                  <th>編集</th>
-                  <td>Enter</td>
-                </tr>
-                <tr>
-                  <th>編集終了</th>
-                  <td>ESC</td>
-                </tr>
-                <tr>
-                  <th>ツリー領域に移動</th>
-                  <td>CTRL+0</td>
-                </tr>
-              </table>
-            </div>
           </div>
         </div>
 
