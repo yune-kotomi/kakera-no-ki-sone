@@ -3,7 +3,7 @@ module Editor2
     attr_reader :tree
     attr_reader :contents
 
-    def initialize
+    def initialize(demo = false)
       @dispatcher = Dispatcher.new
       @store = Store.new
       @dispatcher.stores.push(@store)
@@ -20,7 +20,7 @@ module Editor2
       Element.find('#document-editor>.content-view').append(@contents.dom_element)
       contents.dispatcher = @dispatcher
 
-      @store.subscribers.push(self)
+      @store.subscribers.push(self) unless demo
 
       # 設定ダイアログ
       Element.find('#config-dialog').tap do |d|
@@ -368,7 +368,7 @@ Document.ready? do
     Element.find('footer').remove
     Element.find('.right-bottom-fab').css('bottom', '16px')
 
-    editor = Editor2::Editor.new
+    editor = Editor2::Editor.new(Element.find('#document-demo-mode').value == 'true')
     editor.load_from_dom
     editor.to_tree
     editor.save_start
