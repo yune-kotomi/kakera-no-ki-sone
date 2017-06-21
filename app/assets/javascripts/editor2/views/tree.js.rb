@@ -111,10 +111,6 @@ module Editor2
               container.scroll_left - container.offset.left
           end
         end
-
-        # モバイルのみ、タイトル2回タップで本文領域に移る
-        parent.to_contents if attr[:selected] == @selected
-        @selected = attr[:selected]
       end
 
       def attributes

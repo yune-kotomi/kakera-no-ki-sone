@@ -8,6 +8,8 @@ module Editor2
       @store = Store.new
       @dispatcher.stores.push(@store)
 
+      @dispatcher.stores.push(ViewSwitcher.new(self)) if self.class.phone?
+
       @tree = View::Tree.new({}, self)
       @views = [@tree]
       @store.subscribers.push(@tree)
@@ -358,6 +360,25 @@ module Editor2
           :position => previous.children.size,
           :destination => previous.id
         ))
+      end
+    end
+
+    # モバイル環境でのtree/contents切り替えを司るクラス
+    class ViewSwitcher
+      def initialize(editor)
+        @editor = editor
+      end
+
+      def dispatch(*actions)
+        last_action = actions.
+          select{|a| a.operation == :select }.
+          last
+        if last_action
+          if @previous_target == last_action.target
+            @editor.to_contents
+          end
+          @previous_target = last_action.target
+        end
       end
     end
   end
