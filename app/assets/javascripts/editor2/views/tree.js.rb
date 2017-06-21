@@ -80,12 +80,32 @@ module Editor2
         super
 
         # 選択操作
+        select_leaf(attr[:selected])
+      end
+
+      def attributes
+        @attributes.merge(:id => @id)
+      end
+
+      def dropped(id)
+        emit(Action.new(
+          :operation => :move,
+          :target => id,
+          :position => 0,
+          :destination => @id
+        ))
+
+        # 位置情報をリセットする
+        Element.find(".leaf[data-id='#{id}']").tap{|e| ['top', 'bottom', 'left', 'right', 'width', 'height'].each{|a| e.css(a, '') } }
+      end
+
+      def select_leaf(target)
         selected =
-          if attr[:selected] == @id
+          if target == @id
             self
           else
             attribute_instances[:children].
-              map{|c1| c1.find(attr[:selected]) }.
+              map{|c1| c1.find(target) }.
               compact.
               first
           end
@@ -111,22 +131,6 @@ module Editor2
               container.scroll_left - container.offset.left
           end
         end
-      end
-
-      def attributes
-        @attributes.merge(:id => @id)
-      end
-
-      def dropped(id)
-        emit(Action.new(
-          :operation => :move,
-          :target => id,
-          :position => 0,
-          :destination => @id
-        ))
-
-        # 位置情報をリセットする
-        Element.find(".leaf[data-id='#{id}']").tap{|e| ['top', 'bottom', 'left', 'right', 'width', 'height'].each{|a| e.css(a, '') } }
       end
 
       def select

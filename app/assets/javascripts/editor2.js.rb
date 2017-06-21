@@ -5,10 +5,9 @@ module Editor2
 
     def initialize(demo = false)
       @dispatcher = Dispatcher.new
+      @dispatcher.stores.push(ViewSwitcher.new(self)) if self.class.phone?
       @store = Store.new
       @dispatcher.stores.push(@store)
-
-      @dispatcher.stores.push(ViewSwitcher.new(self)) if self.class.phone?
 
       @tree = View::Tree.new({}, self)
       @views = [@tree]
@@ -146,6 +145,7 @@ module Editor2
       if self.class.phone?
         @contents.dom_element.hide
         @tree.dom_element.show
+        @tree.select_leaf(@store.selected)
       end
     end
 
@@ -401,7 +401,7 @@ Document.ready? do
       Element.find('body').ex_resize do
         main_height = `$(window).innerHeight()` - Element.find('header').outer_height
         main.css('height', "#{main_height}px")
-      end
+      end.call
     end
 
     main.ex_resize do
