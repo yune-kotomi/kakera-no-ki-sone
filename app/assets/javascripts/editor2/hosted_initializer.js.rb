@@ -4,9 +4,12 @@ Document.ready? do
     Element.find('.right-bottom-fab').css('bottom', '16px')
 
     loader = Editor2::DomLoader.new
-    editor = Editor2::Editor.new(Element.find('#document-demo-mode').value == 'true', loader)
+    editor = Editor2::Editor.new(loader)
     editor.load
-    editor.save_start
+
+    unless Element.find('#document-demo-mode').value == 'true'
+      editor.writer = Editor2::HostedWriter.new(editor)
+    end
 
     main = Element.find('main')
     # モバイルではmainのheightはコンテンツ長となるが

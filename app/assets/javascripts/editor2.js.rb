@@ -4,10 +4,12 @@ module Editor2
     attr_reader :contents
     attr_reader :store
     attr_reader :dispatcher
+    attr_accessor :writer
 
-    def initialize(demo = false, loader)
+    def initialize(loader)
       @loader = loader
-      
+      @writer = DummyWriter.new(self)
+
       @dispatcher = Dispatcher.new
       @dispatcher.stores.push(ViewSwitcher.new(self)) if self.class.phone?
       @store = Store.new
@@ -25,7 +27,7 @@ module Editor2
       Element.find('#document-editor>.content-view').append(@contents.dom_element)
       contents.dispatcher = @dispatcher
 
-      @store.subscribers.push(self) unless demo
+      @store.subscribers.push(self)
 
       # 設定ダイアログ
       Element.find('#config-dialog').tap do |d|
@@ -136,59 +138,24 @@ module Editor2
       end
     end
 
-    def apply(_)
-      @save = true
-      Element.find('#save-indicator').effect(:fade_in)
-      Window.on(:beforeunload) { close_confirm }
-    end
-
-    def save_start
-      @save = false
-      Element.find('#save-indicator').hide
-      Window.off(:beforeunload)
-      `setInterval(function(){#{save_loop}}, 5000)`
-    end
-
-    # 保存ループの処理実体
-    def save_loop
-      save if @save
-    end
-
-    # PATCH /documents/ID.jsonを発行する
-    def save
+    def indicate_save(mode)
       indicator = Element.find('#save-indicator')
 
-      data = @store.stored_document
-      data = {
-        :title => data[:title],
-        :description => data[:body],
-        :body => data[:children].to_json,
-        :public => (data[:published] == true),
-        :markup => data[:markup]
-      }
-
-      if data == @sent_data
-        # 内容が更新されていなければ保存しない
+      case mode
+      when :on
+        indicator.effect(:fade_in)
+        Window.on(:beforeunload) { close_confirm }
+      when :progress
+        indicator.add_class('mdl-progress__indeterminate')
+      when :off
+        indicator.remove_class('mdl-progress__indeterminate')
         indicator.effect(:fade_out)
         Window.off(:beforeunload)
-      else
-        indicator.add_class('mdl-progress__indeterminate')
-
-        HTTP.patch("/documents/#{@store.document.id}.json", :payload => {'document' => data}) do |request|
-          if request.ok?
-            @save = false
-            @sent_data = data
-            indicator.remove_class('mdl-progress__indeterminate')
-            indicator.effect(:fade_out)
-            Window.off(:beforeunload)
-          else
-          end
-        end
       end
     end
 
-    def close_confirm
-      'まだ保存されていません。よろしいですか？'
+    def apply(_)
+      @writer.write
     end
 
     def self.device
