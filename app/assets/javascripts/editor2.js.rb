@@ -5,7 +5,9 @@ module Editor2
     attr_reader :store
     attr_reader :dispatcher
 
-    def initialize(demo = false)
+    def initialize(demo = false, loader)
+      @loader = loader
+      
       @dispatcher = Dispatcher.new
       @dispatcher.stores.push(ViewSwitcher.new(self)) if self.class.phone?
       @store = Store.new
@@ -82,18 +84,8 @@ module Editor2
       end
     end
 
-    def load_from_dom
-      doc = {
-        :id => Element.find('#document-id').value,
-        :title => Element.find('#document-title').value,
-        :body => Element.find('#document-description').value,
-        :children => (JSON.parse(Element.find('#document-body').value) || []),
-        :metadatum => {},
-        :markup => JSON.parse(Element.find('#document-markup').value),
-        :published => JSON.parse(Element.find('#document-public').value)
-      }
-
-      @store.load(doc)
+    def load
+      @store.load(@loader.load)
     end
 
     def pushstate(state)
@@ -235,34 +227,5 @@ module Editor2
         end
       end
     end
-  end
-end
-
-Document.ready? do
-  unless Element.find('#document-editor').empty?
-    Element.find('footer').remove
-    Element.find('.right-bottom-fab').css('bottom', '16px')
-
-    editor = Editor2::Editor.new(Element.find('#document-demo-mode').value == 'true')
-    editor.load_from_dom
-    editor.to_tree
-    editor.save_start
-
-    main = Element.find('main')
-    # モバイルではmainのheightはコンテンツ長となるが
-    # PCと同様、画面高さに固定する
-    if Editor2::Editor.phone?
-      Element.find('body').ex_resize do
-        main_height = `$(window).innerHeight()` - Element.find('header').outer_height
-        main.css('height', "#{main_height}px")
-      end.call
-    end
-
-    main.ex_resize do
-      height = main.height - 8*2 - 4*2
-      editor.tree.dom_element(:container).css('height', "#{height}px")
-      editor.contents.dom_element(:container).css('height', "#{height}px")
-      editor.adjust_tree_size
-    end.call
   end
 end
