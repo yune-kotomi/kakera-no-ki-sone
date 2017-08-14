@@ -83,6 +83,10 @@ module Editor2
             #{pushstate(`history.state`)}
           })
         }
+        Element.find('#back-button').on('click') do
+          `history.back()`
+          false
+        end
       end
     end
 
@@ -127,6 +131,7 @@ module Editor2
         @contents.dom_element.hide
         @tree.dom_element.show
         @tree.select_leaf(@store.selected)
+        Element.find('#back-button').hide
       end
     end
 
@@ -135,6 +140,7 @@ module Editor2
         @contents.dom_element.show
         @tree.dom_element.hide
         %x{ history.pushState('contents', null, '#contents') }
+        Element.find('#back-button').show
       end
     end
 
