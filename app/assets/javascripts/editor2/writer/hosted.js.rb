@@ -1,10 +1,14 @@
 module Editor2
   class HostedWriter
-    def initialize(editor, interval = 5000)
+    def initialize(editor, interval = 5)
       @editor = editor
       @save = false
       @sent_data = editor.store.stored_document
-      `setInterval(function(){#{save_loop}}, #{interval})`
+      @timer =
+        Timer::Timer.new(interval) do
+          transmit if @save
+        end
+      @timer.start
     end
 
     def write
@@ -13,11 +17,6 @@ module Editor2
     end
 
     private
-    # 保存ループの処理実体
-    def save_loop
-      transmit if @save
-    end
-
     # PATCH /documents/ID.jsonを発行する
     def transmit
       data = @editor.store.stored_document
