@@ -55,13 +55,19 @@ module Editor2
       super(attr, parent)
 
       # 入力監視
+      # 入力時のパフォーマンスに問題が出るため１秒間隔でemitする
       observe do |name, value|
-        emit(Action.new(
-        :operation => :change,
-        :target => @id,
-        :payload => {name.to_sym => value}
-        ))
+        @input_action =
+          Action.new(
+            :operation => :change,
+            :target => @id,
+            :payload => {name.to_sym => value}
+          )
       end
+      @emit_input_timer =
+        Timer::Timer.new(1) do
+          emit(@input_action) if @input_action
+        end
 
       dom_element(:display).on(:click){|e| edit }
       dom_element(:close_button).on(:click){|e| show }
@@ -105,12 +111,17 @@ module Editor2
     end
 
     def show
+      @emit_input_timer.stop
+      @emit_input_timer.execute # 滞留しているactionを実行
+
       dom_element(:display).show
       dom_element(:editor).hide
       apply_body(attributes[:body])
     end
 
     def edit(focus = :title)
+      @emit_input_timer.start
+
       dom_element(:display).hide
       dom_element(:editor).show
       emit(Action.new(
