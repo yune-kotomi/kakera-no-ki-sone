@@ -7,9 +7,6 @@
 [submodule "vendor/rickdom"]
 	path = vendor/rickdom
 	url = https://github.com/hasegawayosuke/rickdom.git
-[submodule "vendor/mousetrap"]
-	path = vendor/mousetrap
-	url = https://github.com/ccampbell/mousetrap.git
 [submodule "vendor/jquery.ex-resize"]
 	path = vendor/jquery.ex-resize
 	url = https://github.com/cyokodog/jquery.ex-resize.git

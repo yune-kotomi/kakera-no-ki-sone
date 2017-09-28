@@ -1,7 +1,8 @@
 language: ruby
 sudo: required
 rvm:
-  - 2.3.0
+  - 2.3
+  - 2.4
 before_script:
   - psql -c 'create database sone_test;' -U postgres
   - cp config/database.yml.travis config/database.yml
@@ -10,7 +11,7 @@ before_install:
   - curl --silent --location https://github.com/pgroonga/pgroonga/raw/master/data/travis/setup.sh | sh
 cache: bundler
 addons:
-  postgresql: "9.4"
+  postgresql: "9.5"
 notifications:
   email:
     - yune.kotomi+github@gmail.com
