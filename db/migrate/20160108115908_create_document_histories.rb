@@ -1,4 +1,4 @@
-class CreateDocumentHistories < ActiveRecord::Migration
+class CreateDocumentHistories < ActiveRecord::Migration[4.2]
   def change
     create_table :document_histories do |t|
       t.integer :document_id

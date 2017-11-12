@@ -1,4 +1,4 @@
-class EnablePgroonga < ActiveRecord::Migration
+class EnablePgroonga < ActiveRecord::Migration[4.2]
   def change
     reversible do |r|
       current_database = select_value("SELECT current_database()")
