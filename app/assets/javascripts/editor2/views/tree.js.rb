@@ -6,7 +6,7 @@ module Editor2
     class Tree < AbstractView
       template <<-EOS
         <div class="scroll-container" tabindex="-1">
-          <div class="tree">
+          <div class="tree mdl-shadow--4dp">
             <div class="root" data-id="{{attr:id}}"><span>{{:title}}</span></div>
             <div class="buttons">
               <button class="mdl-button mdl-js-button mdl-button--icon add-button">
@@ -14,7 +14,6 @@ module Editor2
               </button>
             </div>
             <ol class="children"></ol>
-            <div class="right-bottom-fab-spacer"></div>
           </div>
         </div>
       EOS

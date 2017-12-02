@@ -139,24 +139,24 @@ body.documents {
   padding: 0;
 
   .content-view {
-    margin-bottom: 4px;
+    margin: 0;
     &>div{
       .scroll-container {
+        box-sizing: border-box;
         overflow: auto;
         outline: none;
+        padding: 8px;
       }
 
       .content {
-        margin: 4px;
-        padding: 4px;
+        margin: 0;
+        padding: 8px;
         word-wrap: break-word;
 
         .display {
-          .footer {
-            text-align: right;
-
-            button {
-              margin-top: 24px;
+          h4 {
+            .chapter_number {
+              font-weight: 200;
             }
           }
         }
@@ -166,24 +166,15 @@ body.documents {
             width: 100%;
           }
 
-          div.footer {
-            button {
-              margin: 177px 0 0 5px;
-            }
+          .footer {
             display: flex;
-            div.mdl-textfield {
-              flex: 1;
-            }
+            justify-content: space-between;
           }
         }
 
         &.root {
-          div.buttons {
-            text-align: right;
-          }
-
-          div.footer button {
-            margin-top: 177px;
+          div.footer {
+            justify-content: flex-end;
           }
         }
       }
@@ -191,25 +182,32 @@ body.documents {
   }
 
   .tree-view {
-    margin-bottom: 4px;
+    margin: 0 16px;
     .scroll-container {
+      box-sizing: border-box;
       overflow: auto;
       outline: none;
+      padding: 8px 24px 8px 8px;
+      text-align: right;
     }
 
     div.tree {
+      display: inline-block;
       padding: 4px;
+      text-align: left;
 
       .children {
-        padding-left: 28px;
+        margin: 0;
+        padding-left: 33px;
 
         .leaf {
           list-style-type: none;
-          margin: 2px 6px;
+          margin: 0;
           position: relative;
 
           .body {
             display: flex;
+            margin: 4px;
 
             .content {
               cursor: pointer;
@@ -234,10 +232,8 @@ body.documents {
             }
           }
 
-          .brother-droppable {
-            height: 32px;
-            margin: -34px 0 0 -4px;
-            width: 32px;
+          .child-droptarget,.brother-droptarget {
+            height: 35px;
 
             &.active {
               background-color: $button-hover-color;
@@ -248,6 +244,22 @@ body.documents {
             }
           }
 
+          .brother-droptarget {
+            margin: -43px 0 8px 5px;
+            width: 24px;
+          }
+
+          .child-droptarget {
+            margin: -39px 0 8px 34px;
+          }
+
+          &.ui-draggable-dragging {
+            &>.child-droptarget,&>.brother-droptarget {
+              height: 0;
+              margin: 0;
+            }
+          }
+
           .buttons {
             display: none;
           }
@@ -255,7 +267,7 @@ body.documents {
           &.selected {
             &>.buttons {
               display: block;
-              margin-left: -4px;
+              margin-top: -16px;
             }
 
             &>.body {
@@ -319,7 +331,7 @@ nav {
 }
 
 #save-indicator {
-  display: none;
+  opacity: 0;
   width: 100%;
 }
 

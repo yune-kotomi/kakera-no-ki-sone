@@ -19,13 +19,16 @@ module Editor2
           </div>
         </div>
 
-        <div class="brother-droppable"></div>
-        <div class="buttons">
-          <button class="mdl-button mdl-js-button mdl-button--icon add-button">
-            <i class="material-icons">add</i>
-          </button>
-        </div>
+        <div class="child-droptarget"></div>
+
         <ol class="children"></ol>
+        <div class="buttons">
+        <button class="mdl-button mdl-js-button mdl-button--icon add-button">
+        <i class="material-icons">add</i>
+        </button>
+        </div>
+
+        <div class="brother-droptarget"></div>
       </li>
       EOS
 
@@ -35,7 +38,7 @@ module Editor2
       element :children, :selector => 'ol.children', :type => Leaf
       element :collapse, :selector => 'button.collapse'
       element :expand, :selector => 'button.expand'
-      element :add_button, :selector => '.buttons .add-button'
+      element :add_button, :selector => '.add-button:last'
 
       def initialize(attr = {}, parent)
         super(attr, parent)
@@ -83,17 +86,26 @@ module Editor2
           #{dom_element}.draggable({
             handle: #{".handle[data-id='#{@id}']"},
             scroll: true,
+            stop: function(event, ui) {
+              var leaf = ui.helper;
+              leaf.css('top', '');
+              leaf.css('bottom', '');
+              leaf.css('left', '');
+              leaf.css('right', '');
+              leaf.css('width', '');
+              leaf.css('height', '');
+            },
             revert: "invalid"
           });
 
-          #{dom_element.children('.brother-droppable')}.droppable({
+          #{dom_element.children('.brother-droptarget')}.droppable({
             activeClass: 'active',
             drop: function(event, ui) { #{dropped(`ui.draggable.attr('data-id')`, :brother)} },
             hoverClass: "hover",
             tolerance: 'pointer'
           });
 
-          #{dom_element(:content)}.droppable({
+          #{dom_element.children('.child-droptarget')}.droppable({
             activeClass: 'active',
             drop: function(event, ui) { #{dropped(`ui.draggable.attr('data-id')`, :child)} },
             hoverClass: "hover",

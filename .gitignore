@@ -16,4 +16,5 @@ vendor/bundle
 config/initializers/kitaguchi.rb
 config/log4r.yml
 config/initializers/exception_notification.rb
+config/initializers/google_api.rb
 .ruby-version

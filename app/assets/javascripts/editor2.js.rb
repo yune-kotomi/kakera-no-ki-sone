@@ -101,7 +101,7 @@ module Editor2
       end
 
       main.ex_resize do
-        height = main.height - 8*2 - 4*2
+        height = main.height - 4
         self.tree.dom_element(:container).css('height', "#{height}px")
         self.contents.dom_element(:container).css('height', "#{height}px")
         self.adjust_tree_size
@@ -167,13 +167,13 @@ module Editor2
 
       case mode
       when :on
-        indicator.effect(:fade_in)
+        indicator.css('opacity', 1)
         Window.on(:beforeunload) { close_confirm }
       when :progress
         indicator.add_class('mdl-progress__indeterminate')
       when :off
         indicator.remove_class('mdl-progress__indeterminate')
-        indicator.effect(:fade_out)
+        indicator.css('opacity', 0)
         Window.off(:beforeunload)
       end
     end

@@ -5,7 +5,7 @@ module Editor2
     template <<-EOS
       <div>
         <div class="scroll-container" tabindex="-1">
-          <div class="contents">
+          <div class="contents mdl-shadow--4dp">
             <div class="root content">
               <div class="display">
                 <div class="display">
@@ -19,21 +19,22 @@ module Editor2
                   <label class="mdl-textfield__label">題名...</label>
                 </div>
 
+                <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                  <textarea class="mdl-textfield__input body leaf edit" type="text" rows= "10">{{:body}}</textarea>
+                  <label class="mdl-textfield__label">本文...</label>
+                </div>
+
                 <div class="footer">
-                  <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-                    <textarea class="mdl-textfield__input body leaf edit" type="text" rows= "10">{{:body}}</textarea>
-                    <label class="mdl-textfield__label">本文...</label>
-                  </div>
                   <button class="mdl-button mdl-js-button mdl-button--icon close">
-                    <i class="material-icons">close</i>
+                    <i class="material-icons">done</i>
                   </button>
                 </div>
               </div>
             </div>
+
             <div>
               <div class="children"></div>
             </div>
-            <div class="right-bottom-fab-spacer"></div>
           </div>
         </div>
       </div>
@@ -85,7 +86,6 @@ module Editor2
       super(attr.update(:title_display => attr[:title]))
 
       # 選択操作
-      dom_element.find('.root.content').remove_class('mdl-shadow--4dp')
       selected =
         if attr[:selected] == @id
           self
@@ -93,8 +93,6 @@ module Editor2
           attribute_instances[:children].
             find{|c| c.id == attr[:selected] }
         end
-
-      selected.select
 
       unless selected.visible?
         container = dom_element(:container)
@@ -158,10 +156,6 @@ module Editor2
 
     def visible?
       false
-    end
-
-    def select
-      dom_element.find('.root.content').add_class('mdl-shadow--4dp')
     end
 
     # 全ての本文を強制更新
