@@ -8,7 +8,7 @@ gem 'pg'
 gem 'sass-rails', '~> 5.0'
 gem 'material_design_lite-sass'
 gem 'autoprefixer-rails'
-gem 'uglifier', '>= 1.3.0'
+gem 'uglifier'
 
 gem 'jquery-rails'
 gem 'opal-rails'
@@ -28,7 +28,7 @@ gem 'bcrypt'
 
 # Use Capistrano for deployment
 # gem 'capistrano-rails', group: :development
-gem 'jwt', '~> 1.5'
+gem 'jwt'
 
 group :test do
   gem 'webmock'
