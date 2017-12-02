@@ -87,6 +87,8 @@ module Editor2
           :operation => :select,
           :target => previous
         ))
+
+        `history.back()` if ::Editor2::Editor.phone? && `history.state` == 'edit'
       end
     end
 
@@ -111,6 +113,8 @@ module Editor2
       dom_element(:display).show
       dom_element(:editor).hide
       apply_body(attributes[:body])
+
+      `history.back()` if ::Editor2::Editor.phone? && `history.state` == 'edit'
     end
 
     def edit(focus = :title)
@@ -129,7 +133,7 @@ module Editor2
         dom_element(:body).focus
       end
 
-      %x{ history.pushState('edit', null, '#edit') } if ::Editor2::Editor.phone?
+      %x{ history.pushState('edit', null, '#edit') } if ::Editor2::Editor.phone? && `history.state` == 'contents'
     end
 
     def visible?

@@ -87,6 +87,8 @@ module Editor2
           `history.back()`
           false
         end
+
+        @contents.dom_element.hide
       end
 
       # 画面サイズまわり
