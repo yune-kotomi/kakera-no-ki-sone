@@ -134,6 +134,7 @@ module Editor2
       column_width = `$(window).innerWidth()` / 12
       columns = (800.0 / column_width).ceil
       columns = 8 if columns > 8
+      columns = 6 if columns < 6
 
       [tree, contents].each do |element|
         element['class'].
