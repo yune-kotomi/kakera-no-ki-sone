@@ -8,6 +8,7 @@ class Document < ActiveRecord::Base
   validate :body_validation
   before_save :update_content_timestamp
   before_save :update_fulltext
+  before_save { self.version = ActiveRecord::Base.connection.select_one("SELECT nextval('document_version_seq')")['nextval'] }
   after_save :create_history
   before_create { self.content_updated_at = Time.now }
 
