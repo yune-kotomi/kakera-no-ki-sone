@@ -1,11 +1,11 @@
 <% @title = "編集: #{@document.title}" %>
 
-<div class="mdl-grid" id="document-editor">
+<div id="save-indicator" class="mdl-progress mdl-js-progress"></div>
+
+<div class="mdl-grid document-editor" id="document-editor">
   <div class="mdl-cell mdl-cell--3-col-tablet mdl-cell--4-col-phone tree-view"></div>
   <div class="mdl-cell mdl-cell--5-col-tablet mdl-cell--4-col-phone content-view"></div>
 </div>
-
-<div id="save-indicator" class="mdl-progress mdl-js-progress"></div>
 
 <%= hidden_field_tag :id, @document.id, :id => 'document-id' %>
 <%= hidden_field_tag :title, @document.title, :id => 'document-title' %>

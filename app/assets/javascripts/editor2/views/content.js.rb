@@ -2,6 +2,7 @@ module Editor2
   class Content < AbstractView
     template <<-EOS
       <div class="content">
+        <hr>
         <div class="display-container">
           <div class="display">
             <h4>
@@ -9,12 +10,6 @@ module Editor2
               <span class="title">{{:title}}</span>
             </h4>
             <div class="body-display mdl-typography--body-1"></div>
-
-            <div class="footer">
-              <button class="mdl-button mdl-js-button mdl-button--icon delete">
-                <i class="material-icons">delete</i>
-              </button>
-            </div>
           </div>
         </div>
 
@@ -25,14 +20,18 @@ module Editor2
               <label class="mdl-textfield__label">題名...</label>
             </div>
 
-            <div class="footer">
-              <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+            <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
               <textarea class="mdl-textfield__input body leaf edit" type="text" rows= "10">{{:body}}</textarea>
               <label class="mdl-textfield__label">本文...</label>
-              </div>
+            </div>
+
+            <div class="footer">
+              <button class="mdl-button mdl-js-button mdl-button--icon delete">
+                <i class="material-icons">delete</i>
+              </button>
 
               <button class="mdl-button mdl-js-button mdl-button--icon close">
-                <i class="material-icons">close</i>
+                <i class="material-icons">done</i>
               </button>
             </div>
           </div>
@@ -47,8 +46,8 @@ module Editor2
     element :delete_button, :selector => 'button.delete'
 
     element :editor, :selector => '.editor-container'
-    element :title, :selector => '.editor>div>input.title'
-    element :body, :selector => '.editor div.footer textarea.body'
+    element :title, :selector => 'input.title'
+    element :body, :selector => 'textarea.body'
     element :close_button, :selector => '.editor button.close'
 
     def initialize(attr, parent)
@@ -88,11 +87,12 @@ module Editor2
           :operation => :select,
           :target => previous
         ))
+
+        `history.back()` if ::Editor2::Editor.phone? && `history.state` == 'edit'
       end
     end
 
     def apply(attr)
-      dom_element.remove_class('mdl-shadow--4dp')
       [:title, :body].map{|n| dom_element(n) }.each{|e| e['data-id'] = @id }
 
       apply_body(attr[:body]) unless attributes[:body] == attr[:body]
@@ -113,6 +113,8 @@ module Editor2
       dom_element(:display).show
       dom_element(:editor).hide
       apply_body(attributes[:body])
+
+      `history.back()` if ::Editor2::Editor.phone? && `history.state` == 'edit'
     end
 
     def edit(focus = :title)
@@ -131,7 +133,7 @@ module Editor2
         dom_element(:body).focus
       end
 
-      %x{ history.pushState('edit', null, '#edit') } if ::Editor2::Editor.phone?
+      %x{ history.pushState('edit', null, '#edit') } if ::Editor2::Editor.phone? && `history.state` == 'contents'
     end
 
     def visible?
@@ -141,10 +143,6 @@ module Editor2
       d = dom_element
 
       min < d.offset.top && d.offset.top + d.outer_height < max
-    end
-
-    def select
-      dom_element.add_class('mdl-shadow--4dp')
     end
 
     def next
