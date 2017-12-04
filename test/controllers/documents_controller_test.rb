@@ -169,69 +169,6 @@ class DocumentsControllerTest < ActionController::TestCase
     assert_equal @private, assigns(:document)
   end
 
-  test "ゲストがパスワード付き非公開文書を開くとプロンプトが出る" do
-    get :show,
-      :params => {:id => @locked.id }
-
-    assert_response :success
-    assert_equal @locked, assigns(:document)
-    assert_select 'title', 'パスワードで保護された文書です: カケラの樹'
-  end
-
-  test "ユーザがパスワード付き非公開文書を開くとプロンプトが出る" do
-    get :show,
-      :params => {:id => @locked.id },
-      :session => {:user_id => @user.id}
-
-    assert_response :success
-    assert_equal @locked, assigns(:document)
-    assert_select 'title', 'パスワードで保護された文書です: カケラの樹'
-  end
-
-  test "オーナーがパスワード付き非公開文書を開くとそのまま表示される" do
-    get :show,
-      :params => {:id => @locked.id },
-      :session => {:user_id => @owner.id}
-
-    assert_response :success
-    assert_equal @locked, assigns(:document)
-    assert_select 'title', "#{@locked.title}: カケラの樹"
-  end
-
-  test "ゲストが正しいパスワードを送出するとパスワード付き非公開文書が開く" do
-    post :show,
-      :params => {:id => @locked.id, :password => 'password'}
-
-    assert_response :success
-    assert_equal @locked, assigns(:document)
-    assert_select 'title', "#{@locked.title}: カケラの樹"
-  end
-
-  test "ゲストが不正なパスワードを送出するとプロンプトにリダイレクト" do
-    post :show,
-      :params => {:id => @locked.id, :password => 'wrong password'}
-
-    assert_redirected_to document_path(@locked)
-  end
-
-  test "ユーザが正しいパスワードを送出するとパスワード付き非公開文書が開く" do
-    post :show,
-      :params => {:id => @locked.id, :password => 'password'},
-      :session => {:user_id => @user.id}
-
-    assert_response :success
-    assert_equal @locked, assigns(:document)
-    assert_select 'title', "#{@locked.title}: カケラの樹"
-  end
-
-  test "ユーザが不正なパスワードを送出するとプロンプトにリダイレクト" do
-    post :show,
-      :params => {:id => @locked.id, :password => 'wrong password'},
-      :session => {:user_id => @user.id}
-
-    assert_redirected_to document_path(@locked)
-  end
-
   test "ゲストは編集画面を開けない" do
     get :edit,
       :params => {:id => @public.id}

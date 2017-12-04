@@ -37,20 +37,4 @@ module DocumentsHelper
 
     Sanitize.clean(ret, Sanitize::Config::RELAXED).html_safe
   end
-
-  def password_prompt?(document, login_user)
-    if document.public
-      false
-    else
-      if document.user == login_user
-        false
-      else
-        if request.post? && document.password && document.password == params[:password]
-          false
-        else
-          true
-        end
-      end
-    end
-  end
 end

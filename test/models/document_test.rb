@@ -113,30 +113,6 @@ class DocumentTest < ActiveSupport::TestCase
   #   assert_equal [documents(:document1), documents(:document4)].sort{|a, b| a.id <=> b.id }, actual
   # end
 
-  test 'パスワードなし' do
-    assert @document1.password.nil?
-  end
-
-  test 'パスワードの比較' do
-    assert @document5.password == 'password'
-    assert @document5.password != 'password2'
-  end
-
-  test 'パスワードの設定' do
-    @document1.password = 'password'
-    assert_equal BCrypt::Password, @document1.password.class
-  end
-
-  test 'nilでパスワード削除' do
-    @document1.password = nil
-    assert @document1.password.nil?
-  end
-
-  test '空文字列でパスワード削除' do
-    @document1.password = ''
-    assert @document1.password.nil?
-  end
-
   test '階層付きテキストがインポートできる' do
     src = open("#{Rails.root}/test/fixtures/structured_text_1root.txt").read
     @document = Document.load(src)

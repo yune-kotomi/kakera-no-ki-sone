@@ -20,22 +20,6 @@ class Document < ActiveRecord::Base
     end
   end
 
-  def password
-    if bcrypt_password
-      BCrypt::Password.new(bcrypt_password)
-    else
-      nil
-    end
-  end
-
-  def password=(value)
-    if value.present?
-      self.bcrypt_password = BCrypt::Password.create(value)
-    else
-      self.bcrypt_password = nil
-    end
-  end
-
   def self.load(src)
     nodes = src.split(/(^\.+)/).reduce([]) do |ret, line|
       if line.match(/\A\.+\z/)
