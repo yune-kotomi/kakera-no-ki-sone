@@ -286,4 +286,22 @@ class DocumentsControllerTest < ActionController::TestCase
     assert_redirected_to :controller => :documents,
       :action => :index, :archived => true
   end
+
+  test 'バージョン情報が一致すれば更新受け入れ、新バージョンを応答' do
+    patch :update,
+      :params => {:id => @public.id, :document => @public.attributes, :format => :json},
+      :session => {:user_id => @owner.id}
+
+    assert_response :success
+  end
+
+  test 'バージョン情報が不一致の場合、現在のバージョンと内容を付けて応答' do
+    payload = @public.attributes.merge('version' => 0)
+    patch :update,
+      :params => {:id => @public.id, :document => payload, :format => :json},
+      :session => {:user_id => @owner.id}
+
+    assert_response 409
+    assert_equal @public.attributes.to_json, response.body
+  end
 end

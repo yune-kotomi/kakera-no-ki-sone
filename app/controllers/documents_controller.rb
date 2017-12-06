@@ -99,21 +99,28 @@ class DocumentsController < ApplicationController
   # PATCH/PUT /documents/1.json
   def update
     respond_to do |format|
-      if @document.update(document_params)
-        format.html do
-          case document_params[:archived].to_s
-          when 'true'
-            redirect_to documents_path
-          when 'false'
-            redirect_to documents_path(:archived => true)
-          else
-            redirect_to @document, notice: 'Document was successfully updated.'
+      if document_params[:version].nil? || @document.version == document_params[:version].to_i
+        # バージョンが指定されていない(互換性保持用)か指定されたバージョンが現状と
+        # 合致する場合のみ更新を許容する
+        if @document.update(document_params)
+          format.html do
+            case document_params[:archived].to_s
+            when 'true'
+              redirect_to documents_path
+            when 'false'
+              redirect_to documents_path(:archived => true)
+            else
+              redirect_to @document, notice: 'Document was successfully updated.'
+            end
           end
+          format.json { render :json => true }
+        else
+          format.html { render :edit }
+          format.json { render json: @document.errors, status: :unprocessable_entity }
         end
-        format.json { render :json => true }
       else
-        format.html { render :edit }
-        format.json { render json: @document.errors, status: :unprocessable_entity }
+        # 指定されたバージョンが現状と異なる場合は409で応答
+        format.json { render json: @document, status: 409 }
       end
     end
   end
@@ -143,7 +150,7 @@ class DocumentsController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def document_params
-      params.require(:document).permit(:title, :description, :body, :public, :archived, :markup)
+      params.require(:document).permit(:title, :description, :body, :public, :archived, :markup, :version)
     end
 
     def owner_required
