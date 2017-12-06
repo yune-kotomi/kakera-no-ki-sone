@@ -1,9 +1,10 @@
 module Editor2
   class HostedWriter
-    def initialize(editor, interval = 5)
+    def initialize(doc, editor, interval = 5)
       @editor = editor
       @save = false
       @in_progress = false
+      @current_doc = doc
       @sent_data = current_document
       @timer =
         Timer::Timer.new(interval) do
@@ -12,7 +13,8 @@ module Editor2
       @timer.start
     end
 
-    def write
+    def apply(doc)
+      @current_doc = doc
       unless current_document == @sent_data
         @save = true
         @editor.indicate_save(:on)
@@ -31,7 +33,7 @@ module Editor2
         @editor.indicate_save(:progress)
         @in_progress = true
 
-        HTTP.patch("/documents/#{@editor.store.document.id}.json", :payload => {'document' => data}) do |request|
+        HTTP.patch("/documents/#{@current_doc[:id]}.json", :payload => {'document' => data}) do |request|
           @in_progress = false
           if request.ok?
             @sent_data = data
@@ -46,7 +48,8 @@ module Editor2
     end
 
     def current_document
-      doc = @editor.store.stored_document
+      doc = @current_doc
+
       {
         :title => doc[:title],
         :description => doc[:body],

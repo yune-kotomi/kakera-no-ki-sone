@@ -107,7 +107,8 @@ module Editor2
     def stored_document
       @document.to_h.update(
         :markup => @markup,
-        :published => @published
+        :published => @published,
+        :selected => @selected
       )
     end
 
@@ -149,13 +150,12 @@ module Editor2
         end
       end
 
-      emit
+      emit(actions)
     end
 
-    def emit
+    def emit(processed_actions = [])
       # サブスクライバに変更済みの文書を与える
-      doc = @document.to_h.update(:markup => @markup, :selected => @selected)
-      @subscribers.each{|s| s.apply(doc) }
+      @subscribers.each{|s| s.apply(stored_document, processed_actions) }
     end
   end
 end

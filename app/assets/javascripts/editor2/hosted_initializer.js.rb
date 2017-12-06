@@ -8,7 +8,8 @@ Document.ready? do
     editor.load
 
     unless Element.find('#document-demo-mode').value == 'true'
-      editor.writer = Editor2::HostedWriter.new(editor)
+      writer = Editor2::HostedWriter.new(editor.store.stored_document ,editor)
+      editor.store.subscribers.push(writer)
     end
   end
 end
