@@ -89,19 +89,8 @@ module Editor2
     attr_reader :id
     attr_reader :document
 
-    def initialize(src = {})
+    def initialize
       @subscribers = []
-      load(src)
-    end
-
-    def load(src)
-      @markup = src[:markup]
-      @id = src[:id]
-      @document = Leaf.new(src)
-      @selected = @id
-      @published = src[:published]
-
-      emit
     end
 
     def stored_document
@@ -122,14 +111,23 @@ module Editor2
           end
 
         case action.operation
+        when :load
+          @markup = action.payload[:markup]
+          @id = action.payload[:id]
+          @selected = @id
+          @document = Leaf.new(action.payload)
+          @published = action.payload[:published]
+
         when :add
           payload = Leaf.new(action.payload, target)
           target.children.insert(action.position, payload)
+
         when :move
           destination = @document.find{|l| l.id == action.destination }
           target.parent.children.delete(target)
           destination.children.insert(action.position, target)
           target.parent = destination
+
         when :change
           if target
             target.update_attributes(action.payload)
@@ -137,14 +135,17 @@ module Editor2
             @markup = action.payload[:markup] if action.payload.keys.include?(:markup)
             @published = action.payload[:published] if action.payload.keys.include?(:published)
           end
+
         when :remove
           if target.parent
             target.parent.children.delete(target)
           else
             raise "can't remove root"
           end
+
         when :select
           @selected = action.target
+
         else
           raise "unknown action: #{action.operation}"
         end

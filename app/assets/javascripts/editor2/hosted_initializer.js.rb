@@ -3,9 +3,12 @@ Document.ready? do
     Element.find('footer').remove
     Element.find('.right-bottom-fab').css('bottom', '16px')
 
-    loader = Editor2::DomLoader.new
-    editor = Editor2::Editor.new(loader)
-    editor.load
+    editor = Editor2::Editor.new
+    Editor2::DomLoader.new.load do |doc|
+      editor.dispatcher.dispatch(
+        Editor2::Action.new(:operation => :load, :payload => doc)
+      )
+    end
 
     unless Element.find('#document-demo-mode').value == 'true'
       writer = Editor2::HostedWriter.new(editor.store.stored_document ,editor)

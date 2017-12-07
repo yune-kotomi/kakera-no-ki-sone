@@ -5,9 +5,7 @@ module Editor2
     attr_reader :store
     attr_reader :dispatcher
 
-    def initialize(loader)
-      @loader = loader
-
+    def initialize
       @dispatcher = Dispatcher.new
       @dispatcher.stores.push(ViewSwitcher.new(self)) if self.class.phone?
       @store = Store.new
@@ -104,10 +102,6 @@ module Editor2
         self.contents.dom_element(:container).css('height', "#{height}px")
         self.adjust_tree_size
       end.call
-    end
-
-    def load
-      @store.load(@loader.load)
     end
 
     def pushstate(state)
