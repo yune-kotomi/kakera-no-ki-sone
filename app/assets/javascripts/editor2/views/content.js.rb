@@ -65,7 +65,10 @@ module Editor2
       end
       @emit_input_timer =
         Timer::Timer.new(1) do
-          emit(@input_action) if @input_action
+          if @input_action
+            emit(@input_action)
+            @input_action = nil
+          end
         end
 
       dom_element(:display).on(:click){|e| edit }
