@@ -3,10 +3,11 @@ module Editor2
     def initialize(editor, interval = 5)
       @editor = editor
       @save = false
+      @in_progress = false
       @sent_data = current_document
       @timer =
         Timer::Timer.new(interval) do
-          transmit if @save
+          transmit if @save && !@in_progress
         end
       @timer.start
     end
@@ -28,12 +29,16 @@ module Editor2
         @editor.indicate_save(:off)
       else
         @editor.indicate_save(:progress)
+        @in_progress = true
 
         HTTP.patch("/documents/#{@editor.store.document.id}.json", :payload => {'document' => data}) do |request|
+          @in_progress = false
           if request.ok?
-            @save = false
             @sent_data = data
-            @editor.indicate_save(:off)
+            if current_document == @sent_data
+              @save = false
+              @editor.indicate_save(:off)
+            end
           else
           end
         end
