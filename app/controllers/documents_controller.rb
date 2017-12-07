@@ -22,16 +22,8 @@ class DocumentsController < ApplicationController
   # GET /documents/1.json
   def show
     if !@document.public && @document.user != @login_user
-      if @document.password
-        if request.post? && @document.password != params[:password]
-          flash[:notice] = 'パスワードが違います'
-          redirect_to @document
-          return
-        end
-      else
-        forbidden
-        return
-      end
+      forbidden
+      return
     end
 
     if params[:type] == 'structured_text'
@@ -151,7 +143,7 @@ class DocumentsController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def document_params
-      params.require(:document).permit(:title, :description, :body, :public, :archived, :password, :markup)
+      params.require(:document).permit(:title, :description, :body, :public, :archived, :markup)
     end
 
     def owner_required

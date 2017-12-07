@@ -1,85 +1,57 @@
-<% if password_prompt?(@document, @login_user) %>
-  <% @title = 'パスワードで保護された文書です' %>
-  <%= form_tag document_path(@document) do %>
-    <div class="modal-card password-prompt">
-      <div class="modal-container">
-        <div class="mdl-card mdl-shadow--2dp">
-          <div class="mdl-card__title mdl-card--expand">
-            <div>
-              <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-                <%= password_field_tag 'password', '', :class => 'mdl-textfield__input' %>
-                <label class="mdl-textfield__label">パスワード...</label>
-              </div>
-              <div><%= flash[:notice] %></div>
-            </div>
-          </div>
+<% @title = @document.title %>
 
-          <div class="mdl-card__actions mdl-card--border">
-            <button class="mdl-button mdl-js-button mdl-js-ripple-effect" type="submit">
-              <i class="material-icons">lock_open</i>
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  <% end %>
-
-<% else %>
-  <% @title = @document.title %>
-
-  <% cache @document do %>
-    <div class="document">
-      <div class="toc">
-        <div class="mdl-card mdl-shadow--2dp">
-          <div class="mdl-card__title">
-            <h2>
-              <%= link_to @document.title, "#content-#{@document.id}",
-                :id => "toc-#{@document.id}" %>
-            </h2>
-            <div class="author">
-              <%= image_tag @document.user.profile_image, :class => 'avater' if @document.user.profile_image.present? %>
-              <%= link_to_user @document.user.nickname, @document.user %>
-            </div>
-          </div>
-
-          <div class="mdl-card__supporting-text">
-            <ol>
-              <%= render :partial => 'documents/show/toc',
-                :collection => @document.body,
-                :locals => {:parent_index => ''} %>
-            </ol>
-          </div>
-        </div>
-      </div>
-
-      <div class="contents">
-        <div class="content">
-          <h3>
-            <%= link_to @document.title, "#toc-#{@document.id}", :id => "content-#{@document.id}" %>
-          </h3>
-
-          <div class="body">
-            <%= body({'body' => @document.description}, @document.markup) %>
+<% cache @document do %>
+  <div class="document">
+    <div class="toc">
+      <div class="mdl-card mdl-shadow--2dp">
+        <div class="mdl-card__title">
+          <h2>
+            <%= link_to @document.title, "#content-#{@document.id}",
+              :id => "toc-#{@document.id}" %>
+          </h2>
+          <div class="author">
+            <%= image_tag @document.user.profile_image, :class => 'avater' if @document.user.profile_image.present? %>
+            <%= link_to_user @document.user.nickname, @document.user %>
           </div>
         </div>
 
-        <%= render :partial => 'documents/show/content',
-          :collection => @document.body,
-          :locals => {:parent_index => ''} %>
+        <div class="mdl-card__supporting-text">
+          <ol>
+            <%= render :partial => 'documents/show/toc',
+              :collection => @document.body,
+              :locals => {:parent_index => ''} %>
+          </ol>
+        </div>
       </div>
     </div>
-    <div class="right-bottom-fab-spacer"></div>
-  <% end %>
 
-  <% if @document.user == @login_user %>
-    <div class="edit-button right-bottom-fab">
-      <!-- Colored FAB button with ripple -->
-      <%= button_to edit_document_path(@document), :method => :get,
-        :class => 'mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored' do %>
-        <i class="material-icons">edit</i>
-      <% end %>
+    <div class="contents">
+      <div class="content">
+        <h3>
+          <%= link_to @document.title, "#toc-#{@document.id}", :id => "content-#{@document.id}" %>
+        </h3>
+
+        <div class="body">
+          <%= body({'body' => @document.description}, @document.markup) %>
+        </div>
+      </div>
+
+      <%= render :partial => 'documents/show/content',
+        :collection => @document.body,
+        :locals => {:parent_index => ''} %>
     </div>
-  <% end %>
+  </div>
+  <div class="right-bottom-fab-spacer"></div>
+<% end %>
+
+<% if @document.user == @login_user %>
+  <div class="edit-button right-bottom-fab">
+    <!-- Colored FAB button with ripple -->
+    <%= button_to edit_document_path(@document), :method => :get,
+      :class => 'mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored' do %>
+      <i class="material-icons">edit</i>
+    <% end %>
+  </div>
 <% end %>
 
 <% content_for(:navigation1) do %>
