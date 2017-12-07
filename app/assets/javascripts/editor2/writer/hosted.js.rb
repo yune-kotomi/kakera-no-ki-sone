@@ -6,6 +6,8 @@ module Editor2
       @in_progress = false
       @current_doc = doc
       @sent_data = current_document
+      @before_save_actions = [] # 未保存のアクション
+      @pending_actions = [] # 保存中の文書に適用済みのアクション
       @timer =
         Timer::Timer.new(interval) do
           transmit if @save && !@in_progress
@@ -13,11 +15,12 @@ module Editor2
       @timer.start
     end
 
-    def apply(doc)
+    def apply(doc, actions)
       @current_doc = doc
       unless current_document == @sent_data
         @save = true
         @editor.indicate_save(:on)
+        @before_save_actions.push(actions).flatten!
       end
     end
 
@@ -32,11 +35,14 @@ module Editor2
       else
         @editor.indicate_save(:progress)
         @in_progress = true
+        @pending_actions.push(@before_save_actions).flatten!
+        @before_save_actions.clear
 
         HTTP.patch("/documents/#{@current_doc[:id]}.json", :payload => {'document' => data}) do |request|
           @in_progress = false
           if request.ok?
             @sent_data = data
+            @pending_actions.clear
             if current_document == @sent_data
               @save = false
               @editor.indicate_save(:off)
