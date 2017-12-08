@@ -120,7 +120,8 @@ class DocumentsController < ApplicationController
         end
       else
         # 指定されたバージョンが現状と異なる場合は409で応答
-        format.json { render json: @document, status: 409 }
+        doc = @document.attributes.select{|k, _| ["id", "title", "description", "body", "version", "markup", "public"].include?(k) }.to_h
+        format.json { render json: doc, status: 409 }
       end
     end
   end

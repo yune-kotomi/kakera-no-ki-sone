@@ -303,6 +303,7 @@ class DocumentsControllerTest < ActionController::TestCase
       :session => {:user_id => @owner.id}
 
     assert_response 409
-    assert_equal @public.attributes.to_json, response.body
+    expected = @public.attributes.select{|k, v| ["id", "title", "description", "body", "version", "markup", "public"].include?(k) }.to_h.to_json
+    assert_equal expected, response.body
   end
 end
