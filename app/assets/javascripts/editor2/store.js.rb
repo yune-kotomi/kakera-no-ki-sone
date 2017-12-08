@@ -61,7 +61,7 @@ module Editor2
     end
 
     def ==(other)
-      self.id == other.id
+      self.id.to_s == other.id.to_s
     end
 
     def index
@@ -97,7 +97,8 @@ module Editor2
       @document.to_h.update(
         :markup => @markup,
         :published => @published,
-        :selected => @selected
+        :selected => @selected,
+        :version => @version
       )
     end
 
@@ -117,6 +118,7 @@ module Editor2
           @selected = @id
           @document = Leaf.new(action.payload)
           @published = action.payload[:published]
+          @version = action.payload[:version]
 
         when :add
           payload = Leaf.new(action.payload, target)
@@ -134,6 +136,7 @@ module Editor2
           else
             @markup = action.payload[:markup] if action.payload.keys.include?(:markup)
             @published = action.payload[:published] if action.payload.keys.include?(:published)
+            @version = action.payload[:version] if action.payload.keys.include?(:version)
           end
 
         when :remove

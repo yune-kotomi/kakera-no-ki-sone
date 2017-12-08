@@ -1,5 +1,7 @@
 module Editor2
   class HostedWriter
+    attr_accessor :dispatcher
+
     def initialize(doc, editor, interval = 5)
       @editor = editor
       @save = false
@@ -8,10 +10,7 @@ module Editor2
       @sent_data = current_document
       @before_save_actions = [] # 未保存のアクション
       @pending_actions = [] # 保存中の文書に適用済みのアクション
-      @timer =
-        Timer::Timer.new(interval) do
-          transmit if @save && !@in_progress
-        end
+      @timer =Timer::Timer.new(interval) { transmit_if_can }
       @timer.start
     end
 
@@ -41,16 +40,55 @@ module Editor2
         HTTP.patch("/documents/#{@current_doc[:id]}.json", :payload => {'document' => data}) do |request|
           @in_progress = false
           if request.ok?
+            version = request.json['version']
             @sent_data = data
             @pending_actions.clear
             if current_document == @sent_data
               @save = false
               @editor.indicate_save(:off)
             end
+            # サーバ側と同一バージョンにしておく
+            @sent_data['version'] = version
+
+            @dispatcher.dispatch(
+              Action.new(
+                :operation => :change,
+                :payload => {:version => version}
+              )
+            )
           else
+            case request.status_code
+            when 409
+              # サーバ側とバージョン不一致
+              # データ構造の読み替え
+              doc =
+                {
+                  :id => request.json['id'],
+                  :title => request.json['title'],
+                  :body => request.json['description'],
+                  :children => request.json['body'],
+                  :markup => request.json['markup'],
+                  :published => request.json['public'],
+                  :version => request.json['version']
+                }
+              # 送り返されてきたものに対して現在滞留しているアクションを適用させる
+              actions =
+                [
+                  Action.new(:operation => :load, :payload => doc),
+                  @pending_actions
+                ].flatten
+              @dispatcher.dispatch(*actions)
+              transmit_if_can
+            else
+              raise request
+            end
           end
         end
       end
+    end
+
+    def transmit_if_can
+      transmit if @save && !@in_progress
     end
 
     def current_document
@@ -61,7 +99,8 @@ module Editor2
         :description => doc[:body],
         :body => doc[:children].to_json,
         :public => (doc[:published] == true),
-        :markup => doc[:markup]
+        :markup => doc[:markup],
+        :version => doc[:version]
       }
     end
   end

@@ -9,7 +9,8 @@ module Editor2
           :children => (JSON.parse(Element.find('#document-body').value) || []),
           :metadatum => {},
           :markup => JSON.parse(Element.find('#document-markup').value),
-          :published => JSON.parse(Element.find('#document-public').value)
+          :published => JSON.parse(Element.find('#document-public').value),
+          :version => JSON.parse(Element.find('#document-version').value)
         }
       yield(doc)
     end

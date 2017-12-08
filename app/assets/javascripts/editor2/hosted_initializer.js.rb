@@ -11,7 +11,8 @@ Document.ready? do
     end
 
     unless Element.find('#document-demo-mode').value == 'true'
-      writer = Editor2::HostedWriter.new(editor.store.stored_document ,editor)
+      writer = Editor2::HostedWriter.new(editor.store.stored_document, editor)
+      writer.dispatcher = editor.dispatcher
       editor.store.subscribers.push(writer)
     end
   end
