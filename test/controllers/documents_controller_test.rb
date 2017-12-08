@@ -293,6 +293,7 @@ class DocumentsControllerTest < ActionController::TestCase
       :session => {:user_id => @owner.id}
 
     assert_response :success
+    assert_equal assigns(:document).version, JSON.parse(response.body)['version']
   end
 
   test 'バージョン情報が不一致の場合、現在のバージョンと内容を付けて応答' do

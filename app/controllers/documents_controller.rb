@@ -113,7 +113,7 @@ class DocumentsController < ApplicationController
               redirect_to @document, notice: 'Document was successfully updated.'
             end
           end
-          format.json { render :json => true }
+          format.json { render :json => {:version => @document.version} }
         else
           format.html { render :edit }
           format.json { render json: @document.errors, status: :unprocessable_entity }
