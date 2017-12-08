@@ -14,5 +14,15 @@ module Editor2
       @destination = params[:destination]
       @payload = params[:payload] || {}
     end
+
+    def inspect
+      {
+        :operation => @operation,
+        :target => @target,
+        :position => @position,
+        :destination => @destination,
+        :payload => @payload
+      }
+    end
   end
 end
