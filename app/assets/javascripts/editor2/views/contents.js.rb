@@ -80,9 +80,10 @@ module Editor2
     def apply(attr)
       @markup = attr[:markup]
       [:title, :body].map{|n| dom_element(n) }.each{|e| e['data-id'] = @id }
-
-      # 文書をフラットに
-      attr[:children] = flatten_children(attr[:children])
+      # 章番号
+      (attr[:children] || []).each_with_index do |c, i|
+        c[:chapter_number] = i + 1
+      end
 
       apply_body(attr[:body]) unless attributes[:body] == attr[:body]
 
@@ -94,7 +95,9 @@ module Editor2
           self
         else
           attribute_instances[:children].
-            find{|c| c.id == attr[:selected] }
+            map{|c1| c1.find(attr[:selected]) }.
+            compact.
+            first
         end
 
       unless selected.visible?
@@ -161,6 +164,10 @@ module Editor2
       false
     end
 
+    def parents
+      [parent]
+    end
+
     # 全ての本文を強制更新
     def refresh!
       apply_body(attributes[:body])
@@ -203,24 +210,11 @@ module Editor2
       end
     end
 
-    def flatten_children(src)
-      case src
-      when Array
-        src.map{|e| flatten_children(e) }
-      when Hash
-        if src[:children].nil?
-          [src]
-        else
-          [src, flatten_children(src[:children])]
-        end
-      end.flatten
-    end
-
     def find(id)
       if id == @id
         self
       else
-        attribute_instances[:children].find{|c| c.id == id }
+        attribute_instances[:children].map{|c| c.find(id) }.compact.first
       end
     end
 
@@ -229,6 +223,10 @@ module Editor2
     end
 
     def previous
+      nil
+    end
+
+    def next_leaf_not_below
       nil
     end
   end

@@ -36,6 +36,8 @@ module Editor2
             </div>
           </div>
         </div>
+
+        <ol class="children"></ol>
       </div>
     EOS
 
@@ -49,6 +51,8 @@ module Editor2
     element :title, :selector => 'input.title'
     element :body, :selector => 'textarea.body'
     element :close_button, :selector => '.editor button.close'
+
+    element :children, :selector => 'ol.children', :type => Content
 
     def initialize(attr, parent)
       super(attr, parent)
@@ -97,6 +101,10 @@ module Editor2
 
     def apply(attr)
       [:title, :body].map{|n| dom_element(n) }.each{|e| e['data-id'] = @id }
+      # 章番号
+      (attr[:children] || []).each_with_index do |c, i|
+        c[:chapter_number] = "#{attr[:chapter_number]}.#{i + 1}"
+      end
 
       apply_body(attr[:body]) unless attributes[:body] == attr[:body]
       super(attr.update(:title_display => attr[:title]))
@@ -104,7 +112,7 @@ module Editor2
 
     def apply_body(src)
       unless dom_element(:display).css(:display) == 'none'
-        html = parent.render(src)
+        html = root.render(src)
         dom_element(:body_display).html = html
       end
     end
@@ -139,29 +147,84 @@ module Editor2
       %x{ history.pushState('edit', null, '#edit') } if ::Editor2::Editor.phone? && `history.state` == 'contents'
     end
 
+    def root
+      parents.find{|c| c.is_a?(Contents) }
+    end
+
+    def parents
+      [parent, parent.parents].flatten
+    end
+
     def visible?
-      container = parent.dom_element(:container)
+      container = root.dom_element(:container)
       min = container.offset.top
       max = min + container.height.to_i
-      d = dom_element
+      d = dom_element(:display)
 
       min < d.offset.top && d.offset.top + d.outer_height < max
     end
 
+    def find(id)
+      if @id == id
+        self
+      else
+        attribute_instances[:children].
+          map{|c1| c1.find(id) }.
+          compact.
+          first
+      end
+    end
+
+    # 親のchildrenにおけるインデックスを返す
+    def index
+      parent.attribute_instances[:children].index(self)
+    end
+
     def next
-      children = parent.attribute_instances[:children]
-      index = children.index(self)
-      children[index + 1]
+      child = attribute_instances[:children].first
+      brother = younger_brother
+      if child.nil?
+        if brother.nil?
+          parent.next_leaf_not_below
+        else
+          brother
+        end
+      else
+        child
+      end
     end
 
     def previous
-      children = parent.attribute_instances[:children]
-      index = children.index(self)
-      if index == 0
-        parent
+      brother = elder_brother
+      if brother
+        brother.last_child
       else
-        children[index - 1]
+        parent
       end
+    end
+
+    # 自分を頂点とした部分木の一番下
+    def last_child
+      c = attribute_instances[:children].last
+      if c
+        c.last_child
+      else
+        self
+      end
+    end
+
+    # 自分と同じか自分より上の階層で次に位置する葉
+    def next_leaf_not_below
+      younger_brother || parent.next_leaf_not_below
+    end
+
+    private
+    def elder_brother
+      parent.attribute_instances[:children][index - 1] if index > 0
+    end
+
+    def younger_brother
+      parent.attribute_instances[:children][index + 1] if index < parent.attribute_instances[:children].size - 1
     end
   end
 end
