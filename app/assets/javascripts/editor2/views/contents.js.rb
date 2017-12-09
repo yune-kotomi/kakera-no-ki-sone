@@ -97,7 +97,7 @@ module Editor2
             find{|c| c.id == attr[:selected] }
         end
 
-      unless selected.visible?
+      if !selected.visible? && selected.dom_element(:editor).css(:display) == 'none'
         container = dom_element(:container)
         target =
           if selected == self
