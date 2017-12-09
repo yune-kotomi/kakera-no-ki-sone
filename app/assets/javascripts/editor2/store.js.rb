@@ -106,7 +106,7 @@ module Editor2
       actions.each do |action|
         target =
           if action.target
-            @document.find{|l| l.id == action.target }
+            @document.find{|l| l.id.to_s == action.target.to_s }
           else
             nil
           end
@@ -122,13 +122,18 @@ module Editor2
 
         when :add
           payload = Leaf.new(action.payload, target)
-          target.children.insert(action.position, payload)
+          # 追加先がない場合(他端末で削除?)はルートノードで代用
+          (target || @document).children.insert(action.position, payload)
 
         when :move
-          destination = @document.find{|l| l.id == action.destination }
-          target.parent.children.delete(target)
-          destination.children.insert(action.position, target)
-          target.parent = destination
+          # 移動先がない場合(他端末で削除?)はルートノードで代用
+          destination = @document.find{|l| l.id == action.destination } || @document
+          # 移動対象が消えている場合は何もしない
+          if target
+            target.parent.children.delete(target)
+            destination.children.insert(action.position, target)
+            target.parent = destination
+          end
 
         when :change
           if target
@@ -140,14 +145,16 @@ module Editor2
           end
 
         when :remove
-          if target.parent
-            target.parent.children.delete(target)
-          else
-            raise "can't remove root"
+          if target
+            if target.parent
+              target.parent.children.delete(target)
+            else
+              raise "can't remove root"
+            end
           end
 
         when :select
-          @selected = action.target
+          @selected = action.target || @document.id
 
         else
           raise "unknown action: #{action.operation}"
