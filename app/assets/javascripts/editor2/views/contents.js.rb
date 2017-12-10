@@ -2,6 +2,9 @@ require 'rickdom'
 
 module Editor2
   class Contents < AbstractView
+    include CommonLeaf
+    include CommonContent
+
     template <<-EOS
       <div>
         <div class="scroll-container" tabindex="-1">
@@ -80,26 +83,13 @@ module Editor2
     def apply(attr)
       @markup = attr[:markup]
       [:title, :body].map{|n| dom_element(n) }.each{|e| e['data-id'] = @id }
-      # 章番号
-      (attr[:children] || []).each_with_index do |c, i|
-        c[:chapter_number] = i + 1
-      end
-
+      attr = update_chapter_number(attr)
       apply_body(attr[:body]) unless attributes[:body] == attr[:body]
 
       super(attr.update(:title_display => attr[:title]))
 
       # 選択操作
-      selected =
-        if attr[:selected] == @id
-          self
-        else
-          attribute_instances[:children].
-            map{|c1| c1.find(attr[:selected]) }.
-            compact.
-            first
-        end
-
+      selected = find(attr[:selected])
       unless selected.visible?
         container = dom_element(:container)
         target =
@@ -112,34 +102,6 @@ module Editor2
           container.scroll_top - container.offset.top
         container.scroll_top = offset
       end
-    end
-
-    def show
-      @emit_input_timer.stop
-      @emit_input_timer.execute # 滞留しているactionを実行
-
-      dom_element(:display).show
-      dom_element(:editor).hide
-      apply_body(attributes[:body])
-    end
-
-    def edit(focus = :title)
-      @emit_input_timer.start
-
-      dom_element(:display).hide
-      dom_element(:editor).show
-      emit(Action.new(
-        :operation => :select,
-        :target => @id
-      ))
-
-      if focus == :title
-        dom_element(:title).focus
-      else
-        dom_element(:body).focus
-      end
-
-      %x{ history.pushState('edit', null, '#edit') } if ::Editor2::Editor.phone?
     end
 
     def render(text)
@@ -160,18 +122,8 @@ module Editor2
       RickDOM.new.build(html)
     end
 
-    def visible?
-      false
-    end
-
-    def parents
-      [parent]
-    end
-
-    # 全ての本文を強制更新
-    def refresh!
-      apply_body(attributes[:body])
-      attribute_instances[:children].each{|c| c.apply_body(c.attributes[:body]) }
+    def root
+      self
     end
 
     private
@@ -201,21 +153,6 @@ module Editor2
       parser = Markdown::Parser.new
       parser.parse(src)
       parser.to_html
-    end
-
-    def apply_body(body)
-      unless dom_element(:display).css(:display) == 'none'
-        html = render(body)
-        dom_element(:body_display).html = html
-      end
-    end
-
-    def find(id)
-      if id == @id
-        self
-      else
-        attribute_instances[:children].map{|c| c.find(id) }.compact.first
-      end
     end
 
     def next

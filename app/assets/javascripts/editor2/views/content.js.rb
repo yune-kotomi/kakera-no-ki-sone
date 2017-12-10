@@ -1,5 +1,8 @@
 module Editor2
   class Content < AbstractView
+    include CommonLeaf
+    include CommonContent
+
     template <<-EOS
       <div class="content">
         <hr>
@@ -101,83 +104,10 @@ module Editor2
 
     def apply(attr)
       [:title, :body].map{|n| dom_element(n) }.each{|e| e['data-id'] = @id }
-      # 章番号
-      (attr[:children] || []).each_with_index do |c, i|
-        c[:chapter_number] = "#{attr[:chapter_number]}.#{i + 1}"
-      end
 
+      attr = update_chapter_number(attr)
       apply_body(attr[:body]) unless attributes[:body] == attr[:body]
       super(attr.update(:title_display => attr[:title]))
-    end
-
-    def apply_body(src)
-      unless dom_element(:display).css(:display) == 'none'
-        html = root.render(src)
-        dom_element(:body_display).html = html
-      end
-    end
-
-    def show
-      @emit_input_timer.stop
-      @emit_input_timer.execute # 滞留しているactionを実行
-
-      dom_element(:display).show
-      dom_element(:editor).hide
-      apply_body(attributes[:body])
-
-      `history.back()` if ::Editor2::Editor.phone? && `history.state` == 'edit'
-    end
-
-    def edit(focus = :title)
-      @emit_input_timer.start
-
-      dom_element(:display).hide
-      dom_element(:editor).show
-      emit(Action.new(
-        :operation => :select,
-        :target => @id
-      ))
-
-      if focus == :title
-        dom_element(:title).focus
-      else
-        dom_element(:body).focus
-      end
-
-      %x{ history.pushState('edit', null, '#edit') } if ::Editor2::Editor.phone? && `history.state` == 'contents'
-    end
-
-    def root
-      parents.find{|c| c.is_a?(Contents) }
-    end
-
-    def parents
-      [parent, parent.parents].flatten
-    end
-
-    def visible?
-      container = root.dom_element(:container)
-      min = container.offset.top
-      max = min + container.height.to_i
-      d = dom_element(:display)
-
-      min < d.offset.top && d.offset.top + d.outer_height < max
-    end
-
-    def find(id)
-      if @id == id
-        self
-      else
-        attribute_instances[:children].
-          map{|c1| c1.find(id) }.
-          compact.
-          first
-      end
-    end
-
-    # 親のchildrenにおけるインデックスを返す
-    def index
-      parent.attribute_instances[:children].index(self)
     end
 
     def next
@@ -201,30 +131,6 @@ module Editor2
       else
         parent
       end
-    end
-
-    # 自分を頂点とした部分木の一番下
-    def last_child
-      c = attribute_instances[:children].last
-      if c
-        c.last_child
-      else
-        self
-      end
-    end
-
-    # 自分と同じか自分より上の階層で次に位置する葉
-    def next_leaf_not_below
-      younger_brother || parent.next_leaf_not_below
-    end
-
-    private
-    def elder_brother
-      parent.attribute_instances[:children][index - 1] if index > 0
-    end
-
-    def younger_brother
-      parent.attribute_instances[:children][index + 1] if index < parent.attribute_instances[:children].size - 1
     end
   end
 end

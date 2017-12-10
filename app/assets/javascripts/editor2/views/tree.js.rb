@@ -4,6 +4,8 @@ require 'editor2/views/leaf'
 module Editor2
   module View
     class Tree < AbstractView
+      include CommonLeaf
+
       template <<-EOS
         <div class="scroll-container" tabindex="-1">
           <div class="tree mdl-shadow--4dp">
@@ -71,19 +73,11 @@ module Editor2
       end
 
       def apply(attr)
-        # 章番号
-        (attr[:children] || []).each_with_index do |c, i|
-          c[:chapter_number] = i + 1
-        end
-
+        attr = update_chapter_number(attr)
         super
 
         # 選択操作
         select_leaf(attr[:selected])
-      end
-
-      def attributes
-        @attributes.merge(:id => @id)
       end
 
       def dropped(id)
@@ -99,15 +93,7 @@ module Editor2
       end
 
       def select_leaf(target)
-        selected =
-          if target == @id
-            self
-          else
-            attribute_instances[:children].
-              map{|c1| c1.find(target) }.
-              compact.
-              first
-          end
+        selected = find(target)
         selected.select
         unselect unless selected == self
 
@@ -144,16 +130,8 @@ module Editor2
         false
       end
 
-      def parents
-        [parent]
-      end
-
-      def find(id)
-        if id == @id
-          self
-        else
-          attribute_instances[:children].map{|c| c.find(id) }.compact.first
-        end
+      def root
+        self
       end
     end
   end

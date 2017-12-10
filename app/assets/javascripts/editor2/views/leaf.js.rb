@@ -1,6 +1,8 @@
 module Editor2
   module View
     class Leaf < AbstractView
+      include CommonLeaf
+
       template <<-EOS
       <li class="leaf" data-id="{{attr:id}}">
         <div class="body">
@@ -115,11 +117,7 @@ module Editor2
       end
 
       def apply(attr)
-        # 章番号
-        (attr[:children] || []).each_with_index do |c, i|
-          c[:chapter_number] = "#{attr[:chapter_number]}.#{i + 1}"
-        end
-
+        attr = update_chapter_number(attr)
         super(attr)
 
         [dom_element, dom_element.find('.handle').first].each{|e| e['data-id'] = @id }
@@ -166,37 +164,13 @@ module Editor2
         Element.find(".leaf[data-id='#{id}']").tap{|e| ['top', 'bottom', 'left', 'right', 'width', 'height'].each{|a| e.css(a, '') } }
       end
 
-      def find(id)
-        if @id == id
-          self
-        else
-          attribute_instances[:children].
-            map{|c1| c1.find(id) }.
-            compact.
-            first
-        end
-      end
-
-      # 親のchildrenにおけるインデックスを返す
-      def index
-        parent.attribute_instances[:children].index(self)
-      end
-
       def select
         dom_element.add_class('selected')
       end
 
-      def parental_tree
-        parents.find{|c| c.is_a?(Tree) }
-      end
-
-      def parents
-        [parent, parent.parents].flatten
-      end
-
       def visible?
-        min = parental_tree.dom_element(:container).offset.top
-        max = min + parental_tree.dom_element(:container).height.to_i
+        min = root.dom_element(:container).offset.top
+        max = min + root.dom_element(:container).height.to_i
         d = dom_element(:title)
 
         min < d.offset.top && d.offset.top + d.outer_height < max
