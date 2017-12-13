@@ -133,6 +133,25 @@ class DocumentsControllerTest < ActionController::TestCase
     assert_equal @public, assigns(:document)
   end
 
+  test '指定したバージョンが最新であれば304で応答する' do
+    get :show,
+      :params => {:id => @public.id, :version => @public.version},
+      :session => {:user_id => @owner.id}
+
+      assert_response 304
+  end
+
+  test '指定したバージョンが現在と違えば通常応答' do
+    get :show,
+      :params => {:id => @public.id, :version => 0, :format => :json},
+      :session => {:user_id => @owner.id}
+
+    assert_response :success
+    assert_equal @public, assigns(:document)
+    expected = @public.attributes.select{|k, v| ["id", "title", "description", "body", "version", "markup", "public"].include?(k) }.to_h.to_json
+    assert_equal expected, response.body.strip
+  end
+
   test 'typeにstructured_textを指定すると階層付きテキストでダウンロードされる' do
     get :show,
       :params => {:id => @public.id, :format => :text, :type => 'structured_text'},
@@ -304,6 +323,6 @@ class DocumentsControllerTest < ActionController::TestCase
 
     assert_response 409
     expected = @public.attributes.select{|k, v| ["id", "title", "description", "body", "version", "markup", "public"].include?(k) }.to_h.to_json
-    assert_equal expected, response.body
+    assert_equal expected, response.body.strip
   end
 end

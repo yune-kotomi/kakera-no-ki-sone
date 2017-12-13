@@ -29,6 +29,10 @@ class DocumentsController < ApplicationController
     if params[:type] == 'structured_text'
       send_data(@document.to_structured_text, :type => 'text/plain', :filename => "#{@document.title}.txt")
     end
+
+    if params[:version] && @document.version.to_s == params[:version].to_s
+      render :plain => 'not modified', :status => 304
+    end
   end
 
   def histories
@@ -120,8 +124,7 @@ class DocumentsController < ApplicationController
         end
       else
         # 指定されたバージョンが現状と異なる場合は409で応答
-        doc = @document.attributes.select{|k, _| ["id", "title", "description", "body", "version", "markup", "public"].include?(k) }.to_h
-        format.json { render json: doc, status: 409 }
+        format.json { render 'show.json.erb', status: 409 }
       end
     end
   end
