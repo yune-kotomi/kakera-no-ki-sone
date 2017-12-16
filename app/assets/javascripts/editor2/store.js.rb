@@ -61,7 +61,7 @@ module Editor2
     end
 
     def ==(other)
-      self.id == other.id
+      self.id.to_s == other.id.to_s
     end
 
     def index
@@ -88,26 +88,18 @@ module Editor2
     attr_reader :selected
     attr_reader :id
     attr_reader :document
+    attr_reader :version
 
-    def initialize(src = {})
+    def initialize
       @subscribers = []
-      load(src)
-    end
-
-    def load(src)
-      @markup = src[:markup]
-      @id = src[:id]
-      @document = Leaf.new(src)
-      @selected = @id
-      @published = src[:published]
-
-      emit
     end
 
     def stored_document
       @document.to_h.update(
         :markup => @markup,
-        :published => @published
+        :published => @published,
+        :selected => @selected,
+        :version => @version
       )
     end
 
@@ -115,47 +107,67 @@ module Editor2
       actions.each do |action|
         target =
           if action.target
-            @document.find{|l| l.id == action.target }
+            @document.find{|l| l.id.to_s == action.target.to_s }
           else
             nil
           end
 
         case action.operation
+        when :load
+          @markup = action.payload[:markup]
+          @id = action.payload[:id]
+          @selected = @id
+          @document = Leaf.new(action.payload)
+          @published = action.payload[:published]
+          @version = action.payload[:version]
+
         when :add
           payload = Leaf.new(action.payload, target)
-          target.children.insert(action.position, payload)
+          # 追加先がない場合(他端末で削除?)はルートノードで代用
+          (target || @document).children.insert(action.position, payload)
+
         when :move
-          destination = @document.find{|l| l.id == action.destination }
-          target.parent.children.delete(target)
-          destination.children.insert(action.position, target)
-          target.parent = destination
+          # 移動先がない場合(他端末で削除?)はルートノードで代用
+          destination = @document.find{|l| l.id == action.destination } || @document
+          # 移動対象が消えている場合は何もしない
+          if target
+            target.parent.children.delete(target)
+            destination.children.insert(action.position, target)
+            target.parent = destination
+          end
+
         when :change
           if target
             target.update_attributes(action.payload)
           else
             @markup = action.payload[:markup] if action.payload.keys.include?(:markup)
             @published = action.payload[:published] if action.payload.keys.include?(:published)
+            @version = action.payload[:version] if action.payload.keys.include?(:version)
           end
+
         when :remove
-          if target.parent
-            target.parent.children.delete(target)
-          else
-            raise "can't remove root"
+          if target
+            if target.parent
+              target.parent.children.delete(target)
+            else
+              raise "can't remove root"
+            end
           end
+
         when :select
-          @selected = action.target
+          @selected = action.target || @document.id
+
         else
           raise "unknown action: #{action.operation}"
         end
       end
 
-      emit
+      emit(actions)
     end
 
-    def emit
+    def emit(processed_actions = [])
       # サブスクライバに変更済みの文書を与える
-      doc = @document.to_h.update(:markup => @markup, :selected => @selected)
-      @subscribers.each{|s| s.apply(doc) }
+      @subscribers.each{|s| s.apply(stored_document, processed_actions) }
     end
   end
 end
