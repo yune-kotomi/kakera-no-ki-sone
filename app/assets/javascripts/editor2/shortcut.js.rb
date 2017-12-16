@@ -169,12 +169,19 @@ module Editor2
       unless target.parent.nil? || target.index == 0
         previous = target.parent.children[target.index - 1]
 
-        @editor.dispatcher.dispatch(Action.new(
-          :operation => :move,
-          :target => target.id,
-          :position => previous.children.size,
-          :destination => previous.id
-        ))
+        @editor.dispatcher.dispatch(
+          Action.new(
+            :operation => :change,
+            :target => previous.id,
+            :payload => {:metadatum => {:open => true}}
+          ),
+          Action.new(
+            :operation => :move,
+            :target => target.id,
+            :position => previous.children.size,
+            :destination => previous.id
+          )
+        )
       end
     end
   end

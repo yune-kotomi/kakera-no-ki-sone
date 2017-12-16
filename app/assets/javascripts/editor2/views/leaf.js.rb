@@ -145,20 +145,33 @@ module Editor2
 
       # 並べ替え処理
       def dropped(id, as = :brother) # or :child
-        if as == :brother
-          destination = parent.id
-          position = parent.attribute_instances[:children].reject{|c| c.id == id }.index(self) + 1
-        else
-          destination = @id
-          position = 0
-        end
+        actions =
+          if as == :brother
+            position = parent.attribute_instances[:children].reject{|c| c.id == id }.index(self) + 1
 
-        emit(Action.new(
-          :operation => :move,
-          :target => id,
-          :position => position,
-          :destination => destination
-        ))
+            [Action.new(
+              :operation => :move,
+              :target => id,
+              :position => position,
+              :destination => parent.id
+            )]
+          else
+            [
+              Action.new(
+                :operation => :change,
+                :target => @id,
+                :payload => {:metadatum => {:open => true}}
+              ),
+              Action.new(
+                :operation => :move,
+                :target => id,
+                :position => 0,
+                :destination => id
+              )
+            ]
+          end
+
+        emit(*actions)
 
         # 位置情報をリセットする
         Element.find(".leaf[data-id='#{id}']").tap{|e| ['top', 'bottom', 'left', 'right', 'width', 'height'].each{|a| e.css(a, '') } }
