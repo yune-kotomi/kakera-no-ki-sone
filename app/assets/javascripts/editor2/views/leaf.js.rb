@@ -175,6 +175,18 @@ module Editor2
 
         min < d.offset.top && d.offset.top + d.outer_height < max
       end
+
+      def open?
+        dom_element(:children).css(:display) != 'none'
+      end
+
+      def last_visible_child
+        if open? && children.size > 0
+          children.last.last_visible_child
+        else
+          self
+        end
+      end
     end
   end
 end

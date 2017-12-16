@@ -1,7 +1,11 @@
 module Editor2
   module CommonLeaf
+    def children
+      attribute_instances[:children]
+    end
+
     def index
-      parent.attribute_instances[:children].index(self)
+      parent.children.index(self)
     end
 
     def root
@@ -9,11 +13,11 @@ module Editor2
     end
 
     def elder_brother
-      parent.attribute_instances[:children][index - 1] if index > 0
+      parent.children[index - 1] if index > 0
     end
 
     def younger_brother
-      parent.attribute_instances[:children][index + 1] if index < parent.attribute_instances[:children].size - 1
+      parent.children[index + 1] if index < parent.children.size - 1
     end
 
     # 自分と同じか自分より上の階層で次に位置する葉
@@ -23,7 +27,7 @@ module Editor2
 
     # 自分を頂点とした部分木の一番下
     def last_child
-      c = attribute_instances[:children].last
+      c = children.last
       if c
         c.last_child
       else
@@ -35,7 +39,7 @@ module Editor2
       if @id == id
         self
       else
-        attribute_instances[:children].
+        children.
           map{|c1| c1.find(id) }.
           compact.
           first

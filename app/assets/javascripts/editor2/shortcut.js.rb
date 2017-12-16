@@ -77,15 +77,31 @@ module Editor2
     end
 
     def up_key
-      prev = @editor.contents.find(@editor.store.selected).previous
-      @editor.store.dispatch(Action.new(
-        :operation => :select,
-        :target => prev.id
-      )) if prev
+      current = @editor.tree.find(@editor.store.selected)
+      unless current == @editor.tree
+        prev =
+          if current.elder_brother
+            current.elder_brother.last_visible_child
+          else
+            current.parent
+          end
+
+        @editor.store.dispatch(Action.new(
+          :operation => :select,
+          :target => prev.id
+        )) if prev
+      end
     end
 
     def down_key
-      n = @editor.contents.find(@editor.store.selected).next
+      current = @editor.tree.find(@editor.store.selected)
+      n =
+        if current.children.size > 0 && current.open?
+          current.children.first
+        else
+          current.next_leaf_not_below
+        end
+
       @editor.dispatcher.dispatch(Action.new(
         :operation => :select,
         :target => n.id

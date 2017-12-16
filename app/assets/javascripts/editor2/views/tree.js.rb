@@ -130,6 +130,10 @@ module Editor2
         false
       end
 
+      def open?
+        true
+      end
+
       def root
         self
       end
