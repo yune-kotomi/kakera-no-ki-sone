@@ -96,7 +96,7 @@ module Editor2
     def down_key
       current = @editor.tree.find(@editor.store.selected)
       n =
-        if current.children.size > 0 && current.open?
+        if current.open?
           current.children.first
         else
           current.next_leaf_not_below
@@ -109,8 +109,16 @@ module Editor2
     end
 
     def left_key
-      button = @editor.tree.find(@editor.store.selected).dom_element(:collapse)
-      button.trigger('click') if button
+      current = @editor.tree.find(@editor.store.selected)
+      if current.open?
+        button = current.dom_element(:collapse)
+        button.trigger('click') if button
+      else
+        @editor.dispatcher.dispatch(Action.new(
+          :operation => :select,
+          :target => current.parent.id
+        ))
+      end
     end
 
     def right_key

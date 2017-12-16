@@ -177,11 +177,11 @@ module Editor2
       end
 
       def open?
-        dom_element(:children).css(:display) != 'none'
+        dom_element(:children).css(:display) != 'none' && children.size > 0
       end
 
       def last_visible_child
-        if open? && children.size > 0
+        if open?
           children.last.last_visible_child
         else
           self
