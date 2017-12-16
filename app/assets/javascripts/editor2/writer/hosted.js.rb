@@ -37,10 +37,10 @@ module Editor2
         @pending_actions.push(@before_save_actions).flatten!
         @before_save_actions.clear
 
-        HTTP.patch("/documents/#{@current_doc[:id]}.json", :payload => {'document' => data}) do |request|
+        HTTP.patch("/documents/#{@current_doc[:id]}.json", :payload => {'document' => data}) do |response|
           @in_progress = false
-          if request.ok?
-            version = request.json['version']
+          if response.ok?
+            version = response.json['version']
             @sent_data = data
             @pending_actions.clear
             if current_document == @sent_data
@@ -57,20 +57,11 @@ module Editor2
               )
             )
           else
-            case request.status_code
+            case response.status_code
             when 409
               # サーバ側とバージョン不一致
               # データ構造の読み替え
-              doc =
-                {
-                  :id => request.json['id'],
-                  :title => request.json['title'],
-                  :body => request.json['description'],
-                  :children => request.json['body'],
-                  :markup => request.json['markup'],
-                  :published => request.json['public'],
-                  :version => request.json['version']
-                }
+              doc = Editor2::Loader::Xhr.response_to_doc(response)
               # 送り返されてきたものに対して現在滞留しているアクションを適用させる
               actions =
                 [
@@ -80,7 +71,7 @@ module Editor2
               @dispatcher.dispatch(*actions)
               transmit_if_can
             else
-              raise request
+              raise response
             end
           end
         end

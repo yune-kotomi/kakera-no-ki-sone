@@ -88,6 +88,7 @@ module Editor2
     attr_reader :selected
     attr_reader :id
     attr_reader :document
+    attr_reader :version
 
     def initialize
       @subscribers = []
