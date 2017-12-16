@@ -47,7 +47,7 @@ GEM
     addressable (2.5.2)
       public_suffix (>= 2.0.2, < 4.0)
     arel (8.0.0)
-    autoprefixer-rails (7.2.2)
+    autoprefixer-rails (7.2.3)
       execjs
     bcrypt (3.1.11)
     bindex (0.5.0)
@@ -160,7 +160,7 @@ GEM
     public_suffix (3.0.1)
     pygments.rb (1.2.1)
       multi_json (>= 1.0.0)
-    qiita-markdown (0.22.0)
+    qiita-markdown (0.23.0)
       addressable
       gemoji
       github-linguist (~> 4.0)
@@ -221,7 +221,7 @@ GEM
       crass (~> 1.0.2)
       nokogiri (>= 1.4.4)
       nokogumbo (~> 1.4.1)
-    sass (3.5.3)
+    sass (3.5.4)
       sass-listen (~> 4.0.0)
     sass-listen (4.0.0)
       rb-fsevent (~> 0.9, >= 0.9.4)
@@ -248,7 +248,7 @@ GEM
     tilt (2.0.8)
     tzinfo (1.2.4)
       thread_safe (~> 0.1)
-    uglifier (4.0.1)
+    uglifier (4.0.2)
       execjs (>= 0.3.0, < 3)
     unf (0.1.4)
       unf_ext
