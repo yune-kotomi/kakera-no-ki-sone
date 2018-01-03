@@ -18,14 +18,16 @@
 <%= hidden_field_tag :demo_mode, params[:action] == 'demo', :id => 'document-demo-mode' %>
 
 <% content_for(:navigation1) do %>
-  <%= link_to @document, :class => 'mdl-navigation__link' do %>
-    <i class="material-icons">insert_drive_file</i>
-    表示
+  <% if @document.drive_id.nil? %>
+    <%= link_to @document, :class => 'mdl-navigation__link' do %>
+      <i class="material-icons">insert_drive_file</i>
+      表示
+    <% end %>
+    <%= link_to({:action => :histories}, :class => 'mdl-navigation__link') do %>
+      <i class="material-icons">history</i>
+      編集履歴
+    <% end unless params[:action] == 'demo' %>
   <% end %>
-  <%= link_to({:action => :histories}, :class => 'mdl-navigation__link') do %>
-    <i class="material-icons">history</i>
-    編集履歴
-  <% end unless params[:action] == 'demo' %>
 
   <%= link_to '#', :class => 'mdl-navigation__link modal-trigger', :data => {:modal_selector => '#config-dialog'} do %>
     <i class="material-icons">settings</i>
@@ -36,8 +38,6 @@
     <i class="material-icons">help</i>
     ヘルプ
   <% end %>
-  <hr>
-  <div id="tag-list"></div>
 <% end %>
 
 <% content_for(:bottom) do %>
@@ -61,13 +61,15 @@
             </label>
           </div>
 
-          <div>
-            <h4>公開範囲</h4>
-            <label class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect">
-              <input type="checkbox" class="mdl-checkbox__input" id="public-checkbox" <%= 'checked="checked"' if @document.public %>>
-              <span class="mdl-checkbox__label">一般公開する</span>
-            </label>
-          </div>
+          <% if @document.drive_id.nil? %>
+            <div>
+              <h4>公開範囲</h4>
+              <label class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect">
+                <input type="checkbox" class="mdl-checkbox__input" id="public-checkbox" <%= 'checked="checked"' if @document.public %>>
+                <span class="mdl-checkbox__label">一般公開する</span>
+              </label>
+            </div>
+          <% end %>
         </div>
 
         <div class="mdl-card__menu">

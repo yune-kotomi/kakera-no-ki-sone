@@ -1,0 +1,1 @@
+Sone::Application.config.google = <client_secret.jsonの中身>

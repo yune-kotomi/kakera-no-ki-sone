@@ -47,40 +47,44 @@
 
       <div class="mdl-layout__drawer">
         <header class="drawer-header">
-          <% if @login_user.blank? %>
-            <!-- <img src="http://placehold.it/48x48" class="avatar"> -->
-            <div class="username">ゲスト</div>
-          <% else %>
-            <%= image_tag @login_user.profile_image, :class => 'avater' if @login_user.profile_image.present? %>
-            <div class="username"><%= @login_user.nickname %></div>
+          <% unless params[:action].start_with?('drive') %>
+            <% if @login_user.blank? %>
+              <!-- <img src="http://placehold.it/48x48" class="avatar"> -->
+              <div class="username">ゲスト</div>
+            <% else %>
+              <%= image_tag @login_user.profile_image, :class => 'avater' if @login_user.profile_image.present? %>
+              <div class="username"><%= @login_user.nickname %></div>
+            <% end %>
           <% end %>
         </header>
 
         <nav class="mdl-navigation">
           <%= yield :navigation1 %>
 
-          <% if @login_user.blank? %>
-            <%= link_to users_login_path, :class => 'mdl-navigation__link' do %>
-              <i class="material-icons">person</i>
-              ユーザ登録/ログイン
-            <% end %>
-          <% else %>
-            <%= link_to documents_path, :class => 'mdl-navigation__link' do %>
-              <i class="material-icons">library_books</i>
-              文書
-            <% end %>
-            <%= link_to documents_path(:archived => true), :class => 'mdl-navigation__link' do %>
-              <i class="material-icons">archive</i>
-              保存記録
-            <% end %>
+          <% unless params[:action].start_with?('drive') %>
+            <% if @login_user.blank? %>
+              <%= link_to users_login_path, :class => 'mdl-navigation__link' do %>
+                <i class="material-icons">person</i>
+                ユーザ登録/ログイン
+              <% end %>
+            <% else %>
+              <%= link_to documents_path, :class => 'mdl-navigation__link' do %>
+                <i class="material-icons">library_books</i>
+                文書
+              <% end %>
+              <%= link_to documents_path(:archived => true), :class => 'mdl-navigation__link' do %>
+                <i class="material-icons">archive</i>
+                保存記録
+              <% end %>
 
-            <%= yield :navigation2 %>
-            <hr>
+              <%= yield :navigation2 %>
+              <hr>
 
-            <%= link_to_profile_edit '<i class="material-icons">settings</i>プロフィール編集'.html_safe, :class => 'mdl-navigation__link' %>
-            <%= link_to users_logout_path, :class => 'mdl-navigation__link' do %>
-              <i class="material-icons">person_outline</i>
-              ログアウト
+              <%= link_to_profile_edit '<i class="material-icons">settings</i>プロフィール編集'.html_safe, :class => 'mdl-navigation__link' %>
+              <%= link_to users_logout_path, :class => 'mdl-navigation__link' do %>
+                <i class="material-icons">person_outline</i>
+                ログアウト
+              <% end %>
             <% end %>
           <% end %>
 

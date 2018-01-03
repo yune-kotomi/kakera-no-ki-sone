@@ -8,6 +8,14 @@ Rails.application.routes.draw do
     :to => 'users#show',
     :constraints => {:domain_name => /(.*?)/}
 
+  get 'users/authorize',
+    :controller => 'users',
+    :to => 'users#authorize'
+
+  get 'users/authorize_callback',
+    :controller => 'users',
+    :to => 'users#authorize_callback'
+
   patch 'users/update', :to => 'users#update'
   post 'users/update', :to => 'users#update'
 
@@ -22,6 +30,11 @@ Rails.application.routes.draw do
   get 'documents/:id/histories', :to => 'documents#histories'
   get 'documents/:id/diff', :to => 'documents#diff'
   resources :documents
+
+  scope 'drive' do
+    get 'documents/new', :to => 'documents#drive_new'
+    get 'documents/:id', :to => 'documents#drive_show'
+  end
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
