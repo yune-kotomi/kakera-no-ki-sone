@@ -104,23 +104,27 @@ class DocumentsController < ApplicationController
   def update
     respond_to do |format|
       if document_params[:version].nil? || @document.version == document_params[:version].to_i
-        # バージョンが指定されていない(互換性保持用)か指定されたバージョンが現状と
-        # 合致する場合のみ更新を許容する
-        if save_document(document_params)
-          format.html do
-            case document_params[:archived].to_s
-            when 'true'
-              redirect_to documents_path
-            when 'false'
-              redirect_to documents_path(:archived => true)
-            else
-              redirect_to @document, notice: 'Document was successfully updated.'
+        begin
+          # バージョンが指定されていない(互換性保持用)か指定されたバージョンが現状と
+          # 合致する場合のみ更新を許容する
+          if save_document(document_params)
+            format.html do
+              case document_params[:archived].to_s
+              when 'true'
+                redirect_to documents_path
+              when 'false'
+                redirect_to documents_path(:archived => true)
+              else
+                redirect_to @document, notice: 'Document was successfully updated.'
+              end
             end
+            format.json { render :json => {:version => @document.version} }
+          else
+            format.html { render :edit }
+            format.json { render json: @document.errors, status: :unprocessable_entity }
           end
-          format.json { render :json => {:version => @document.version} }
-        else
-          format.html { render :edit }
-          format.json { render json: @document.errors, status: :unprocessable_entity }
+        rescue Google::Apis::AuthorizationError => e
+          format.json { render json: {}, status: 401 }
         end
       else
         # 指定されたバージョンが現状と異なる場合は409で応答

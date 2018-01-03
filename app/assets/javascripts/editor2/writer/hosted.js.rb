@@ -58,6 +58,10 @@ module Editor2
             )
           else
             case response.status_code
+            when 401
+              # OAuthトークンが無効
+              # 強制リフレッシュを実行、トークンを再取得させる
+              `location.reload()`
             when 409
               # サーバ側とバージョン不一致
               # データ構造の読み替え
