@@ -22,11 +22,15 @@ Document.ready? do
       Window.on('focus') do
         if Time.now - last_blured > 5 * 60
           # フォーカスが5分以上外れていた場合、現在のバージョンを確認する
-          loader.load(editor.store.id, editor.store.version) do |doc|
-            # 指定したバージョンとサーバ上のものが異なる場合のみyieldされる
-            editor.dispatcher.dispatch(
-              Editor2::Action.new(:operation => :load, :payload => doc)
-            )
+          loader.load(editor.store.id, editor.store.version) do |status_code, doc|
+            case status_code
+            when 200
+              editor.dispatcher.dispatch(
+                Editor2::Action.new(:operation => :load, :payload => doc)
+              )
+            when 401
+              `location.reload()`
+            end
           end
         end
       end

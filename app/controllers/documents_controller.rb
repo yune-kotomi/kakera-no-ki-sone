@@ -26,6 +26,15 @@ class DocumentsController < ApplicationController
       return
     end
 
+    if @document.drive_id
+      begin
+        drive_service.get_file(@document.drive_id)
+      rescue => e
+        render json: {}, status: 401
+        return
+      end
+    end
+
     if params[:type] == 'structured_text'
       send_data(@document.to_structured_text, :type => 'text/plain', :filename => "#{@document.title}.txt")
     end
@@ -185,7 +194,19 @@ class DocumentsController < ApplicationController
     end
 
     def owner_required
-      forbidden unless @document.user == @login_user
+      owned =
+        if @document.drive_id
+          begin
+            drive_service.get_file(@document.drive_id)
+            true
+          rescue => e
+            false
+          end
+        else
+          @document.user == @login_user
+        end
+
+      forbidden unless owned
     end
 
     def check_login

@@ -6,9 +6,9 @@ module Editor2
         uri += "?version=#{version}" if version
         HTTP.get(uri) do |response|
           if response.status_code == 200
-            yield(self.class.response_to_doc(response))
+            yield(response.status_code, self.class.response_to_doc(response))
           else
-            p response
+            yield(response.status_code)
           end
         end
       end
