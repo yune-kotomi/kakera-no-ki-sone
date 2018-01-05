@@ -32,7 +32,6 @@ gem 'jwt'
 
 group :test do
   gem 'webmock'
-  gem 'rr', :require => false
   gem 'rails-controller-testing'
 end
 

@@ -245,7 +245,6 @@ GEM
       mime-types (>= 1.16, < 4.0)
       netrc (~> 0.8)
     retriable (3.1.1)
-    rr (1.2.1)
     rubyzip (1.2.1)
     rugged (0.26.0)
     safe_yaml (1.0.4)
@@ -328,7 +327,6 @@ DEPENDENCIES
   rails (~> 5.0)
   rails-controller-testing
   rails_real_favicon
-  rr
   sanitize
   sass-rails (~> 5.0)
   text-hatena!

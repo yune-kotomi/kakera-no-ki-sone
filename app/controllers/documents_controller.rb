@@ -1,8 +1,9 @@
 class DocumentsController < ApplicationController
-  before_action :set_document, :except => [:index, :create, :demo, :drive_new]
+  before_action :set_document, :except => [:index, :create, :demo, :drive_new, :drive_show]
+  before_action :set_drive_document, :only => [:drive_show]
 
   before_action :check_login, :except => [:show, :demo, :drive_new, :drive_show]
-  before_action :owner_required, :except => [:index, :show, :create, :demo, :drive_new]
+  before_action :owner_required, :except => [:index, :show, :create, :demo, :drive_new, :drive_show]
 
   # GET /documents
   # GET /documents.json
@@ -172,20 +173,41 @@ class DocumentsController < ApplicationController
         :content_type => 'text/html'
       )
     redirect_to :action => :drive_show, :id => ret.id
+  rescue DriveNotAuthorizedError, Google::Apis::AuthorizationError, Signet::AuthorizationError
+    session[:redirect_to] = request.fullpath
+    redirect_to :controller => :users, :action => :authorize
+  rescue Google::Apis::ClientError => e
+    case e.status_code
+    when 404
+      missing
+    end
   end
 
   def drive_show
-    @document = drive_document
-    render :action => :edit
-  rescue => e
-    session[:redirect_to] = url_for
+    if @document.nil?
+      missing
+    else
+      drive_service.get_file(@document.drive_id)
+      render :action => :edit
+    end
+  rescue DriveNotAuthorizedError, Google::Apis::AuthorizationError, Signet::AuthorizationError
+    session[:redirect_to] = request.fullpath
     redirect_to :controller => :users, :action => :authorize
+  rescue Google::Apis::ClientError => e
+    case e.status_code
+    when 404
+      missing
+    end
   end
 
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_document
       @document = Document.find(params[:id])
+    end
+
+    def set_drive_document
+      @document = Document.where(:drive_id => params[:id]).first
     end
 
     # Never trust parameters from the scary internet, only allow the white list through.
@@ -196,12 +218,7 @@ class DocumentsController < ApplicationController
     def owner_required
       owned =
         if @document.drive_id
-          begin
-            drive_service.get_file(@document.drive_id)
-            true
-          rescue => e
-            false
-          end
+          true
         else
           @document.user == @login_user
         end
@@ -225,23 +242,6 @@ class DocumentsController < ApplicationController
         drive = Google::Apis::DriveV3::DriveService.new
         drive.authorization = token.credential
         drive
-      end
-    end
-
-    def drive_document
-      drive = drive_service
-
-      begin
-        drive_file = drive.get_file(params[:id])
-        document = Document.where(:drive_id => params[:id]).first
-        if document.nil?
-          document = Document.new(:drive_id => params[:id])
-          document.save
-        end
-
-        document
-      rescue => e
-        raise DriveNotAuthorizedError.new
       end
     end
 
