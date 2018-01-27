@@ -32,24 +32,23 @@
 
           <% if @login_user.present? %>
             <div class="mdl-textfield mdl-js-textfield mdl-textfield--expandable mdl-textfield--floating-label mdl-textfield--align-right">
-            <label class="mdl-button mdl-js-button mdl-button--icon" for="fixed-header-drawer-exp">
-              <i class="material-icons">search</i>
-            </label>
-            <div class="mdl-textfield__expandable-holder">
-              <%= form_tag documents_path, :method => :get do %>
-                <%= text_field_tag 'keywords', params[:keywords], :id => 'fixed-header-drawer-exp', :class => 'mdl-textfield__input' %>
-              <% end %>
+              <label class="mdl-button mdl-js-button mdl-button--icon" for="fixed-header-drawer-exp">
+                <i class="material-icons">search</i>
+              </label>
+              <div class="mdl-textfield__expandable-holder">
+                <%= form_tag documents_path, :method => :get do %>
+                  <%= text_field_tag 'keywords', params[:keywords], :id => 'fixed-header-drawer-exp', :class => 'mdl-textfield__input' %>
+                <% end %>
+              </div>
             </div>
-          </div>
           <% end %>
         </div>
       </header>
 
       <div class="mdl-layout__drawer">
         <header class="drawer-header">
-          <% unless params[:action].start_with?('drive') %>
+          <% unless params[:controller].start_with?('drive') %>
             <% if @login_user.blank? %>
-              <!-- <img src="http://placehold.it/48x48" class="avatar"> -->
               <div class="username">ゲスト</div>
             <% else %>
               <%= image_tag @login_user.profile_image, :class => 'avater' if @login_user.profile_image.present? %>
@@ -61,7 +60,7 @@
         <nav class="mdl-navigation">
           <%= yield :navigation1 %>
 
-          <% unless params[:action].start_with?('drive') %>
+          <% unless params[:controller].start_with?('drive') %>
             <% if @login_user.blank? %>
               <%= link_to users_login_path, :class => 'mdl-navigation__link' do %>
                 <i class="material-icons">person</i>

@@ -1,9 +1,8 @@
 class DocumentsController < ApplicationController
-  before_action :set_document, :except => [:index, :create, :demo, :drive_new, :drive_show]
-  before_action :set_drive_document, :only => [:drive_show]
+  before_action :set_document, :except => [:index, :create, :demo]
 
-  before_action :check_login, :except => [:show, :demo, :drive_new, :drive_show]
-  before_action :owner_required, :except => [:index, :show, :create, :demo, :drive_new, :drive_show]
+  before_action :login_required, :except => [:show, :demo]
+  before_action :owner_required, :except => [:index, :show, :create, :demo]
 
   # GET /documents
   # GET /documents.json
@@ -25,15 +24,6 @@ class DocumentsController < ApplicationController
     if !@document.public && @document.user != @login_user
       forbidden
       return
-    end
-
-    if @document.drive_id
-      begin
-        drive_service.get_file(@document.drive_id)
-      rescue => e
-        render json: {}, status: 401
-        return
-      end
     end
 
     if params[:type] == 'structured_text'
@@ -114,27 +104,23 @@ class DocumentsController < ApplicationController
   def update
     respond_to do |format|
       if document_params[:version].nil? || @document.version == document_params[:version].to_i
-        begin
-          # バージョンが指定されていない(互換性保持用)か指定されたバージョンが現状と
-          # 合致する場合のみ更新を許容する
-          if save_document(document_params)
-            format.html do
-              case document_params[:archived].to_s
-              when 'true'
-                redirect_to documents_path
-              when 'false'
-                redirect_to documents_path(:archived => true)
-              else
-                redirect_to @document, notice: 'Document was successfully updated.'
-              end
+        # バージョンが指定されていない(互換性保持用)か指定されたバージョンが現状と
+        # 合致する場合のみ更新を許容する
+        if @document.update(document_params)
+          format.html do
+            case document_params[:archived].to_s
+            when 'true'
+              redirect_to documents_path
+            when 'false'
+              redirect_to documents_path(:archived => true)
+            else
+              redirect_to @document, notice: 'Document was successfully updated.'
             end
-            format.json { render :json => {:version => @document.version} }
-          else
-            format.html { render :edit }
-            format.json { render json: @document.errors, status: :unprocessable_entity }
           end
-        rescue Google::Apis::AuthorizationError => e
-          format.json { render json: {}, status: 401 }
+          format.json { render :json => {:version => @document.version} }
+        else
+          format.html { render :edit }
+          format.json { render json: @document.errors, status: :unprocessable_entity }
         end
       else
         # 指定されたバージョンが現状と異なる場合は409で応答
@@ -160,54 +146,10 @@ class DocumentsController < ApplicationController
     end
   end
 
-  def drive_new
-    state = JSON.parse(params[:state])
-    metadata = {
-      :name => '新しい文書.html',
-      :parents => [state['folderId']]
-    }
-    ret =
-      drive_service.create_file(
-        metadata,
-        :upload_source => StringIO.new(''),
-        :content_type => 'text/html'
-      )
-    redirect_to :action => :drive_show, :id => ret.id
-  rescue DriveNotAuthorizedError, Google::Apis::AuthorizationError, Signet::AuthorizationError
-    session[:redirect_to] = request.fullpath
-    redirect_to :controller => :users, :action => :authorize
-  rescue Google::Apis::ClientError => e
-    case e.status_code
-    when 404
-      missing
-    end
-  end
-
-  def drive_show
-    if @document.nil?
-      missing
-    else
-      drive_service.get_file(@document.drive_id)
-      render :action => :edit
-    end
-  rescue DriveNotAuthorizedError, Google::Apis::AuthorizationError, Signet::AuthorizationError
-    session[:redirect_to] = request.fullpath
-    redirect_to :controller => :users, :action => :authorize
-  rescue Google::Apis::ClientError => e
-    case e.status_code
-    when 404
-      missing
-    end
-  end
-
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_document
       @document = Document.find(params[:id])
-    end
-
-    def set_drive_document
-      @document = Document.where(:drive_id => params[:id]).first
     end
 
     # Never trust parameters from the scary internet, only allow the white list through.
@@ -216,67 +158,6 @@ class DocumentsController < ApplicationController
     end
 
     def owner_required
-      owned =
-        if @document.drive_id
-          true
-        else
-          @document.user == @login_user
-        end
-
-      forbidden unless owned
+      forbidden unless @document.user == @login_user
     end
-
-    def check_login
-      if @document.nil? || @document.drive_id.nil?
-        login_required
-      else
-        true
-      end
-    end
-
-    def drive_service
-      token = GoogleToken.where(:token_id => session.id).first
-      if token.nil?
-        raise DriveNotAuthorizedError.new
-      else
-        drive = Google::Apis::DriveV3::DriveService.new
-        drive.authorization = token.credential
-        drive
-      end
-    end
-
-    def save_document(document_params)
-      Document.transaction do
-        save_result = @document.update(document_params)
-        if @document.drive_id.nil?
-          save_result
-        else
-          drive = drive_service
-          html = render_to_string :partial => 'drive_document.html'
-          begin
-            ret =
-              drive.update_file(
-                @document.drive_id,
-                {:name => "#{@document.title}.html"},
-                :upload_source => StringIO.new(html))
-          rescue Google::Apis::ClientError => e
-            case e.status_code
-            when 404
-              ret =
-                drive_service.create_file(
-                  {:name => "#{@document.title}.html"},
-                  :upload_source => StringIO.new(html),
-                  :content_type => 'text/html'
-                )
-              @document.update_attribute(:drive_id, ret.id)
-            end
-          end
-          true
-        end
-      end
-    rescue DriveNotAuthorizedError
-      false
-    end
-
-    class DriveNotAuthorizedError < StandardError; end
 end

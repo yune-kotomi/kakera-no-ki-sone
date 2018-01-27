@@ -116,8 +116,7 @@ CREATE TABLE documents (
     content_updated_at timestamp without time zone NOT NULL,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    version integer,
-    drive_id character varying
+    version integer
 );
 
 
@@ -305,7 +304,7 @@ CREATE INDEX index_documents_on_fulltext ON documents USING pgroonga (fulltext);
 -- PostgreSQL database dump complete
 --
 
-SET search_path TO "$user", public, pgroonga, pg_catalog;
+SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
 ('20150101000000'),
@@ -314,7 +313,6 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20160108115908'),
 ('20160417065627'),
 ('20171203125259'),
-('20180102054845'),
-('20180102110559');
+('20180102054845');
 
 

@@ -77,16 +77,20 @@ class UsersController < ApplicationController
   end
 
   def authorize
+    r = session[:redirect_to]
+    reset_session
+    session[:redirect_to] = r
+
     redirect_to authorizer.get_authorization_url(:login_hint => session.id, :request => request)
   end
 
   def authorize_callback
-    redirect_to session[:redirect_to]
-    c, _ = authorizer.handle_auth_callback(session.id, request)
-    token = GoogleToken.where(:token_id => session.id).first
-
-    reset_session
-    token.update_attribute(:token_id, session.id)
+    authorizer.handle_auth_callback(session.id, request)
+    if session[:redirect_to]
+      redirect_to session.delete(:redirect_to)
+    else
+      redirect_to :controller => :welcome, :action => :installed
+    end
   end
 
   def authorizer

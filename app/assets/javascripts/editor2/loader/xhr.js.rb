@@ -1,8 +1,12 @@
 module Editor2
   module Loader
     class Xhr
+      def initialize(endpoint)
+        @endpoint = endpoint
+      end
+
       def load(id, version = nil)
-        uri = "/documents/#{id}.json"
+        uri = @endpoint
         uri += "?version=#{version}" if version
         HTTP.get(uri) do |response|
           if response.status_code == 200

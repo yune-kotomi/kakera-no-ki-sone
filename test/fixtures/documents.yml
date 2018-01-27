@@ -87,21 +87,3 @@ document5:
   user: user1
   body: []
   content_updated_at: 2015-11-24 21:43:52.000000000 +09:00
-
-drive_document1:
-  title: document 1
-  description: document 1 description
-  public: true
-  archived: false
-  bcrypt_password:
-  markup: plaintext
-  user: user1
-  body:
-  - id: id
-    title: 日本語のタイトル
-    body: ''
-    children: []
-    metadatum: {}
-  content_updated_at: 2015-11-24 21:43:52.000000000 +09:00
-  version: 1
-  drive_id: aaaaaaaaaaaaaaaaaaaaaaaa

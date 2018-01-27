@@ -3,6 +3,8 @@ Document.ready? do
     Element.find('footer').remove
     Element.find('.right-bottom-fab').css('bottom', '16px')
 
+    endpoint = Element.find('#document-endpoint').value
+
     editor = Editor2::Editor.new
     Editor2::Loader::Dom.new.load do |doc|
       editor.dispatcher.dispatch(
@@ -11,13 +13,13 @@ Document.ready? do
     end
 
     unless Element.find('#document-demo-mode').value == 'true'
-      writer = Editor2::HostedWriter.new(editor.store.stored_document, editor)
+      writer = Editor2::HostedWriter.new(editor.store.stored_document, editor, endpoint)
       writer.dispatcher = editor.dispatcher
       editor.store.subscribers.push(writer)
 
       # ウィンドウフォーカス監視
       last_blured = Time.now
-      loader = Editor2::Loader::Xhr.new
+      loader = Editor2::Loader::Xhr.new(endpoint)
       Window.on('blur') { last_blured = Time.now }
       Window.on('focus') do
         if Time.now - last_blured > 5 * 60

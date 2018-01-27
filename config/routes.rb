@@ -31,9 +31,13 @@ Rails.application.routes.draw do
   get 'documents/:id/diff', :to => 'documents#diff'
   resources :documents
 
-  scope 'drive' do
-    get 'documents/new', :to => 'documents#drive_new'
-    get 'documents/:id', :to => 'documents#drive_show'
+  namespace :drive do
+    get 'documents/new', :to => 'documents#new'
+    resources :documents, :only => [:show, :update]
+  end
+
+  scope :drive do
+    get 'installed', :to => 'welcome#installed'
   end
 
   # The priority is based upon order of creation: first created -> highest priority.

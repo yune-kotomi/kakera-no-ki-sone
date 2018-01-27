@@ -1,4 +1,4 @@
-<% @title = "編集: #{@document.title}" %>
+<% @title = "編集: #{@document.body['title']}" %>
 
 <div id="save-indicator" class="mdl-progress mdl-js-progress"></div>
 
@@ -9,25 +9,15 @@
 
 <%= hidden_field_tag :endpoint, url_for(:action => :show, :id => @document.id, :format => :json), :id => 'document-endpoint' %>
 <%= hidden_field_tag :id, @document.id, :id => 'document-id' %>
-<%= hidden_field_tag :title, @document.title, :id => 'document-title' %>
-<%= hidden_field_tag :description, @document.description, :id => 'document-description' %>
-<%= hidden_field_tag :body, @document.body.to_json, :id => 'document-body' %>
-<%= hidden_field_tag :public, @document.public.to_json, :id => 'document-public' %>
-<%= hidden_field_tag :archived, @document.archived.to_json, :id => 'document-archived' %>
-<%= hidden_field_tag :markup, @document.markup.to_json, :id => 'document-markup' %>
-<%= hidden_field_tag :version, @document.version.to_json, :id => 'document-version' %>
+<%= hidden_field_tag :title, @document.body['title'], :id => 'document-title' %>
+<%= hidden_field_tag :description, @document.body['body'], :id => 'document-description' %>
+<%= hidden_field_tag :body, @document.body['children'].to_json, :id => 'document-body' %>
+<%= hidden_field_tag :public, false.to_json, :id => 'document-public' %>
+<%= hidden_field_tag :markup, @document.body['markup'].to_json, :id => 'document-markup' %>
+<%= hidden_field_tag :version, @document.body['version'].to_json, :id => 'document-version' %>
 <%= hidden_field_tag :demo_mode, params[:action] == 'demo', :id => 'document-demo-mode' %>
 
 <% content_for(:navigation1) do %>
-  <%= link_to @document, :class => 'mdl-navigation__link' do %>
-    <i class="material-icons">insert_drive_file</i>
-    表示
-  <% end %>
-  <%= link_to({:action => :histories}, :class => 'mdl-navigation__link') do %>
-    <i class="material-icons">history</i>
-    編集履歴
-  <% end unless params[:action] == 'demo' %>
-
   <%= link_to '#', :class => 'mdl-navigation__link modal-trigger', :data => {:modal_selector => '#config-dialog'} do %>
     <i class="material-icons">settings</i>
     設定
@@ -47,24 +37,16 @@
           <div>
             <h4>記法</h4>
             <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect">
-              <input type="radio" class="mdl-radio__button" name="markup" value="plaintext" id="markup1" <%= 'checked' if @document.markup == 'plaintext' %>>
+              <input type="radio" class="mdl-radio__button" name="markup" value="plaintext" id="markup1" <%= 'checked' if @document.body['markup'] == 'plaintext' %>>
               <span class="mdl-radio__label">記法なし</span>
             </label>
             <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect">
-              <input type="radio" class="mdl-radio__button" name="markup" value="hatena"id="markup2" <%= 'checked' if @document.markup == 'hatena' %>>
+              <input type="radio" class="mdl-radio__button" name="markup" value="hatena"id="markup2" <%= 'checked' if @document.body['markup'] == 'hatena' %>>
               <span class="mdl-radio__label">はてな記法</span>
             </label>
             <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect">
-              <input type="radio" class="mdl-radio__button" name="markup" value="markdown"id="markup3" <%= 'checked' if @document.markup == 'markdown' %>>
+              <input type="radio" class="mdl-radio__button" name="markup" value="markdown"id="markup3" <%= 'checked' if @document.body['markup'] == 'markdown' %>>
               <span class="mdl-radio__label">Markdown</span>
-            </label>
-          </div>
-
-          <div>
-            <h4>公開範囲</h4>
-            <label class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect">
-              <input type="checkbox" class="mdl-checkbox__input" id="public-checkbox" <%= 'checked="checked"' if @document.public %>>
-              <span class="mdl-checkbox__label">一般公開する</span>
             </label>
           </div>
         </div>

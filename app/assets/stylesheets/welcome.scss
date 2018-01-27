@@ -46,6 +46,13 @@ body.welcome {
       }
     }
 
+    .installed {
+      padding: 14px;
+      img {
+        max-width: 100%;
+      }
+    }
+
     .introduction {
       ol {
         margin-right: 1em;
@@ -78,11 +85,18 @@ body.welcome {
       }
 
       .buttons {
-        display: flex;
-        flex: 1;
+        text-align: center;
 
         form {
-          margin: auto;
+          margin: 12px;
+
+          button {
+            width: 12em;
+          }
+
+          #google-drive-authorize {
+            text-transform: none;
+          }
         }
       }
     }
