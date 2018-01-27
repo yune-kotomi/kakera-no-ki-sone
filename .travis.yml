@@ -1,12 +1,13 @@
 language: ruby
 sudo: required
 rvm:
-  - 2.3
   - 2.4
+  - 2.5
 before_script:
   - psql -c 'create database sone_test;' -U postgres
   - cp config/database.yml.travis config/database.yml
   - cp config/initializers/kitaguchi.rb.example config/initializers/kitaguchi.rb
+  - cp config/initializers/google_api.rb.example config/initializers/google_api.rb
 before_install:
   - curl --silent --location https://github.com/pgroonga/pgroonga/raw/master/data/travis/setup.sh | sh
 cache: bundler
