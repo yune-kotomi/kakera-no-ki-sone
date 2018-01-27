@@ -50,4 +50,3 @@ end
 gem 'uuidtools'
 gem 'exception_notification'
 gem 'google-api-client'
-gem 'stackdriver'
