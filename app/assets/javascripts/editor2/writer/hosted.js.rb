@@ -60,7 +60,7 @@ module Editor2
             )
           else
             case response.status_code
-            when 401
+            when 401, 422
               # OAuthトークンが無効
               # 強制リフレッシュを実行、トークンを再取得させる
               `location.reload()`

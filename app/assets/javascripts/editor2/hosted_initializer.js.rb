@@ -30,7 +30,7 @@ Document.ready? do
               editor.dispatcher.dispatch(
                 Editor2::Action.new(:operation => :load, :payload => doc)
               )
-            when 401
+            when 401, 422
               `location.reload()`
             end
           end
