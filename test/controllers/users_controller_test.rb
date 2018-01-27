@@ -220,4 +220,35 @@ class UsersControllerTest < ActionController::TestCase
       titles = @user.documents.where(:public => true).map{|d| d.title}.sort
       assert_equal titles, assigns(:documents).map(&:title).sort
   end
+
+  test '#authorizeはGoogleへリダイレクトさせてOAuth認可を得る' do
+    authorizer = Minitest::Mock.new
+    authorizer.expect(:get_authorization_url, 'https://example.com/', [Hash])
+
+    Google::Auth::WebUserAuthorizer.stub(:new, authorizer) do
+      get :authorize
+      assert_response :redirect
+    end
+  end
+
+  test '#authorize_callbackはセッションに戻り先があればそこに戻す' do
+    authorizer = Minitest::Mock.new
+    authorizer.expect(:handle_auth_callback, nil, [session.id, ActionController::TestRequest])
+    r = 'https:/example.com'
+
+    Google::Auth::WebUserAuthorizer.stub(:new, authorizer) do
+      get :authorize_callback, :session => {:redirect_to => r}
+      assert_redirected_to r
+    end
+  end
+
+  test '#authorize_callbackはセッションに戻り先が無ければインストール完了画面に飛ばす' do
+    authorizer = Minitest::Mock.new
+    authorizer.expect(:handle_auth_callback, nil, [session.id, ActionController::TestRequest])
+
+    Google::Auth::WebUserAuthorizer.stub(:new, authorizer) do
+      get :authorize_callback
+      assert_redirected_to :controller => :welcome, :action => :installed
+    end
+  end
 end

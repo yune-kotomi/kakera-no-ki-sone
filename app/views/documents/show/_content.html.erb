@@ -7,7 +7,7 @@
 </div>
 
 <% if content['children'].present? %>
-  <%= render :partial => 'documents/show/content',
+  <%= render :partial => 'documents/show/content.html',
     :collection => content['children'],
     :locals => {:parent_index => "#{parent_index}#{content_counter + 1}."} %>
 <% end %>

@@ -2,11 +2,13 @@ module Editor2
   class HostedWriter
     attr_accessor :dispatcher
 
-    def initialize(doc, editor, interval = 5)
+    def initialize(doc, editor, endpoint, interval = 5)
+      @current_doc = doc
       @editor = editor
+      @endpoint = endpoint
+
       @save = false
       @in_progress = false
-      @current_doc = doc
       @sent_data = current_document
       @before_save_actions = [] # 未保存のアクション
       @pending_actions = [] # 保存中の文書に適用済みのアクション
@@ -37,7 +39,7 @@ module Editor2
         @pending_actions.push(@before_save_actions).flatten!
         @before_save_actions.clear
 
-        HTTP.patch("/documents/#{@current_doc[:id]}.json", :payload => {'document' => data}) do |response|
+        HTTP.patch(@endpoint, :payload => {'document' => data}) do |response|
           @in_progress = false
           if response.ok?
             version = response.json['version']
@@ -58,6 +60,10 @@ module Editor2
             )
           else
             case response.status_code
+            when 401
+              # OAuthトークンが無効
+              # 強制リフレッシュを実行、トークンを再取得させる
+              `location.reload()`
             when 409
               # サーバ側とバージョン不一致
               # データ構造の読み替え

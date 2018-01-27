@@ -27,7 +27,7 @@ module DocumentsHelper
       end
 
     when 'markdown'
-      processor = Qiita::Markdown::Processor.new
+      processor = Qiita::Markdown::Processor.new(hostname: request.host_with_port)
       rendered = processor.call(node['body'])
       rendered[:output].to_s
     else
