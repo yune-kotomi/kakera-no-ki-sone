@@ -3,7 +3,7 @@ source 'https://rubygems.org'
 gem 'rails', '~> 5.0'
 gem 'therubyracer'
 
-gem 'pg'
+gem 'pg', '~> 0.21'
 
 gem 'sass-rails', '~> 5.0'
 gem 'material_design_lite-sass'
