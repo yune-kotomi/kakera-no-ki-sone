@@ -1,5 +1,8 @@
 module Editor2
   class Content < AbstractView
+    include CommonLeaf
+    include CommonContent
+
     template <<-EOS
       <div class="content">
         <hr>
@@ -36,6 +39,8 @@ module Editor2
             </div>
           </div>
         </div>
+
+        <ol class="children"></ol>
       </div>
     EOS
 
@@ -49,6 +54,8 @@ module Editor2
     element :title, :selector => 'input.title'
     element :body, :selector => 'textarea.body'
     element :close_button, :selector => '.editor button.close'
+
+    element :children, :selector => 'ol.children', :type => Content
 
     def initialize(attr, parent)
       super(attr, parent)
@@ -98,69 +105,31 @@ module Editor2
     def apply(attr)
       [:title, :body].map{|n| dom_element(n) }.each{|e| e['data-id'] = @id }
 
+      attr = update_chapter_number(attr)
       apply_body(attr[:body]) unless attributes[:body] == attr[:body]
       super(attr.update(:title_display => attr[:title]))
     end
 
-    def apply_body(src)
-      unless dom_element(:display).css(:display) == 'none'
-        html = parent.render(src)
-        dom_element(:body_display).html = html
-      end
-    end
-
-    def show
-      @emit_input_timer.stop
-      @emit_input_timer.execute # 滞留しているactionを実行
-
-      dom_element(:display).show
-      dom_element(:editor).hide
-      apply_body(attributes[:body])
-
-      `history.back()` if ::Editor2::Editor.phone? && `history.state` == 'edit'
-    end
-
-    def edit(focus = :title)
-      @emit_input_timer.start
-
-      dom_element(:display).hide
-      dom_element(:editor).show
-      emit(Action.new(
-        :operation => :select,
-        :target => @id
-      ))
-
-      if focus == :title
-        dom_element(:title).focus
-      else
-        dom_element(:body).focus
-      end
-
-      %x{ history.pushState('edit', null, '#edit') } if ::Editor2::Editor.phone? && `history.state` == 'contents'
-    end
-
-    def visible?
-      container = parent.dom_element(:container)
-      min = container.offset.top
-      max = min + container.height.to_i
-      d = dom_element
-
-      min < d.offset.top && d.offset.top + d.outer_height < max
-    end
-
     def next
-      children = parent.attribute_instances[:children]
-      index = children.index(self)
-      children[index + 1]
+      child = attribute_instances[:children].first
+      brother = younger_brother
+      if child.nil?
+        if brother.nil?
+          parent.next_leaf_not_below
+        else
+          brother
+        end
+      else
+        child
+      end
     end
 
     def previous
-      children = parent.attribute_instances[:children]
-      index = children.index(self)
-      if index == 0
-        parent
+      brother = elder_brother
+      if brother
+        brother.last_child
       else
-        children[index - 1]
+        parent
       end
     end
   end

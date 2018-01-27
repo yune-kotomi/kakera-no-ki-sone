@@ -1,0 +1,14 @@
+<%=
+  doc =
+    {
+      'id' => @document.id,
+      'title' => @document.body['title'],
+      'description' => @document.body['body'],
+      'body' => @document.body['children'],
+      'markup' => @document.body['markup'],
+      'version' => @document.body['version'],
+      'public' => false
+    }
+
+  doc.to_json.html_safe
+%>

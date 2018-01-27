@@ -33,24 +33,31 @@
   </div>
 
   <div class="buttons">
-    <%= button_to({:controller => :documents, :action => :demo},
-      :method => :get,
-      :class => 'mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect') do %>
-      編集画面を試す
-    <% end if @login_user.blank? %>
+      <%= button_to({:controller => :documents, :action => :demo},
+        :method => :get,
+        :class => 'mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect') do %>
+        編集画面を試す
+      <% end if @login_user.blank? %>
 
-    <%= button_to({:controller => :users, :action => :login},
-      :method => :get,
-      :class => 'mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent') do %>
-      使いはじめる
-    <% end if @login_user.blank? %>
+      <%= button_to({:controller => :users, :action => :login},
+        :method => :get,
+        :class => 'mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent') do %>
+        使いはじめる
+      <% end if @login_user.blank? %>
 
-    <%= button_to(documents_path,
-      :method => :get,
-      :class => 'mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent') do %>
-      <i class="material-icons">library_books</i>
-      文書一覧
-    <% end if @login_user.present? %>
+      <%= button_to(documents_path,
+        :method => :get,
+        :class => 'mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent') do %>
+        <i class="material-icons">library_books</i>
+        文書一覧
+      <% end if @login_user.present? %>
+
+      <%= button_to({:controller => :users, :action => :authorize},
+        :method => :get,
+        :class => 'mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect',
+        :id => 'google-drive-authorize') do %>
+        Google Drive™ で使う
+      <% end %>
   </div>
 </div>
 
@@ -86,7 +93,7 @@
         面倒なユーザID、パスワードの管理は必要ありません。
       </div>
       <div>
-        いつものGoogleアカウントやはてなIDなどを使って、簡単に使い始められます。
+        いつものGoogleアカウントやはてなIDなどを使って、簡単に使い始められます。
       </div>
     </li>
   </ol>

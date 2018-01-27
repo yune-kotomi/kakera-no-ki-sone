@@ -3,7 +3,7 @@ source 'https://rubygems.org'
 gem 'rails', '~> 5.0'
 gem 'therubyracer'
 
-gem 'pg'
+gem 'pg', '~> 0.21'
 
 gem 'sass-rails', '~> 5.0'
 gem 'material_design_lite-sass'
@@ -32,7 +32,6 @@ gem 'jwt'
 
 group :test do
   gem 'webmock'
-  gem 'rr', :require => false
   gem 'rails-controller-testing'
 end
 
@@ -50,3 +49,5 @@ end
 
 gem 'uuidtools'
 gem 'exception_notification'
+gem 'google-api-client'
+gem 'stackdriver'

@@ -77,15 +77,31 @@ module Editor2
     end
 
     def up_key
-      prev = @editor.contents.find(@editor.store.selected).previous
-      @editor.store.dispatch(Action.new(
-        :operation => :select,
-        :target => prev.id
-      )) if prev
+      current = @editor.tree.find(@editor.store.selected)
+      unless current == @editor.tree
+        prev =
+          if current.elder_brother
+            current.elder_brother.last_visible_child
+          else
+            current.parent
+          end
+
+        @editor.store.dispatch(Action.new(
+          :operation => :select,
+          :target => prev.id
+        )) if prev
+      end
     end
 
     def down_key
-      n = @editor.contents.find(@editor.store.selected).next
+      current = @editor.tree.find(@editor.store.selected)
+      n =
+        if current.open?
+          current.children.first
+        else
+          current.next_leaf_not_below
+        end
+
       @editor.dispatcher.dispatch(Action.new(
         :operation => :select,
         :target => n.id
@@ -93,8 +109,16 @@ module Editor2
     end
 
     def left_key
-      button = @editor.tree.find(@editor.store.selected).dom_element(:collapse)
-      button.trigger('click') if button
+      current = @editor.tree.find(@editor.store.selected)
+      if current.open?
+        button = current.dom_element(:collapse)
+        button.trigger('click') if button
+      else
+        @editor.dispatcher.dispatch(Action.new(
+          :operation => :select,
+          :target => current.parent.id
+        ))
+      end
     end
 
     def right_key
@@ -145,12 +169,19 @@ module Editor2
       unless target.parent.nil? || target.index == 0
         previous = target.parent.children[target.index - 1]
 
-        @editor.dispatcher.dispatch(Action.new(
-          :operation => :move,
-          :target => target.id,
-          :position => previous.children.size,
-          :destination => previous.id
-        ))
+        @editor.dispatcher.dispatch(
+          Action.new(
+            :operation => :change,
+            :target => previous.id,
+            :payload => {:metadatum => {:open => true}}
+          ),
+          Action.new(
+            :operation => :move,
+            :target => target.id,
+            :position => previous.children.size,
+            :destination => previous.id
+          )
+        )
       end
     end
   end

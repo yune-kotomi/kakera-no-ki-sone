@@ -4,12 +4,8 @@ module Editor2
     attr_reader :contents
     attr_reader :store
     attr_reader :dispatcher
-    attr_accessor :writer
 
-    def initialize(loader)
-      @loader = loader
-      @writer = DummyWriter.new(self)
-
+    def initialize
       @dispatcher = Dispatcher.new
       @dispatcher.stores.push(ViewSwitcher.new(self)) if self.class.phone?
       @store = Store.new
@@ -26,8 +22,6 @@ module Editor2
       @store.subscribers.push(@contents)
       Element.find('#document-editor>.content-view').append(@contents.dom_element)
       contents.dispatcher = @dispatcher
-
-      @store.subscribers.push(self)
 
       # 設定ダイアログ
       Element.find('#config-dialog').tap do |d|
@@ -110,10 +104,6 @@ module Editor2
       end.call
     end
 
-    def load
-      @store.load(@loader.load)
-    end
-
     def pushstate(state)
       case state
       when 'tree'
@@ -179,10 +169,6 @@ module Editor2
         indicator.css('opacity', 0)
         Window.off(:beforeunload)
       end
-    end
-
-    def apply(_)
-      @writer.write
     end
 
     def self.device

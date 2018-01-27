@@ -1,6 +1,6 @@
 module Editor2
   class Action
-    # :add, :change, :move, :remove, :select
+    # :load, :add, :change, :move, :remove, :select
     attr_reader :operation
     attr_reader :target # ノードID
     attr_reader :position # 挿入位置(add, moveで使用)
@@ -13,6 +13,16 @@ module Editor2
       @position = params[:position]
       @destination = params[:destination]
       @payload = params[:payload] || {}
+    end
+
+    def inspect
+      {
+        :operation => @operation,
+        :target => @target,
+        :position => @position,
+        :destination => @destination,
+        :payload => @payload
+      }
     end
   end
 end

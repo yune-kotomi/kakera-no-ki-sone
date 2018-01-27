@@ -75,4 +75,29 @@ class UsersController < ApplicationController
   rescue Hotarugaike::Profile::Client::InvalidProfileExchangeError
     forbidden
   end
+
+  def authorize
+    r = session[:redirect_to]
+    reset_session
+    session[:redirect_to] = r
+
+    redirect_to authorizer.get_authorization_url(:login_hint => session.id, :request => request)
+  end
+
+  def authorize_callback
+    authorizer.handle_auth_callback(session.id, request)
+    if session[:redirect_to]
+      redirect_to session.delete(:redirect_to)
+    else
+      redirect_to :controller => :welcome, :action => :installed
+    end
+  end
+
+  def authorizer
+    client_id = Google::Auth::ClientId.from_hash(Sone::Application.config.google)
+    token_store = GoogleToken::TokenStore.new
+    scope = [Google::Apis::DriveV3::AUTH_DRIVE_FILE,
+      'https://www.googleapis.com/auth/drive.install']
+    Google::Auth::WebUserAuthorizer.new(client_id, scope, token_store, url_for(:action => 'authorize_callback', :only_path => true))
+  end
 end
