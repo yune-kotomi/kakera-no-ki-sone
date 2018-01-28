@@ -166,7 +166,7 @@ module Editor2
                 :operation => :move,
                 :target => id,
                 :position => 0,
-                :destination => id
+                :destination => @id
               )
             ]
           end

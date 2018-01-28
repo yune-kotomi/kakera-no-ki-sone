@@ -5,7 +5,7 @@ module Drive
 
     attr_accessor :body
 
-    def initialize(src = {})
+    def initialize(src = {}, options = {})
       @body = {
         'title' => '新しい文書',
         'body' => '',
@@ -13,6 +13,10 @@ module Drive
         'markup' => 'plaintext'
       }
       ([:id, :parent, :body] & src.keys).each{|c| self.send("#{c}=".to_sym, src[c]) }
+
+      @writable = options[:writable]
+      @host = options[:host] || 'example.com'
+
       self
     end
 
@@ -46,7 +50,11 @@ module Drive
     end
 
     def to_html
-      Drive::DocumentsController.render(:partial => 'documents/drive_document.html.erb', :assigns => {:document => self})
+      Drive::DocumentsController.render(
+        :partial => 'documents/drive_document.html.erb',
+        :assigns => {:document => self},
+        :locals => {:host => @host}
+      )
     end
 
     def markup
@@ -57,15 +65,21 @@ module Drive
       ActiveRecord::Base.connection.select_one("SELECT nextval('document_version_seq')")['nextval']
     end
 
-    def self.find(id, token)
+    def writable?
+      @writable
+    end
+
+    def self.find(id, token, host: '')
+      metadata = service(token).get_file(id, :fields => 'capabilities')
       content = service(token).get_file(id, :download_dest => StringIO.new)
       content.rewind
       content = Nokogiri::HTML(content.read)
       body = JSON.parse(content.css('#document-body').first['value'])
 
       Document.new(
-        :id => id,
-        :body => body
+        {:id => id, :body => body},
+        :writable => metadata.capabilities.can_edit,
+        :host => host
       )
     end
 

@@ -14,12 +14,22 @@ module Drive
 
     test 'findで文書を取得できる' do
       doc = open('test/fixtures/drive_document.html')
-      @drive_service.expect(:get_file, doc, [@id, Hash])
+      metadata =
+        Google::Apis::DriveV3::File.new.tap do |f|
+          f.capabilities =
+            Google::Apis::DriveV3::File::Capabilities.new.tap do |c|
+              c.can_edit = true
+            end
+        end
+      @drive_service.expect(:get_file, metadata) {|id, options| id == @id && options[:fields] == 'capabilities' }
+
+      @drive_service.expect(:get_file, doc) {|id, options| id == @id && options[:download_dest].is_a?(StringIO) }
 
       Google::Apis::DriveV3::DriveService.stub(:new, @drive_service) do
         document = Drive::Document.find(@id, @token)
         assert_equal document.id, @id
         assert_equal document.body['title'], '新しい文書'
+        assert_equal document.writable?, true
       end
     end
 

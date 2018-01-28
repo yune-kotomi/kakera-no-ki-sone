@@ -11,9 +11,22 @@ module Drive
       token.save
 
       drive_service = Minitest::Mock.new
-      2.times{ drive_service.expect(:'authorization=', nil, [Google::Auth::UserRefreshCredentials]) }
+      3.times{ drive_service.expect(:'authorization=', nil, [Google::Auth::UserRefreshCredentials]) }
 
       drive_service
+    end
+
+    def expect_document_get(service, document_id, writable = true)
+      metadata =
+        Google::Apis::DriveV3::File.new.tap do |f|
+          f.capabilities =
+            Google::Apis::DriveV3::File::Capabilities.new.tap do |c|
+              c.can_edit = writable
+            end
+        end
+      service.expect(:get_file, metadata) {|id, options| id == document_id && options[:fields] == 'capabilities' }
+
+      service.expect(:get_file, open('test/fixtures/drive_document.html')) {|id, options| id == document_id && options[:download_dest].is_a?(StringIO) }
     end
 
     test '#newはトークンが有効の場合、新規文書を指定されたフォルダへ生成して編集画面へ' do
@@ -67,8 +80,7 @@ module Drive
 
     test '#showはトークンが有効の場合編集画面を返す' do
       drive_service = mock_drive_service
-      doc = open('test/fixtures/drive_document.html')
-      drive_service.expect(:get_file, doc, [@document_id, Hash])
+      expect_document_get(drive_service, @document_id)
 
       Google::Apis::DriveV3::DriveService.stub(:new, drive_service) do
         get :show, :params => {:id => @document_id}
@@ -78,8 +90,7 @@ module Drive
 
     test '指定したバージョンが最新であれば304で応答する' do
       drive_service = mock_drive_service
-      doc = open('test/fixtures/drive_document.html')
-      drive_service.expect(:get_file, doc, [@document_id, Hash])
+      expect_document_get(drive_service, @document_id)
 
       Google::Apis::DriveV3::DriveService.stub(:new, drive_service) do
         get :show,
@@ -139,7 +150,8 @@ module Drive
 
     test '#updateはDriveの文書を更新する' do
       drive_service = mock_drive_service
-      drive_service.expect(:get_file, open('test/fixtures/drive_document.html'), [@document_id, Hash])
+      expect_document_get(drive_service, @document_id)
+
       drive_service.expect(:update_file, {}, [@document_id, {:name => "test"}, Hash])
 
       Google::Apis::DriveV3::DriveService.stub(:new, drive_service) do
@@ -156,7 +168,7 @@ module Drive
 
     test 'バージョン情報が不一致の場合、現在のバージョンと内容を付けて応答' do
       drive_service = mock_drive_service
-      drive_service.expect(:get_file, open('test/fixtures/drive_document.html'), [@document_id, Hash])
+      expect_document_get(drive_service, @document_id)
       drive_service.expect(:update_file, {}, [@document_id, {:name => "test"}, Hash])
 
       Google::Apis::DriveV3::DriveService.stub(:new, drive_service) do
@@ -200,6 +212,22 @@ module Drive
             }
         assert_response 401
         assert_equal '{}', response.body
+      end
+    end
+
+    test '#updateは書き込み権限がなければ403' do
+      drive_service = mock_drive_service
+      expect_document_get(drive_service, @document_id, false)
+
+      Google::Apis::DriveV3::DriveService.stub(:new, drive_service) do
+        patch :update,
+          :params =>
+            {
+              :id => @document_id,
+              :document => {:title => 'test', :version => 288, :body => '[]'},
+              :format => :json
+            }
+        assert_response :forbidden
       end
     end
   end

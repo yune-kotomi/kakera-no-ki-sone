@@ -5,11 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no"/>
     <title><%= @document.body['title'] %></title>
 
-    <%= stylesheet_link_tag 'application', media: 'all', 'data-turbolinks-track' => true %>
+    <%= stylesheet_link_tag stylesheet_url('application', :host => host), media: 'all', 'data-turbolinks-track' => true %>
     <%= yield :head %>
   </head>
 
-  <body>
+  <body class="documents">
     <div class="document">
       <div class="toc">
         <div class="mdl-card mdl-shadow--2dp">
@@ -44,6 +44,12 @@
         <%= render :partial => 'documents/show/content.html',
           :collection => @document.body['children'],
           :locals => {:parent_index => ''} %>
+      </div>
+
+      <div class="drive-document-logo">
+        <%= link_to root_url(:host => host) do %>
+          <%= image_tag image_url('banner.png', :host => host), :alt => '創り出すためのアウトライン・プロセッサ' %>
+        <% end %>
       </div>
     </div>
 
