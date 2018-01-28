@@ -17,7 +17,7 @@ CREATE EXTENSION IF NOT EXISTS pgroonga WITH SCHEMA public;
 -- Name: EXTENSION pgroonga; Type: COMMENT; Schema: -; Owner: -
 --
 
-COMMENT ON EXTENSION pgroonga IS 'Super fast and all languages supported full text search index based on Groonga';
+COMMENT ON EXTENSION pgroonga IS 'CJK-ready fast full-text search index based on Groonga';
 
 
 --
@@ -50,6 +50,45 @@ CREATE TABLE ar_internal_metadata (
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );
+
+
+--
+-- Name: delayed_jobs; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE delayed_jobs (
+    id bigint NOT NULL,
+    priority integer DEFAULT 0 NOT NULL,
+    attempts integer DEFAULT 0 NOT NULL,
+    handler text NOT NULL,
+    last_error text,
+    run_at timestamp without time zone,
+    locked_at timestamp without time zone,
+    failed_at timestamp without time zone,
+    locked_by character varying,
+    queue character varying,
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone
+);
+
+
+--
+-- Name: delayed_jobs_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE delayed_jobs_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: delayed_jobs_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE delayed_jobs_id_seq OWNED BY delayed_jobs.id;
 
 
 --
@@ -221,6 +260,13 @@ ALTER SEQUENCE users_id_seq OWNED BY users.id;
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
+ALTER TABLE ONLY delayed_jobs ALTER COLUMN id SET DEFAULT nextval('delayed_jobs_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
 ALTER TABLE ONLY document_histories ALTER COLUMN id SET DEFAULT nextval('document_histories_id_seq'::regclass);
 
 
@@ -254,6 +300,14 @@ ALTER TABLE ONLY ar_internal_metadata
 
 
 --
+-- Name: delayed_jobs_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY delayed_jobs
+    ADD CONSTRAINT delayed_jobs_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: document_histories_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -278,14 +332,6 @@ ALTER TABLE ONLY google_tokens
 
 
 --
--- Name: schema_migrations_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY schema_migrations
-    ADD CONSTRAINT schema_migrations_pkey PRIMARY KEY (version);
-
-
---
 -- Name: users_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -294,10 +340,24 @@ ALTER TABLE ONLY users
 
 
 --
+-- Name: delayed_jobs_priority; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX delayed_jobs_priority ON delayed_jobs USING btree (priority, run_at);
+
+
+--
 -- Name: index_documents_on_fulltext; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_documents_on_fulltext ON documents USING pgroonga (fulltext);
+
+
+--
+-- Name: unique_schema_migrations; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX unique_schema_migrations ON schema_migrations USING btree (version);
 
 
 --
@@ -313,6 +373,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20160108115908'),
 ('20160417065627'),
 ('20171203125259'),
-('20180102054845');
+('20180102054845'),
+('20180128083813');
 
 

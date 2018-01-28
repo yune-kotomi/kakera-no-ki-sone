@@ -26,6 +26,7 @@ module Sone
     # config.i18n.default_locale = :de
 
     config.title = 'カケラの樹'
+    config.active_job.queue_adapter = :delayed_job
   end
 end
 
