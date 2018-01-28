@@ -17,7 +17,7 @@ module Drive
     end
 
     def update
-      @document = Drive::Document.find(params[:id], token)
+      @document = Drive::Document.find(params[:id], token, :host => request.host_with_port)
 
       if @document.writable?
         respond_to do |format|

@@ -15,6 +15,8 @@ module Drive
       ([:id, :parent, :body] & src.keys).each{|c| self.send("#{c}=".to_sym, src[c]) }
 
       @writable = options[:writable]
+      @host = options[:host] || 'example.com'
+
       self
     end
 
@@ -48,7 +50,11 @@ module Drive
     end
 
     def to_html
-      Drive::DocumentsController.render(:partial => 'documents/drive_document.html.erb', :assigns => {:document => self})
+      Drive::DocumentsController.render(
+        :partial => 'documents/drive_document.html.erb',
+        :assigns => {:document => self},
+        :locals => {:host => @host}
+      )
     end
 
     def markup
@@ -63,7 +69,7 @@ module Drive
       @writable
     end
 
-    def self.find(id, token)
+    def self.find(id, token, host: '')
       metadata = service(token).get_file(id, :fields => 'capabilities')
       content = service(token).get_file(id, :download_dest => StringIO.new)
       content.rewind
@@ -72,7 +78,8 @@ module Drive
 
       Document.new(
         {:id => id, :body => body},
-        :writable => metadata.capabilities.can_edit
+        :writable => metadata.capabilities.can_edit,
+        :host => host
       )
     end
 
