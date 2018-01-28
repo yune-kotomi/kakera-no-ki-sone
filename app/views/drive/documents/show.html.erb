@@ -1,4 +1,11 @@
-<% @title = "編集: #{@document.body['title']}" %>
+<%
+  @title =
+    if @document.writable?
+      "編集: #{@document.body['title']}"
+    else
+      "#{@document.body['title']} (読み込み専用)"
+    end
+%>
 
 <div id="save-indicator" class="mdl-progress mdl-js-progress"></div>
 
@@ -15,7 +22,8 @@
 <%= hidden_field_tag :public, false.to_json, :id => 'document-public' %>
 <%= hidden_field_tag :markup, @document.body['markup'].to_json, :id => 'document-markup' %>
 <%= hidden_field_tag :version, @document.body['version'].to_json, :id => 'document-version' %>
-<%= hidden_field_tag :demo_mode, params[:action] == 'demo', :id => 'document-demo-mode' %>
+<%= hidden_field_tag :demo_mode, params[:action] == 'demo' || !@document.writable?, :id => 'document-demo-mode' %>
+<%= hidden_field_tag :writable, @document.writable?.to_json, :id => 'document-writable' %>
 
 <% content_for(:navigation1) do %>
   <%= link_to '#', :class => 'mdl-navigation__link modal-trigger', :data => {:modal_selector => '#config-dialog'} do %>

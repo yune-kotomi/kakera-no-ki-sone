@@ -17,23 +17,27 @@ module Drive
     end
 
     def update
-      respond_to do |format|
-        @document = Drive::Document.find(params[:id], token)
+      @document = Drive::Document.find(params[:id], token)
 
-        if @document.body['version'] == document_params[:version].to_i
-          @document.body =
+      if @document.writable?
+        respond_to do |format|
+          if @document.body['version'] == document_params[:version].to_i
+            @document.body =
             {
               'title' => document_params[:title],
               'body' => document_params[:description],
               'children' => JSON.parse(document_params[:body]),
               'markup' => document_params[:markup]
             }
-          @document.save(token)
-          format.json { render :json => {:version => @document.body['version']} }
-        else
-          # 指定されたバージョンが現状と異なる場合は409で応答
-          format.json { render 'show.json.erb', status: 409 }
+            @document.save(token)
+            format.json { render :json => {:version => @document.body['version']} }
+          else
+            # 指定されたバージョンが現状と異なる場合は409で応答
+            format.json { render 'show.json.erb', status: 409 }
+          end
         end
+      else
+        forbidden
       end
     end
 
@@ -52,6 +56,8 @@ module Drive
 
     rescue_from Google::Apis::ClientError do |e|
       case e.status_code
+      when 403
+        forbidden
       when 404
         missing
       end
