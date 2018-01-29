@@ -19,27 +19,9 @@ class DocumentsControllerTest < ActionController::TestCase
     get :index, :session => {:user_id => @user.id}
 
     assert_response :success
-    assert_equal @user.documents.where(:archived => false).count, assigns(:documents).size
+    assert_equal @user.documents.count, assigns(:documents).size
 
-    titles = @user.documents.where(:archived => false).map{|d| d.title}.sort
-    assert_equal titles, assigns(:documents).map(&:title).sort
-  end
-
-  # test "キーワードを与えると全文検索" do
-  #   get :index, {:keywords => '日本語 タイトル'}, {:user_id => @owner.id}
-  #
-  #   assert_response :success
-  #   assert_equal [documents(:document1), documents(:document4)].sort{|a, b| a.id <=> b.id }, assigns(:documents).sort{|a, b| a.id <=> b.id }
-  # end
-
-  test 'index アーカイブ表示' do
-    get :index,
-      :params => {:archived => true},
-      :session => {:user_id => @user.id}
-
-    assert_equal @user.documents.where(:public => true, :archived => true).count, assigns(:documents).size
-
-    titles = @user.documents.where(:public => true, :archived => true).map{|d| d.title}.sort
+    titles = @user.documents.map{|d| d.title}.sort
     assert_equal titles, assigns(:documents).map(&:title).sort
   end
 
