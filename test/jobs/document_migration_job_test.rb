@@ -100,6 +100,8 @@ class DocumentMigrationJobTest < ActiveJob::TestCase
     Google::Apis::DriveV3::DriveService.stub(:new, @drive_service) do
       @job.perform(document_id: @document.id, token: @token, host: 'https://example.com')
       assert @drive_service.verify
+      @document.reload
+      assert_equal @document.google_document_id, 'document-id'
     end
   end
 end

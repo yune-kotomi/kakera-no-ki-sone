@@ -34,5 +34,7 @@ class DocumentMigrationJob < ApplicationJob
       )
 
     drive_doc.save(token)
+
+    hosted_doc.update_attribute(:google_document_id, drive_doc.id)
   end
 end

@@ -155,7 +155,8 @@ CREATE TABLE documents (
     content_updated_at timestamp without time zone NOT NULL,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    version integer
+    version integer,
+    google_document_id character varying
 );
 
 
@@ -374,6 +375,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20160417065627'),
 ('20171203125259'),
 ('20180102054845'),
-('20180128083813');
+('20180128083813'),
+('20180129143228');
 
 
