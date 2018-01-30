@@ -77,10 +77,9 @@ class UsersController < ApplicationController
   end
 
   def authorize
-    r = session[:redirect_to]
+    s = [:redirect_to, :user_id].map{|k| [k, session[k]] }.to_h
     reset_session
-    session[:redirect_to] = r
-
+    s.each{|k, v| session[k] = v }
     redirect_to authorizer.get_authorization_url(:login_hint => session.id, :request => request)
   end
 
