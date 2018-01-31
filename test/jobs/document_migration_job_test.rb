@@ -25,7 +25,9 @@ class DocumentMigrationJobTest < ActiveJob::TestCase
     metadata =
       {
         :name => @document.title,
-        :parents => [@folder_id]
+        :parents => [@folder_id],
+        :created_time => @document.created_at.iso8601,
+        :modified_time => @document.updated_at.iso8601
       }
     ret = Google::Apis::DriveV3::File.new.tap{|f| f.id = 'document-id' }
     s.expect(:create_file, ret, [metadata, Hash])

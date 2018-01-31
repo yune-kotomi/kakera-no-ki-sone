@@ -14,6 +14,9 @@ module Drive
       }
       ([:id, :parent, :body] & src.keys).each{|c| self.send("#{c}=".to_sym, src[c]) }
 
+      @created_at = src[:created_at]
+      @updated_at = src[:updated_at]
+
       @writable = options[:writable]
       @host = options[:host] || 'example.com'
 
@@ -25,6 +28,9 @@ module Drive
         # 新規作成
         metadata = {:name => @body['title']}
         metadata[:parents] = [@parent] if @parent
+        metadata[:created_time] = @created_at.iso8601 if @created_at
+        metadata[:modified_time] = @updated_at.iso8601 if @updated_at
+
         body['version'] = new_version
 
         ret =

@@ -28,7 +28,9 @@ class DocumentMigrationJob < ApplicationJob
             'body' => hosted_doc.description,
             'children' => hosted_doc.body,
             'markup' => hosted_doc.markup
-          }
+          },
+          :created_at => hosted_doc.created_at,
+          :updated_at => hosted_doc.updated_at
         },
         {:host => host}
       )
