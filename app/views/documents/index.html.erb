@@ -5,6 +5,39 @@
     @title = "文書一覧"
   end
  %>
+<div class="migration-notice">
+  <div class="mdl-card mdl-shadow--2dp">
+    <div class="mdl-card__title">
+      <h2>Googleドライブへの移行について</h2>
+    </div>
+
+    <div class="mdl-card__supporting-text">
+
+      <% if @login_user.migration_started %>
+        <% if @remainings == 0 %>
+          すべての文書を移行済みです。今後は
+          <%= link_to 'Google Drive™', 'https://drive.google.com/drive/' %>
+          からご利用下さい。
+        <% else %>
+          移行処理中です。
+        <% end %>
+      <% else %>
+        <p>
+          カケラの樹は文書をGoogleドライブに保存するようになりました。
+          今までの文書は移行処理を行うことでGoogleドライブにコピーされ、引き続きお使いいただけます。
+        </p>
+
+        <% if @token %>
+          <%= button_to 'Google Drive™ へ文書を移行する', {:action => :migrate}, :class => 'mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect',
+          :style => 'text-transform: none;' %>
+        <% else %>
+          <%= button_to 'Google Drive™ で使う準備をする', {:action => :authorize}, :class => 'mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect',
+          :style => 'text-transform: none;' %>
+        <% end %>
+      <% end %>
+    </div>
+  </div>
+</div>
 
 <div class="documents">
   <table class="mdl-data-table mdl-js-data-table">

@@ -129,6 +129,33 @@ body.documents {
       }
     }
   }
+
+  .migration-notice {
+    box-sizing: border-box;
+    padding: 16px 16px 0;
+    width: 70%;
+
+    @media (max-width: 800px) {
+      width: 100%;
+    }
+
+    &>.mdl-card {
+      width: 100%;
+    }
+
+    .mdl-card__title {
+      &>h2 {
+        font-size: 24px;
+        margin: 0;
+
+        img.avater {
+          margin-right: 10px;
+          max-height: 64px;
+          max-width: 64px;
+        }
+      }
+    }
+  }
 }
 
 #document-editor {

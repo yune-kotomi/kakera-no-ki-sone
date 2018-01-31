@@ -29,6 +29,8 @@ Rails.application.routes.draw do
   get 'documents/editor_demo', :to => 'documents#demo'
   get 'documents/:id/histories', :to => 'documents#histories'
   get 'documents/:id/diff', :to => 'documents#diff'
+  post 'documents/authorize', :to => 'documents#authorize'
+  post 'documents/migrate', :to => 'documents#migrate'
   resources :documents
 
   namespace :drive do

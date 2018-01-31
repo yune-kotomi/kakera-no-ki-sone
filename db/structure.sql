@@ -234,7 +234,8 @@ CREATE TABLE users (
     kitaguchi_profile_id integer,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    profile_image character varying
+    profile_image character varying,
+    migration_started boolean
 );
 
 
@@ -376,6 +377,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20171203125259'),
 ('20180102054845'),
 ('20180128083813'),
-('20180129143228');
+('20180129143228'),
+('20180130153211');
 
 
