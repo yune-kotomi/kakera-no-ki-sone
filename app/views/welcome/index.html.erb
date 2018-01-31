@@ -33,12 +33,6 @@
   </div>
 
   <div class="buttons">
-      <%= button_to({:controller => :documents, :action => :demo},
-        :method => :get,
-        :class => 'mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect') do %>
-        編集画面を試す
-      <% end if @login_user.blank? %>
-
       <%= button_to({:controller => :users, :action => :login},
         :method => :get,
         :class => 'mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent') do %>
