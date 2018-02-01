@@ -33,26 +33,31 @@
   </div>
 
   <div class="buttons">
+    <%= button_to({:controller => :users, :action => :authorize},
+      :method => :get,
+      :class => 'mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect  mdl-button--accent',
+      :id => 'google-drive-authorize') do %>
+      Googleドライブで使う
+    <% end %>
+
       <%= button_to({:controller => :users, :action => :login},
         :method => :get,
-        :class => 'mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent') do %>
-        使いはじめる
+        :class => 'mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect') do %>
+        ログイン/文書を移行
       <% end if @login_user.blank? %>
 
       <%= button_to(documents_path,
         :method => :get,
-        :class => 'mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent') do %>
+        :class => 'mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect') do %>
         <i class="material-icons">library_books</i>
-        文書一覧
+        文書の移行
       <% end if @login_user.present? %>
-
-      <%= button_to({:controller => :users, :action => :authorize},
-        :method => :get,
-        :class => 'mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect',
-        :id => 'google-drive-authorize') do %>
-        Google Drive™ で使う
-      <% end %>
   </div>
+</div>
+
+<div class="notice" style="text-align: center">
+  カケラの樹は文書をGoogleドライブに保存するようになりました。
+  今までの文書は移行処理を行うことでGoogleドライブにコピーされ、引き続きお使いいただけます。
 </div>
 
 <div class="introduction">
@@ -72,22 +77,13 @@
         ブラウザ上で全ての機能が使用できます。
       </div>
       <div>
-        文書はサーバ上に保存されるため、パソコン、スマートフォン、タブレットなど様々な端末から常に同じ文書を編集できます。
+        文書はGoogleドライブに保存され、パソコン、スマートフォン、タブレットなど様々な端末から常に同じ文書を編集できます。
       </div>
     </li>
     <li>
       <h4>ブログ感覚で、書けます。</h4>
       <div>
         文字装飾をせずに書く以外に、簡単な記述で豊かな表現ができるはてな記法や、プログラマに人気のMarkdown記法も使えます。
-      </div>
-    </li>
-    <li>
-      <h4>パスワードも不要、気軽に使えます。</h4>
-      <div>
-        面倒なユーザID、パスワードの管理は必要ありません。
-      </div>
-      <div>
-        いつものGoogleアカウントやはてなIDなどを使って、簡単に使い始められます。
       </div>
     </li>
   </ol>

@@ -29,19 +29,6 @@
           <span class="mdl-layout-title"><%= @title %></span>
           <!-- Add spacer, to align navigation to the right -->
           <div class="mdl-layout-spacer"></div>
-
-          <% if @login_user.present? %>
-            <div class="mdl-textfield mdl-js-textfield mdl-textfield--expandable mdl-textfield--floating-label mdl-textfield--align-right">
-              <label class="mdl-button mdl-js-button mdl-button--icon" for="fixed-header-drawer-exp">
-                <i class="material-icons">search</i>
-              </label>
-              <div class="mdl-textfield__expandable-holder">
-                <%= form_tag documents_path, :method => :get do %>
-                  <%= text_field_tag 'keywords', params[:keywords], :id => 'fixed-header-drawer-exp', :class => 'mdl-textfield__input' %>
-                <% end %>
-              </div>
-            </div>
-          <% end %>
         </div>
       </header>
 
@@ -64,22 +51,12 @@
             <% if @login_user.blank? %>
               <%= link_to users_login_path, :class => 'mdl-navigation__link' do %>
                 <i class="material-icons">person</i>
-                ユーザ登録/ログイン
+                ログイン
               <% end %>
             <% else %>
-              <%= link_to documents_path, :class => 'mdl-navigation__link' do %>
-                <i class="material-icons">library_books</i>
-                文書
-              <% end %>
-              <%= link_to documents_path(:archived => true), :class => 'mdl-navigation__link' do %>
-                <i class="material-icons">archive</i>
-                保存記録
-              <% end %>
-
               <%= yield :navigation2 %>
               <hr>
 
-              <%= link_to_profile_edit '<i class="material-icons">settings</i>プロフィール編集'.html_safe, :class => 'mdl-navigation__link' %>
               <%= link_to users_logout_path, :class => 'mdl-navigation__link' do %>
                 <i class="material-icons">person_outline</i>
                 ログアウト

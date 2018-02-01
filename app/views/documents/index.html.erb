@@ -1,10 +1,4 @@
-<%
-  if params[:archived]
-    @title = "保存記録"
-  else
-    @title = "文書一覧"
-  end
- %>
+<% @title = "文書一覧" %>
 <div class="migration-notice">
   <div class="mdl-card mdl-shadow--2dp">
     <div class="mdl-card__title">
@@ -16,7 +10,7 @@
       <% if @login_user.migration_started %>
         <% if @remainings == 0 %>
           すべての文書を移行済みです。今後は
-          <%= link_to 'Google Drive™', 'https://drive.google.com/drive/' %>
+          <%= link_to 'Googleドライブ', 'https://drive.google.com/drive/' %>
           からご利用下さい。
         <% else %>
           移行処理中です。
@@ -28,10 +22,10 @@
         </p>
 
         <% if @token %>
-          <%= button_to 'Google Drive™ へ文書を移行する', {:action => :migrate}, :class => 'mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect',
+          <%= button_to 'Googleドライブへ文書を移行する', {:action => :migrate}, :class => 'mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect',
           :style => 'text-transform: none;' %>
         <% else %>
-          <%= button_to 'Google Drive™ で使う準備をする', {:action => :authorize}, :class => 'mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect',
+          <%= button_to 'Googleドライブで使う準備をする', {:action => :authorize}, :class => 'mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect',
           :style => 'text-transform: none;' %>
         <% end %>
       <% end %>
