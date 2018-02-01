@@ -27,21 +27,6 @@ body.documents {
       text-align: right;
     }
 
-    .histories {
-      li {
-        display: flex;
-        .from,.to {
-          width: 34px;
-        }
-        label {
-          span.label {
-            opacity: 0;
-            font-size: 1px;
-          }
-        }
-      }
-    }
-
     .toc {
       box-sizing: border-box;
       padding: 16px;
@@ -147,12 +132,6 @@ body.documents {
       &>h2 {
         font-size: 24px;
         margin: 0;
-
-        img.avater {
-          margin-right: 10px;
-          max-height: 64px;
-          max-width: 64px;
-        }
       }
     }
   }
@@ -407,34 +386,5 @@ nav {
     &>.mdl-card {
       margin: auto;
     }
-  }
-}
-
-#import-dialog {
-  .mdl-button--file {
-    input {
-      cursor: pointer;
-      height: 100%;
-      right: 0;
-      opacity: 0;
-      position: absolute;
-      top: 0;
-      width: 300px;
-      z-index: 4;
-    }
-  }
-
-  .mdl-textfield--file {
-    .mdl-textfield__input {
-      box-sizing: border-box;
-      width: calc(100% - 32px);
-    }
-    .mdl-button--file {
-      right: 0;
-    }
-  }
-
-  .primary-button {
-    text-align: right;
   }
 }
