@@ -97,11 +97,7 @@ body.documents {
 
       .updated {
         text-align: center;
-        width: 20em;
-
-        @media (max-width: $grid-tablet-breakpoint) {
-          display: none;
-        }
+        width: 7em;
       }
 
       td.buttons {
