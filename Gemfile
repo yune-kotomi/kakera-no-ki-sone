@@ -50,3 +50,5 @@ end
 gem 'uuidtools'
 gem 'exception_notification'
 gem 'google-api-client'
+gem 'delayed_job_active_record'
+gem 'daemons'

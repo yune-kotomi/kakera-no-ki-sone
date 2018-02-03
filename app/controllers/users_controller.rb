@@ -1,17 +1,6 @@
 class UsersController < ApplicationController
-  protect_from_forgery :except => :update
-
   def show
-    @user = User.where(
-      :domain_name => params[:domain_name],
-      :screen_name => params[:screen_name]
-    ).first
-
-    if @user.present?
-      @documents = @user.documents.where(:public => true).page(params[:page])
-    else
-      missing
-    end
+    missing
   end
 
   def login
@@ -56,31 +45,10 @@ class UsersController < ApplicationController
     redirect_to Sone::Application.config.authentication.logout
   end
 
-  def update
-    if @login_user.present? && verify_authenticity_token.nil?
-      @login_user.update(params[:user].permit(:default_markup))
-      render :plain => ({:status => 'ok'}).to_json
-    else
-      data = Sone::Application.config.authentication.updated_profile(params[:token])
-      @user = User.where(:kitaguchi_profile_id => data['profile_id']).first
-      if @user.present?
-        @user.update_attributes(
-          :nickname => data['nickname'],
-          :profile_text => data['profile_text'],
-          :profile_image => data['profile_image']
-         )
-      end
-      render :plain => "success"
-    end
-  rescue Hotarugaike::Profile::Client::InvalidProfileExchangeError
-    forbidden
-  end
-
   def authorize
-    r = session[:redirect_to]
+    s = [:redirect_to, :user_id].map{|k| [k, session[k]] }.to_h
     reset_session
-    session[:redirect_to] = r
-
+    s.each{|k, v| session[k] = v }
     redirect_to authorizer.get_authorization_url(:login_hint => session.id, :request => request)
   end
 

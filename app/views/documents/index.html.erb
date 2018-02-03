@@ -1,18 +1,44 @@
-<%
-  if params[:archived]
-    @title = "保存記録"
-  else
-    @title = "文書一覧"
-  end
- %>
+<% @title = "文書一覧" %>
+<div class="migration-notice">
+  <div class="mdl-card mdl-shadow--2dp">
+    <div class="mdl-card__title">
+      <h2>Googleドライブへの移行について</h2>
+    </div>
+
+    <div class="mdl-card__supporting-text">
+
+      <% if @login_user.migration_started %>
+        <% if @remainings == 0 %>
+          すべての文書を移行済みです。今後は
+          <%= link_to 'Googleドライブ', 'https://drive.google.com/drive/' %>
+          からご利用下さい。
+        <% else %>
+          移行処理中です。
+        <% end %>
+      <% else %>
+        <p>
+          カケラの樹は文書をGoogleドライブに保存するようになりました。
+          今までの文書は移行処理を行うことでGoogleドライブにコピーされ、引き続きお使いいただけます。
+        </p>
+
+        <% if @token %>
+          <%= button_to 'Googleドライブへ文書を移行する', {:action => :migrate}, :class => 'mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect',
+          :style => 'text-transform: none;' %>
+        <% else %>
+          <%= button_to 'Googleドライブで使う準備をする', {:action => :authorize}, :class => 'mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect',
+          :style => 'text-transform: none;' %>
+        <% end %>
+      <% end %>
+    </div>
+  </div>
+</div>
 
 <div class="documents">
   <table class="mdl-data-table mdl-js-data-table">
     <thead>
       <tr>
         <th class="mdl-data-table__cell--non-numeric title">題名</th>
-        <th class="mdl-data-table__cell--non-numeric updated">最終更新</th>
-        <th></th>
+        <th class="mdl-data-table__cell--non-numeric updated">移行状態</th>
       </tr>
     </thead>
 
@@ -20,46 +46,15 @@
       <% @documents.each do |document| %>
         <tr>
           <td class="mdl-data-table__cell--non-numeric title">
-            <%= link_to edit_document_path(document) do %>
-              <%= document.title %>
-              <% if document.public %>
-                <i class="material-icons">public</i>
-              <% end %>
-            <% end %>
+            <%= document.title %>
           </td>
 
           <td class="updated">
-            <%= document.content_updated_at %>
-          </td>
-
-          <td class="buttons">
-            <div class="buttons">
-              <%= button_to document,
-                :method => :delete,
-                :data => {:confirm => '本当に削除してよろしいですか?'},
-                :class => 'mdl-button mdl-js-button mdl-button--icon' do %>
-                <i class="material-icons">delete</i>
-              <% end %>
-
-              <%= form_for @login_user.documents.build do %>
-                <%= hidden_field_tag 'template', document.id %>
-                <button class="mdl-button mdl-js-button mdl-button--icon">
-                  <i class="material-icons">content_copy</i>
-                </button>
-              <% end %>
-
-              <%= form_for(document) do |f| %>
-                <%= f.button :class => 'mdl-button mdl-js-button mdl-button--icon' do %>
-                  <% if document.archived %>
-                    <i class="material-icons">unarchive</i>
-                  <% else %>
-                    <i class="material-icons">archive</i>
-                  <% end %>
-                <% end %>
-                <% document.archived = !document.archived %>
-                <%= f.hidden_field :archived %>
-              <% end %>
-            </div>
+            <% if document.google_document_id.nil? %>
+              移行前
+            <% else %>
+              <%= link_to '移行完了', :controller => 'drive/documents', :action => :show, :id => document.google_document_id %>
+            <% end %>
           </td>
         </tr>
       <% end %>
@@ -68,90 +63,3 @@
 </div>
 
 <%= paginate(@documents) %>
-
-<div class="right-bottom-fab-spacer"></div>
-<div class="add-button right-bottom-fab">
-  <%= form_for @login_user.documents.build do %>
-    <!-- Colored FAB button with ripple -->
-    <button class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored">
-      <i class="material-icons">add</i>
-    </button>
-  <% end %>
-</div>
-
-<% content_for(:navigation2) do %>
-  <%= link_to '#', :class => 'mdl-navigation__link modal-trigger', :data => {:modal_selector => '#import-dialog'} do %>
-    <i class="material-icons">file_upload</i>
-    取り込み
-  <% end %>
-  <hr>
-  <%= link_to '#', :class => 'mdl-navigation__link modal-trigger', :data => {:modal_selector => '#config-dialog'} do %>
-    <i class="material-icons">settings</i>
-    設定
-  <% end %>
-<% end %>
-
-<% content_for(:bottom) do %>
-  <div id="config-dialog" class="modal-card user-config">
-    <div class="modal-container">
-      <div class="mdl-card mdl-shadow--2dp">
-        <div class="mdl-card__supporting-text">
-          <div>
-            <h4>記法</h4>
-            <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect">
-              <input type="radio" class="mdl-radio__button" name="markup" value="plaintext" id="markup1" <%= 'checked' if @login_user.default_markup == 'plaintext' %>>
-              <span class="mdl-radio__label">記法なし</span>
-            </label>
-            <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect">
-              <input type="radio" class="mdl-radio__button" name="markup" value="hatena"id="markup2" <%= 'checked' if @login_user.default_markup == 'hatena' %>>
-              <span class="mdl-radio__label">はてな記法</span>
-            </label>
-            <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect">
-              <input type="radio" class="mdl-radio__button" name="markup" value="markdown"id="markup3" <%= 'checked' if @login_user.default_markup == 'markdown' %>>
-              <span class="mdl-radio__label">Markdown</span>
-            </label>
-          </div>
-        </div>
-
-        <div class="mdl-card__menu">
-          <button class="mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect close">
-            <i class="material-icons">close</i>
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div id="import-dialog" class="modal-card import">
-    <div class="modal-container">
-      <div class="mdl-card mdl-shadow--2dp">
-        <div class="mdl-card__supporting-text">
-          <div>
-            <h4>取り込み</h4>
-            <%= form_for @login_user.documents.build, :html => {:multipart => true} do %>
-              <div class="mdl-textfield mdl-js-textfield mdl-textfield--file">
-                <input class="mdl-textfield__input filename-display" placeholder="階層付きテキスト" type="text" readonly/>
-                <div class="mdl-button mdl-button--primary mdl-button--icon mdl-button--file">
-                  <i class="material-icons">attach_file</i><input type="file" name="import">
-                </div>
-              </div>
-
-              <div class="primary-button">
-                <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--accent" type="submit">
-                  <i class="material-icons">file_upload</i>
-                  取り込み
-                </button>
-              </div>
-            <% end %>
-          </div>
-        </div>
-
-        <div class="mdl-card__menu">
-          <button class="mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect close">
-            <i class="material-icons">close</i>
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-<% end %>

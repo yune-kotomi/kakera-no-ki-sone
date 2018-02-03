@@ -6,12 +6,12 @@ module Drive
       @document_id = 'document-id'
     end
 
-    def mock_drive_service
+    def mock_drive_service(auth_count = 3)
       token = GoogleToken.new(:token_id => session.id, :token => '{}')
       token.save
 
       drive_service = Minitest::Mock.new
-      3.times{ drive_service.expect(:'authorization=', nil, [Google::Auth::UserRefreshCredentials]) }
+      auth_count.times{ drive_service.expect(:'authorization=', nil, [Google::Auth::UserRefreshCredentials]) }
 
       drive_service
     end
@@ -30,7 +30,7 @@ module Drive
     end
 
     test '#newはトークンが有効の場合、新規文書を指定されたフォルダへ生成して編集画面へ' do
-      drive_service = mock_drive_service
+      drive_service = mock_drive_service(1)
 
       folder_id = 'folder-id'
       ret = Minitest::Mock.new
@@ -45,11 +45,12 @@ module Drive
       Google::Apis::DriveV3::DriveService.stub(:new, drive_service) do
         get :new, :params => {:state => ({ 'folderId' => folder_id}).to_json}
         assert_redirected_to :action => :show, :id => 'document-id'
+        assert drive_service.verify
       end
     end
 
     test '#newで指定されたフォルダが存在しない場合は404応答' do
-      drive_service = mock_drive_service
+      drive_service = mock_drive_service(1)
 
       folder_id = 'folder-id'
       drive_service.expect(:create_file, nil){ raise Google::Apis::ClientError.new('', :status_code => 404) }
@@ -57,6 +58,7 @@ module Drive
       Google::Apis::DriveV3::DriveService.stub(:new, drive_service) do
         get :new, :params => {:state => ({ 'folderId' => folder_id}).to_json}
         assert_response :missing
+        assert drive_service.verify
       end
     end
 
@@ -69,27 +71,29 @@ module Drive
     end
 
     test '#newはトークンが無効な場合、新規文書を作らず認可アクションへ' do
-      drive_service = mock_drive_service
+      drive_service = mock_drive_service(1)
       drive_service.expect(:create_file, nil){ raise Google::Apis::AuthorizationError.new('') }
 
       Google::Apis::DriveV3::DriveService.stub(:new, drive_service) do
         get :new, :params => {:state => ({ 'folderId' => 'folder-id'}).to_json}
         assert_redirected_to :controller => '/users', :action => :authorize
+        assert drive_service.verify
       end
     end
 
     test '#showはトークンが有効の場合編集画面を返す' do
-      drive_service = mock_drive_service
+      drive_service = mock_drive_service(2)
       expect_document_get(drive_service, @document_id)
 
       Google::Apis::DriveV3::DriveService.stub(:new, drive_service) do
         get :show, :params => {:id => @document_id}
         assert_response :success
+        assert drive_service.verify
       end
     end
 
     test '指定したバージョンが最新であれば304で応答する' do
-      drive_service = mock_drive_service
+      drive_service = mock_drive_service(2)
       expect_document_get(drive_service, @document_id)
 
       Google::Apis::DriveV3::DriveService.stub(:new, drive_service) do
@@ -97,6 +101,7 @@ module Drive
           :params => {:id => @document_id, :version => 288}
 
         assert_response 304
+        assert drive_service.verify
       end
     end
 
@@ -109,7 +114,7 @@ module Drive
 
     test '#showはトークンが無効の場合、編集画面を返さず認可アクションへ' do
       [Google::Apis::AuthorizationError, Signet::AuthorizationError].each do |klass|
-        drive_service = mock_drive_service
+        drive_service = mock_drive_service(1)
         drive_service.expect(:get_file, nil){ raise klass.new('') }
 
         Google::Apis::DriveV3::DriveService.stub(:new, drive_service) do
@@ -117,6 +122,7 @@ module Drive
 
           assert_equal "/drive/documents/#{@document_id}", session[:redirect_to]
           assert_redirected_to :controller => '/users', :action => :authorize
+          assert drive_service.verify
         end
       end
     end
@@ -128,28 +134,30 @@ module Drive
     end
 
     test '#show.jsonはトークンが無効の場合、401応答' do
-      drive_service = mock_drive_service
+      drive_service = mock_drive_service(1)
       drive_service.expect(:get_file, nil){ raise Google::Apis::AuthorizationError.new('') }
 
       Google::Apis::DriveV3::DriveService.stub(:new, drive_service) do
         get :show, :params => {:id => @document_id}, :format => :json
         assert_response 401
         assert_equal '{}', response.body
+        assert drive_service.verify
       end
     end
 
     test '#showはDriveに文書が存在しない場合404' do
-      drive_service = mock_drive_service
+      drive_service = mock_drive_service(1)
       drive_service.expect(:get_file, nil){ raise Google::Apis::ClientError.new('', :status_code => 404) }
 
       Google::Apis::DriveV3::DriveService.stub(:new, drive_service) do
         get :show, :params => {:id => @document_id}
         assert_response :missing
+        assert drive_service.verify
       end
     end
 
     test '#updateはDriveの文書を更新する' do
-      drive_service = mock_drive_service
+      drive_service = mock_drive_service(3)
       expect_document_get(drive_service, @document_id)
 
       drive_service.expect(:update_file, {}, [@document_id, {:name => "test"}, Hash])
@@ -163,13 +171,13 @@ module Drive
               :format => :json
             }
         assert_response :success
+        assert drive_service.verify
       end
     end
 
     test 'バージョン情報が不一致の場合、現在のバージョンと内容を付けて応答' do
-      drive_service = mock_drive_service
+      drive_service = mock_drive_service(2)
       expect_document_get(drive_service, @document_id)
-      drive_service.expect(:update_file, {}, [@document_id, {:name => "test"}, Hash])
 
       Google::Apis::DriveV3::DriveService.stub(:new, drive_service) do
         patch :update,
@@ -183,6 +191,7 @@ module Drive
         assert_response 409
         actual = JSON.parse(response.body)
         assert_equal ["id", "title", "description", "body", "markup", "version", "public"], actual.keys
+        assert drive_service.verify
       end
     end
 
@@ -199,7 +208,7 @@ module Drive
     end
 
     test '#updateはトークンが無効の場合401応答' do
-      drive_service = mock_drive_service
+      drive_service = mock_drive_service(1)
       drive_service.expect(:get_file, {}){ raise Google::Apis::AuthorizationError.new('') }
 
       Google::Apis::DriveV3::DriveService.stub(:new, drive_service) do
@@ -212,11 +221,12 @@ module Drive
             }
         assert_response 401
         assert_equal '{}', response.body
+        assert drive_service.verify
       end
     end
 
     test '#updateは書き込み権限がなければ403' do
-      drive_service = mock_drive_service
+      drive_service = mock_drive_service(2)
       expect_document_get(drive_service, @document_id, false)
 
       Google::Apis::DriveV3::DriveService.stub(:new, drive_service) do
@@ -228,6 +238,7 @@ module Drive
               :format => :json
             }
         assert_response :forbidden
+        assert drive_service.verify
       end
     end
   end

@@ -1,67 +1,12 @@
-<% @title = @document.title %>
+<% @title = '文書公開機能は廃止されました' %>
 
-<% cache @document do %>
-  <div class="document">
-    <div class="toc">
-      <div class="mdl-card mdl-shadow--2dp">
-        <div class="mdl-card__title">
-          <h2>
-            <%= link_to @document.title, "#content-#{@document.id}",
-              :id => "toc-#{@document.id}" %>
-          </h2>
-          <div class="author">
-            <%= image_tag @document.user.profile_image, :class => 'avater' if @document.user.profile_image.present? %>
-            <%= link_to_user @document.user.nickname, @document.user %>
-          </div>
-        </div>
-
-        <div class="mdl-card__supporting-text">
-          <ol>
-            <%= render :partial => 'documents/show/toc',
-              :collection => @document.body,
-              :locals => {:parent_index => ''} %>
-          </ol>
-        </div>
-      </div>
-    </div>
-
-    <div class="contents">
-      <div class="content">
-        <h3>
-          <%= link_to @document.title, "#toc-#{@document.id}", :id => "content-#{@document.id}" %>
-        </h3>
-
-        <div class="body">
-          <%= body({'body' => @document.description}, @document.markup) %>
-        </div>
-      </div>
-
-      <%= render :partial => 'documents/show/content',
-        :collection => @document.body,
-        :locals => {:parent_index => ''} %>
-    </div>
-  </div>
-  <div class="right-bottom-fab-spacer"></div>
-<% end %>
-
-<% if @document.user == @login_user %>
-  <div class="edit-button right-bottom-fab">
-    <!-- Colored FAB button with ripple -->
-    <%= button_to edit_document_path(@document), :method => :get,
-      :class => 'mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored' do %>
-      <i class="material-icons">edit</i>
-    <% end %>
-  </div>
-<% end %>
-
-<% content_for(:navigation1) do %>
-  <%= link_to document_path(@document, :format => :text), :class => 'mdl-navigation__link' do %>
-    <i class="material-icons">insert_drive_file</i>
-    テキスト形式で表示
-  <% end %>
-  <%= link_to document_path(@document, :format => :text, :type => :structured_text), :class => 'mdl-navigation__link' do %>
-    <i class="material-icons">file_download</i>
-    階層付きテキスト形式で保存
-  <% end %>
-  <hr>
-<% end %>
+<div class="document">
+  <h2>Googleドライブへの移行について</h2>
+  <p>
+    カケラの樹は文書をGoogleドライブに保存するようになりました。
+    それに伴い、本サイトでの文書公開機能は廃止されております。
+  </p>
+  <p>
+    今までの文書は移行処理を行うことでGoogleドライブにコピーされ、引き続きお使いいただけます。<%= link_to 'トップページ', root_path %>よりお手続き下さい。
+  </p>
+</div>

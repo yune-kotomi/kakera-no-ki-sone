@@ -16,20 +16,15 @@ Rails.application.routes.draw do
     :controller => 'users',
     :to => 'users#authorize_callback'
 
-  patch 'users/update', :to => 'users#update'
-  post 'users/update', :to => 'users#update'
-
-
   get 'users/login'
 
   get 'users/login_complete'
 
   get 'users/logout'
 
-  get 'documents/editor_demo', :to => 'documents#demo'
-  get 'documents/:id/histories', :to => 'documents#histories'
-  get 'documents/:id/diff', :to => 'documents#diff'
-  resources :documents
+  post 'documents/authorize', :to => 'documents#authorize'
+  post 'documents/migrate', :to => 'documents#migrate'
+  resources :documents, :only => [:index, :show]
 
   namespace :drive do
     get 'documents/new', :to => 'documents#new'

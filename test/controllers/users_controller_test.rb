@@ -110,50 +110,7 @@ class UsersControllerTest < ActionController::TestCase
     assert @response.header['Location'] =~ /logout/
   end
 
-  test "updateは署名が正当ならその内容でuserを更新する(Kitugachi認証サービスからのPOST)" do
-    payload = {
-      'id' => Sone::Application.config.authentication.service_id,
-      'profile_id' => @user.kitaguchi_profile_id,
-      'nickname' => 'new nickname',
-      'profile_text' => 'new profile text',
-      'profile_image' => 'http://www.hatena.ne.jp/users/ha/hatena/profile.gif',
-      'exp' => 5.minutes.from_now.to_i
-    }
-
-    post :update,
-      :params => {:token => JWT.encode(payload, Sone::Application.config.authentication.key)}
-
-    assert_response :success
-    assert_not_nil assigns(:user)
-    assert_equal 'new nickname', assigns(:user).nickname
-    assert_equal payload['profile_image'], assigns(:user).profile_image
-  end
-
-  test "updateは署名が不正なら蹴る(Kitugachi認証サービスからのPOST)" do
-    payload = {
-      'id' => Sone::Application.config.authentication.service_id,
-      'profile_id' => @user.kitaguchi_profile_id,
-      'nickname' => 'new nickname',
-      'profile_text' => 'new profile text',
-      'exp' => 5.minutes.from_now.to_i
-    }
-
-    post :update,
-      :params => {:token => JWT.encode(payload, 'wrong key')}
-
-    assert_response :forbidden
-  end
-
-  test "セッションが有効なら署名チェックせずに更新する(設定画面からのPOST)" do
-    params = {:user => {:default_markup => 'hatena'}, :format => :json}
-    patch :update,
-      :params => params,
-      :session => {:user_id => @user.id}
-    assert_response :success
-    assert 'hatena', assigns(:login_user).default_markup
-  end
-
-  test "show(format=rss)は公開文書のみを含むvalidなRSSを返す" do
+  test "show(format=rss)は404" do
     get :show,
       :params => {
         :domain_name => @user.domain_name,
@@ -161,17 +118,7 @@ class UsersControllerTest < ActionController::TestCase
         :format => :rss
       }
 
-    assert_response :success
-
-    assert_nothing_raised do
-      rss = RSS::Parser.parse(@response.body)
-      assert_not_nil rss
-
-      assert_equal @user.documents.where(:public => true).count, rss.items.size
-
-      titles = @user.documents.where(:public => true).map{|d| d.title}.sort
-      assert_equal titles, rss.items.map{|item| item.title }.sort
-    end
+    assert_response :missing
   end
 
   test "存在しないユーザを叩いたら404" do
@@ -180,45 +127,14 @@ class UsersControllerTest < ActionController::TestCase
     assert_response :missing
   end
 
-  test "showはゲストに公開文書のみを表示" do
+  test "showは404" do
     get :show,
       :params => {
         :domain_name => @user.domain_name,
         :screen_name => @user.screen_name
       }
 
-    assert_equal @user.documents.where(:public => true).count, assigns(:documents).size
-
-    titles = @user.documents.where(:public => true).map{|d| d.title}.sort
-    assert_equal titles, assigns(:documents).map(&:title).sort
-  end
-
-  test "showは他のユーザに公開文書のみを表示" do
-    get :show,
-      :params => {
-        :domain_name => @user.domain_name,
-        :screen_name => @user.screen_name
-      },
-      :session => {:user_id => @user2.id}
-
-      assert_equal @user.documents.where(:public => true).count, assigns(:documents).size
-
-      titles = @user.documents.where(:public => true).map{|d| d.title}.sort
-      assert_equal titles, assigns(:documents).map(&:title).sort
-  end
-
-  test "showはオーナーにも公開文書のみを表示" do
-    get :show,
-      :params => {
-        :domain_name => @user.domain_name,
-        :screen_name => @user.screen_name
-      },
-      :session => {:user_id => @user.id}
-
-      assert_equal @user.documents.where(:public => true).count, assigns(:documents).size
-
-      titles = @user.documents.where(:public => true).map{|d| d.title}.sort
-      assert_equal titles, assigns(:documents).map(&:title).sort
+    assert_response :missing
   end
 
   test '#authorizeはGoogleへリダイレクトさせてOAuth認可を得る' do

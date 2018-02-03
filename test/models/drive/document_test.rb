@@ -7,12 +7,14 @@ module Drive
       @token.save
 
       @drive_service = Minitest::Mock.new
-      2.times{ @drive_service.expect(:'authorization=', nil, [Google::Auth::UserRefreshCredentials]) }
+      @drive_service.expect(:'authorization=', nil, [Google::Auth::UserRefreshCredentials])
 
       @id = 'document-id'
     end
 
     test 'findで文書を取得できる' do
+      @drive_service.expect(:'authorization=', nil, [Google::Auth::UserRefreshCredentials])
+
       doc = open('test/fixtures/drive_document.html')
       metadata =
         Google::Apis::DriveV3::File.new.tap do |f|
@@ -30,6 +32,7 @@ module Drive
         assert_equal document.id, @id
         assert_equal document.body['title'], '新しい文書'
         assert_equal document.writable?, true
+        assert @drive_service.verify
       end
     end
 
@@ -43,6 +46,7 @@ module Drive
       Google::Apis::DriveV3::DriveService.stub(:new, @drive_service) do
         assert document.save(@token)
         assert_equal document.id, @id
+        assert @drive_service.verify
       end
     end
 
@@ -54,6 +58,7 @@ module Drive
       Google::Apis::DriveV3::DriveService.stub(:new, @drive_service) do
         assert document.save(@token)
         assert_equal document.id, @id
+        assert @drive_service.verify
       end
     end
   end
