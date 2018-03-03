@@ -41,6 +41,7 @@ class UsersController < ApplicationController
 
   def logout
     if session.delete(:user_id)
+      reset_session
       redirect_to Sone::Application.config.authentication.logout
     else
       reset_session
