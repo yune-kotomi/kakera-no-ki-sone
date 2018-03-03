@@ -1,5 +1,9 @@
 module Drive
   class DocumentsController < ApplicationController
+    def index
+      @documents, @next_page = Drive::Document.list(token, params[:next_page])
+    end
+
     def show
       @document = Drive::Document.find(params[:id], token)
 
