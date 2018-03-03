@@ -36,6 +36,30 @@ module Drive
       end
     end
 
+    test 'listで文書一覧を取得できる' do
+      @drive_service.expect(:'authorization=', nil, [Google::Auth::UserRefreshCredentials])
+
+      file =
+        Google::Apis::DriveV3::File.new.tap do |f|
+          f.id = @id
+          f.name = 'document name'
+        end
+      list =
+        Google::Apis::DriveV3::FileList.new.tap do |l|
+          l.files = [file]
+          l.next_page_token = 'next page token'
+        end
+      @drive_service.expect(:list_files, list) {|params| params.keys.sort == [:page_token, :order_by, :q].sort }
+
+      Google::Apis::DriveV3::DriveService.stub(:new, @drive_service) do
+        l, n = Drive::Document.list(@token)
+        f = l.first
+        assert_equal f.id, @id
+        assert_equal f.body['title'], 'document name'
+        assert_equal n, 'next page token'
+      end
+    end
+
     test '初回の#saveでは文書を新規作成する' do
       ret = Minitest::Mock.new
       ret.expect(:id, @id)

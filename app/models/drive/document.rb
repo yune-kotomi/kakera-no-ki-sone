@@ -98,5 +98,17 @@ module Drive
       drive.authorization = token.credential
       drive
     end
+
+    def self.list(token, next_page_token = nil)
+      list =
+        service(token).list_files(
+          :page_token => next_page_token,
+          :order_by => 'modifiedTime desc',
+          :q => "mimeType='text/html'"
+        )
+      documents = list.files.map{|s| Document.new(:id => s.id, :body => {'title' => s.name}) }
+
+      [documents, list.next_page_token]
+    end
   end
 end

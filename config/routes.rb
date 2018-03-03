@@ -28,7 +28,7 @@ Rails.application.routes.draw do
 
   namespace :drive do
     get 'documents/new', :to => 'documents#new'
-    resources :documents, :only => [:show, :update]
+    resources :documents, :only => [:index, :show, :update]
   end
 
   scope :drive do

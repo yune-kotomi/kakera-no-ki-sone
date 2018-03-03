@@ -12,7 +12,7 @@
     <%= yield :head %>
   </head>
 
-  <body class="<%= params[:controller] %>">
+  <body class="<%= params[:controller].gsub('/', '-') %>">
     <!-- Always shows a header, even in smaller screens. -->
     <div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
       <header class="mdl-layout__header">

@@ -40,9 +40,12 @@ class UsersController < ApplicationController
   end
 
   def logout
-    session.delete(:user_id)
-
-    redirect_to Sone::Application.config.authentication.logout
+    if session.delete(:user_id)
+      redirect_to Sone::Application.config.authentication.logout
+    else
+      reset_session
+      redirect_to root_path
+    end
   end
 
   def authorize
