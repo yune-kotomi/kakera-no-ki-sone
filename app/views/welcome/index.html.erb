@@ -40,27 +40,27 @@
         <i class="material-icons">library_books</i>
         文書一覧
       <% end %>
-    <% else %>
-      <%= button_to({:controller => :users, :action => :authorize},
-        :method => :get,
-        :class => 'mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect  mdl-button--accent',
-        :id => 'google-drive-authorize') do %>
-        Googleドライブで使う
-      <% end %>
-
-      <%= button_to({:controller => :users, :action => :login},
-        :method => :get,
-        :class => 'mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect') do %>
-        ログイン/文書を移行
-      <% end if @login_user.blank? %>
-
-      <%= button_to(documents_path,
-        :method => :get,
-        :class => 'mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect') do %>
-        <i class="material-icons">library_books</i>
-        文書の移行
-      <% end if @login_user.present? %>
     <% end %>
+
+    <%= button_to({:controller => :users, :action => :authorize},
+      :method => :get,
+      :class => 'mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect  mdl-button--accent',
+      :id => 'google-drive-authorize') do %>
+      Googleドライブで使う
+    <% end %>
+
+    <%= button_to({:controller => :users, :action => :login},
+      :method => :get,
+      :class => 'mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect') do %>
+      ログイン/文書を移行
+    <% end if @login_user.blank? %>
+
+    <%= button_to(documents_path,
+      :method => :get,
+      :class => 'mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect') do %>
+      <i class="material-icons">library_books</i>
+      文書の移行
+    <% end if @login_user.present? %>
   </div>
 </div>
 
