@@ -255,7 +255,7 @@ GEM
     rubyzip (1.2.1)
     rugged (0.26.0)
     safe_yaml (1.0.4)
-    sanitize (4.6.0)
+    sanitize (4.6.4)
       crass (~> 1.0.2)
       nokogiri (>= 1.4.4)
       nokogumbo (~> 1.4)
