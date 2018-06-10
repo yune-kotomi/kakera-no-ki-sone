@@ -1,3 +1,0 @@
-<%
-  doc = @document.attributes.select{|k, _| ["id", "title", "description", "body", "version", "markup", "public"].include?(k) }.to_h
-%><%= doc.to_json.html_safe %>
